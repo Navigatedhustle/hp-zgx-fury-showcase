@@ -1,0 +1,10 @@
+{
+ "notice":"FICTIONAL DEMONSTRATION DATA. Vela Ridge Instruments and every supplier, document, price and risk are invented. Read-only; no orders or messages are sent.",
+ "company":"Vela Ridge Instruments",
+ "scenario":{"id":"urgent-order","title":"An urgent order. A considered decision.","request":"Which supplier should Vela Ridge Instruments choose for 1,200 sensor housings by 5 November, within a £40,000 delivered budget?","as_of":"2026-10-22","needed_by":"2026-11-05","units":1200,"budget_gbp":40000,"min_on_time_pct":96,"required_certification":"ISO 9001","permitted_regions":["UK","EU"],"human_decision":"A purchasing manager must verify stock, the certificate, tax treatment and the final delivered quote before approving any order."},
+ "suppliers":[
+  {"id":"S1","name":"Quillstone Components","unit_price_gbp":31.60,"units":1200,"freight_gbp":420,"delivery_days":10,"on_time_pct":97.3,"iso9001_evidence_supplied":true,"data_region":"UK","evidence":"[DATA:S1]"},
+  {"id":"S2","name":"Marrowbay Fabrication","unit_price_gbp":28.90,"units":1200,"freight_gbp":760,"delivery_days":17,"on_time_pct":94.2,"iso9001_evidence_supplied":true,"data_region":"EU","evidence":"[DATA:S2]"},
+  {"id":"S3","name":"Juniper Arc Supply","unit_price_gbp":33.25,"units":1200,"freight_gbp":950,"delivery_days":7,"on_time_pct":98.7,"iso9001_evidence_supplied":false,"data_region":"UK","evidence":"[DATA:S3]"}
+ ]
+}

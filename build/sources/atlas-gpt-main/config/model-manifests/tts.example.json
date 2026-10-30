@@ -1,0 +1,7 @@
+{
+  "repo": "nvidia/magpie_tts_multilingual_357m",
+  "path": "${MODEL_STORAGE}/19806879b16d3f2ccf28fb112b1bcd16a3c7923e",
+  "patterns": [
+    "magpie_tts_multilingual_357m.v2607.f16.gguf"
+  ]
+}

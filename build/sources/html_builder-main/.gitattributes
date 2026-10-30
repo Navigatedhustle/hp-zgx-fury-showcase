@@ -1,0 +1,9 @@
+* text=auto
+*.sh text eol=lf
+*.woff2 binary
+*.png binary
+*.jpg binary
+*.pptx binary
+# The built UI is committed so nobody needs Node. Keep it byte-for-byte as Vite wrote it (LF): converting it
+# to CRLF on checkout made every rebuild show as modified and turned the next `git pull` into a conflict.
+frontend/dist/** -text

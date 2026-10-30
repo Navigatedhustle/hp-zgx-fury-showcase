@@ -1,0 +1,3 @@
+title = "Fury source secret scan"
+[extend]
+useDefault = true

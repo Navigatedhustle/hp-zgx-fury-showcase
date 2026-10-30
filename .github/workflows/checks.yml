@@ -1,0 +1,21 @@
+name: Source checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - run: bash ops/scan-secrets.sh
+      - run: python ops/check-source.py
+      - run: python ops/package-release.py --version v1.0.0
+      - run: pip install -r ops/apps-requirements.lock
+      - name: Hardware-independent controller and API failure fixtures
+        run: python -m pytest -q ops/tests ops/acceptance/test_gateway.py ops/acceptance/test_booth.py
+      # GPU/browser/namespace/model generation acceptance is intentionally separate.

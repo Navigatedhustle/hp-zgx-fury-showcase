@@ -1,0 +1,23 @@
+/* HP deck design tokens — derived from ZGX_Fury.html. Brand kit in /brand overrides these. */
+:root{
+  --ink:#0A0A0F; --navy:#15213F; --navy-2:#1B2A4E; --blue:#024AD8; --blue-2:#3B74F0;
+  --sky:#8FD3FF; --tint:#E8EEFC; --tint-2:#F4F6FE; --paper:#FFFFFF; --rule:#D3D8E6;
+  --mute:#565C6E; --faint:#6D7386; --track:#F2F4FA;
+  /* solid brand blue that always carries white text; never remapped by the dark themes */
+  --blue-solid:var(--blue);
+  --alert:#C81E3C; --alert-2:#A9152F; --alert-soft:#FBE9ED;
+  --good:#0B8F5E; --good-soft:#E3F4EC; --warn:#B86E00; --warn-soft:#FDF1DC;
+
+  --disp:'Archivo',-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:'PlexMono',ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;
+
+  /* type scale (px on a 1600x900 stage) */
+  --t-hero:60px; --t-title:50px; --t-h2:34px; --t-h3:22px; --t-lede:21px;
+  --t-body:17px; --t-small:15px; --t-micro:13px; --t-eyebrow:15px;
+
+  /* spacing */
+  --pad-y:64px; --pad-x:76px; --s-1:8px; --s-2:14px; --s-3:22px; --s-4:32px; --s-5:48px; --s-6:64px;
+  --r-s:9px; --r-m:14px; --r-l:18px;
+  --shadow-1:0 10px 34px rgba(10,16,40,.10); --shadow-2:0 24px 48px rgba(10,16,40,.20);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}

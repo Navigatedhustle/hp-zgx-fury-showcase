@@ -1,0 +1,1 @@
+Atlas source is MIT licensed. First-party ownership for the discovered projects was confirmed by the owner on 2026-10-10. Public distribution authorized 2026-10-30. Third-party terms and trademarks remain separate. See root THIRD_PARTY_NOTICES.md.

@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@font-face { font-family: "Archivo"; src: url("/fonts/Archivo-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Archivo"; src: url("/fonts/Archivo-600.woff2") format("woff2"); font-weight: 500 600; font-display: swap; }
+@font-face { font-family: "Archivo"; src: url("/fonts/Archivo-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Archivo"; src: url("/fonts/Archivo-800.woff2") format("woff2"); font-weight: 800 900; font-display: swap; }
+
+:root {
+  --canvas: #edf0f5;
+  --surface: #ffffff;
+  --surface-2: #f6f8fb;
+  --ink: #0e1422;
+  --muted: #5a6376;
+  --faint: #8a93a6;
+  --line: #d9dee8;
+  --line-2: #e7ebf2;
+  --accent: #024ad8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e6edfc;
+  --good: #0b8f5e;
+  --good-soft: #e2f3eb;
+  --warn: #a8660a;
+  --warn-soft: #fbf0dc;
+  --bad: #c81e3c;
+  --bad-soft: #fbe7eb;
+  --room: #161b26;
+  --room-2: #1f2533;
+  --room-line: #2c3445;
+  --room-ink: #e6eaf2;
+  --room-muted: #97a1b5;
+  --shadow: 0 1px 2px rgba(14, 20, 34, .06), 0 8px 24px rgba(14, 20, 34, .06);
+}
+.dark {
+  --canvas: #0f131b;
+  --surface: #171c26;
+  --surface-2: #1c2230;
+  --ink: #e8ecf3;
+  --muted: #a1aabb;
+  --faint: #6f7a8e;
+  --line: #2a3242;
+  --line-2: #232a38;
+  --accent: #3b78f5;
+  --accent-soft: #1b2a4a;
+  --good: #3cc48d;
+  --good-soft: #15302a;
+  --warn: #e0a444;
+  --warn-soft: #33291a;
+  --bad: #f2667e;
+  --bad-soft: #3a1c24;
+  --room: #0a0d13;
+  --room-2: #121722;
+  --room-line: #232b3a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+}
+
+@theme inline {
+  --font-sans: "Archivo", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-room: var(--room);
+  --color-room-2: var(--room-2);
+  --color-room-line: var(--room-line);
+  --color-room-ink: var(--room-ink);
+  --color-room-muted: var(--room-muted);
+  --shadow-card: var(--shadow);
+}
+
+html, body, #root { height: 100%; }
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "tnum" 1;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent-soft); }
+
+.scroll-thin { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.room .scroll-thin { scrollbar-color: var(--room-line) transparent; }
+
+@keyframes shimmer { 0% { background-position: -400px 0 } 100% { background-position: 400px 0 } }
+.shimmer {
+  background: linear-gradient(90deg, transparent 0, rgba(255, 255, 255, .06) 50%, transparent 100%) var(--room-2);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+.shimmer-light {
+  background: linear-gradient(90deg, transparent 0, rgba(14, 20, 34, .04) 50%, transparent 100%) var(--surface-2);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer, .shimmer-light { animation: none; }
+  *, *::before, *::after { transition-duration: 0s !important; }
+}
+
+.room kbd { background: var(--room-2); border-color: var(--room-line); color: var(--room-muted); }
+.room .on-light kbd { background: var(--surface-2); border-color: var(--line); color: var(--muted); }
+
+/* Fury showcase: common enterprise surfaces, type and focus rules. */
+.dark{--canvas:#101112;--surface:#191b1d;--surface-2:#242729;--ink:#f5f6f7;--muted:#b1b8bd;--faint:#929da4;--line:#3b4043;--line-2:#303639;--accent:#a4d943;--accent-ink:#151a0c;--accent-soft:#29331f;--room:#111413;--room-2:#202620;--room-line:#424c3a;--room-muted:#b1b8bd}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #80c9ee;outline-offset:3px}button{min-height:40px}h1{letter-spacing:-.04em}

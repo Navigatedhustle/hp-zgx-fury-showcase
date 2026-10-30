@@ -1,0 +1,7 @@
+{
+  "repo": "nvidia/Nemotron-3.5-ASR-Streaming-0.6B",
+  "path": "${MODEL_STORAGE}/ea30d66debe3740a08b573244286791d423d6b3e",
+  "patterns": [
+    "nemotron-3.5-asr-streaming-0.6b.q8_0.gguf"
+  ]
+}

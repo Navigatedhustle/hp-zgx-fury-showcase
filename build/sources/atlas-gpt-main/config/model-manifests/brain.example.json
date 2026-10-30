@@ -1,0 +1,7 @@
+{
+  "repo": "ggml-org/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF",
+  "path": "${MODEL_STORAGE}/8a08a1c81dadcc75d35dbb96016cfd344b632e67",
+  "patterns": [
+    "NVIDIA-Nemotron-3.5-Lightning-30B-A3B-Q4_0.gguf"
+  ]
+}

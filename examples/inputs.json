@@ -1,0 +1,11 @@
+{
+  "atlas": "What happens to Q4 profit if our Commit stage win rate drops by 8 percentage points?",
+  "presentation": "Explain reliable local AI workflows, evidence, human review, and next steps.",
+  "image": "A detailed botanical illustration of a red fox in an autumn garden, natural light, no text",
+  "factory_short": "Select the supplied fictional five-hotel travel brief in /devteam; enable automatic review to run all roles.",
+  "factory_complete": "Select complete travel mode, or python3 ops/factory-travel.py start. The immutable contract is examples/travel-specification.md.",
+  "operator": "Open /operator on port 8080 to inspect measured usage and resource status; no inference input is required.",
+  "speech": "What is our forecast revenue for the next quarter?",
+  "reference": "Start the separately labeled reference server using examples/reference-travel/README.md; discover a stay, register a fictional account, quote and reserve.",
+  "historical_source": "Supplier and research/sales sources and fictional fixtures are retained but retired by the active API. They are not live demos."
+}

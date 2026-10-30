@@ -1,0 +1,11 @@
+{
+  "repo": "jaredpalmer/kev-4b",
+  "path": "${MODEL_STORAGE}/6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+  "patterns": [
+    "*.json",
+    "*.safetensors",
+    "head.pt",
+    "*.txt",
+    "README.md"
+  ]
+}

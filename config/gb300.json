@@ -1,0 +1,18 @@
+{
+  "device_total_gib": 250.6865234375,
+  "lead_fraction": 0.6701596786948341,
+  "qwen_fraction": 0.12764946260853982,
+  "lead_gib": 168.0,
+  "qwen_gib": 32.0,
+  "reserve_gib": 10.0,
+  "model": "nvidia/DeepSeek-V4-Flash-NVFP4",
+  "revision": "e3cd60e7de98e9867116860d522499a728de1cf9",
+  "lead_context": 16384,
+  "lead_prefill": 8192,
+  "qwen_context": 65536,
+  "qwen_prefill": 8192,
+  "lead_sequences": 1,
+  "qwen_sequences": 4,
+  "runtime_vllm_version": "0.31.0",
+  "profile_note": "Public GB300 profile: 168 GiB lead engine allocation preserves 16384 context and one sequence; Qwen concurrency/context and gateway limits unchanged. Original live installation used 176 GiB lead."
+}

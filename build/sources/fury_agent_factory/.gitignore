@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+runs/
+*.sqlite*
+# Model-authored projects, local application databases and execution evidence
+devruns/
+devruns-archive/
+
+# Locally generated image assets; optional maintained UI resource.
+travel_portal/art-data.json

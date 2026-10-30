@@ -1,0 +1,12 @@
+'use strict';
+const assert=require('node:assert/strict');
+const stack=require('../static/devteam-stack.js');
+assert.equal(stack.friendly('fury-lead'),'DeepSeek V4 Flash');
+assert.equal(stack.friendly('unrecognized-route'),'unrecognized-route');
+const run={calls:[{model:'fury-lead',status:'complete',usage:{completion_tokens:120},current_tps:0},{model:'fury-lead',status:'generating',usage:{completion_tokens:40},current_tps:8},{model:'unsloth/Qwen3.6-27B-NVFP4',status:'complete',usage:{completion_tokens:900},current_tps:0}]};
+assert.deepEqual({...stack.summarize(run,'fury-lead'),calls:undefined},{calls:undefined,completed:1,generating:1,queued:0,admitted:0,output:160,unknown:false,rate:8});
+const unknown=stack.summarize({calls:[{model:'fury-lead',status:'queued',usage:null,current_tps:null}]},'fury-lead');assert.equal(unknown.output,0);assert.equal(unknown.unknown,true);assert.equal(unknown.rate,null);assert.equal(unknown.queued,1);assert.equal(unknown.generating,0);
+const finalOnly=stack.summarize({calls:[{model:'fury-lead',status:'complete',usage:{completion_tokens:20},current_tps:null}]},'fury-lead');assert.equal(finalOnly.output,20);assert.equal(finalOnly.rate,null);
+const stale=stack.summarize(run,'fury-lead',true);assert.equal(stale.rate,null);assert.equal(stale.generating,null);assert.equal(stale.output,160);
+assert.equal(stack.summarize({calls:[]},'fury-lead').output,0);
+console.log('PASS: friendly identity, route-only counts, queued/unknown/final-only usage, stale state, empty run');

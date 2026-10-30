@@ -1,0 +1,24 @@
+{
+  "as_of": "2026-10-15",
+  "frontier": [
+    {
+      "id": "low",
+      "name": "Published scenario low",
+      "vendor": "Selected range",
+      "input": 2,
+      "cached": 2,
+      "output": 12,
+      "source": "http://localhost:8080/methodology"
+    },
+    {
+      "id": "high",
+      "name": "Published scenario high",
+      "vendor": "Selected range",
+      "input": 10,
+      "cached": 10,
+      "output": 50,
+      "source": "http://localhost:8080/methodology"
+    }
+  ],
+  "same_size": []
+}

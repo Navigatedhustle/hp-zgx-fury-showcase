@@ -1,0 +1,21 @@
+brotli==1.2.0
+fastapi==0.141.1
+fonttools==4.65.0
+httpx==0.28.1
+lxml==6.1.3
+openai==3.14.1
+pillow==12.3.0
+playwright==1.63.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+pypdf==6.19.0
+pytest==9.1.1
+python-multipart==0.0.32
+python-docx==1.2.0
+python-pptx==1.0.2
+# PowerPoint COM rendering is Windows-only; the file must still install on the Linux box that
+# serves the model, and on CI. Everything else here is cross-platform.
+pywin32==312 ; sys_platform == "win32"
+sqlmodel==0.0.42
+sse-starlette==3.4.11
+uvicorn==0.53.0

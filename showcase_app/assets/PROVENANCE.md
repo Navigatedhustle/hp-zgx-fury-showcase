@@ -1,0 +1,1 @@
+Product diagrams and hp.svg are original neutral workstation diagrams created for this distribution; they are not HP or NVIDIA logos. image-sample.png is a labeled prebuilt synthetic output, separate from live image generation. Archivo and IBM Plex Mono fonts: SIL Open Font License 1.1; notices in licenses/. No vendor product photographs are included.

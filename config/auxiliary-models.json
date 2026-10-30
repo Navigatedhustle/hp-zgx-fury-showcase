@@ -1,0 +1,12 @@
+[
+  {
+    "name": "en_core_web_sm",
+    "version": "3.8.0",
+    "source": "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+    "sha256": "1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85",
+    "license": "MIT",
+    "format": "spaCy CPU English linguistic model, unquantized",
+    "required_by": "Misaki English G2P for Kokoro speech",
+    "delivery": "Installed by the hash-pinned direct wheel URL in ops/models-requirements.lock"
+  }
+]

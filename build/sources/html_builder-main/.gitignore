@@ -1,0 +1,21 @@
+# Environment and dependencies
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+frontend/node_modules/
+*.tsbuildinfo
+
+# Local config and user data (decks, uploads, library, usage ledger)
+.env
+data/
+evals/results/
+
+# Local only: AI assistant notes and working files, not part of the app
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+skill/ponytail/
+evals/baseline/
+backend/scripts/render_baseline.py
+ZGX_Fury.html

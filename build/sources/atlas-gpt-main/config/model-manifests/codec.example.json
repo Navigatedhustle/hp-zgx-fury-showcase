@@ -1,0 +1,7 @@
+{
+  "repo": "nvidia/nemo-nano-codec-22khz-1.89kbps-21.5fps",
+  "path": "${MODEL_STORAGE}/fc00890b604aa2de298d2641ffc6c5f6caf8c4d7",
+  "patterns": [
+    "nemo_nano_codec_22khz_1.89kbps_21.5fps.decoder.f16.gguf"
+  ]
+}
