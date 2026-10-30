@@ -174,7 +174,8 @@ function ProjectRow({ p, onDelete }: { p: Project; onDelete: (p: Project) => voi
     <div className="group relative flex items-center gap-4 rounded-xl border border-line bg-surface p-3 pr-2 transition-colors hover:border-faint">
       <Link to={`/p/${p.id}/${target}`} className="absolute inset-0 rounded-xl" aria-label={`Open ${p.deck_title || p.name}`} />
       <div className="relative hidden aspect-video w-32 shrink-0 overflow-hidden rounded-md bg-surface-2 ring-1 ring-line-2 sm:block">
-        {p.cover_slide_index && img ? <img src={urls.cover(p)} alt="" className="size-full object-cover" onError={() => setImg(false)} />
+        {/* Booth/composed decks have no uploaded raster cover; keep the honest icon fallback. */}
+        {p.filename && p.cover_slide_index && img ? <img src={urls.cover(p)} alt="" className="size-full object-cover" onError={() => setImg(false)} />
           : <div className="flex size-full items-center justify-center text-faint"><Presentation className="size-5" /></div>}
       </div>
       <div className="min-w-0 flex-1">
@@ -231,7 +232,7 @@ export default function Home() {
           Your next presentation<br className="hidden sm:block" /> starts here.
         </h1>
         <p className="mt-2.5 max-w-2xl text-[15px] leading-relaxed text-muted">
-          HP ZGX Fury powered by NVIDIA GB300. Start a short booth presentation or use the full authoring and conversion tools below. Fury host inference; Frankfurt access requires WAN.
+          HP ZGX Fury demo experience. Start a short booth presentation or use the full authoring and conversion tools below. Fury host inference; Frankfurt access requires WAN.
         </p>
         <div className="mt-7"><StartCards /></div>
         <LibraryStrip />

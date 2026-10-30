@@ -3,7 +3,7 @@
 import argparse,hashlib,json,stat,tarfile,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--version',default='v1.0.0');p.add_argument('--output',type=Path,default=ROOT/'dist');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--version',default='v2.0.0');p.add_argument('--output',type=Path,default=ROOT/'dist');a=p.parse_args()
 if not __import__('re').fullmatch(r'v\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?',a.version):raise SystemExit('Invalid version')
 files=json.loads((ROOT/'config/distribution-files.json').read_text());prefix='hp-zgx-fury-showcase-'+a.version;a.output.mkdir(parents=True,exist_ok=True)
 for name in files:

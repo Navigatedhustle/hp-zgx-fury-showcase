@@ -1,4 +1,4 @@
-# HP ZGX Fury showcase — community demonstration
+# HP ZGX Fury demo experience
 
 Run Atlas analytics, local presentation creation, an autonomous Agent Factory, image generation, speech, and a measured-token operator dashboard on one GB300. Use it to demonstrate several useful local AI workflows sharing a workstation, with generated applications, real browser previews, isolated Python backends and visible resource limits.
 
@@ -9,7 +9,7 @@ This is a demonstration project, with fictional data and public demonstration ac
 ## Download and launch
 
 ```bash
-git clone https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
+git clone --branch v2.0.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
 cd hp-zgx-fury-showcase
 ./launch.sh
 ```
@@ -37,6 +37,14 @@ The pinned model files total **193.91 GiB**; allow another 20–40 GiB for depen
 ```
 
 A desktop copy may require the file manager's **Allow Launching / Trust** action. The shortcut opens a terminal so installation progress and errors remain visible. Setup does not require Git even when launched from a ZIP. Administrator prerequisite installation can be required; it is never performed silently.
+
+## Present the HP experience
+
+The home page has direct demo launches, customer tasks, sample inputs, a shared-AI walkthrough, and sourced HP system/software content. Start with the customer’s task, then show the actual output and evidence. [Presenter guide](docs/PRESENTER.md) · [HP claims](docs/HP-CLAIMS.md) · [Design reference](docs/HP-DESIGN.md) · [V2 verification](docs/V2-VERIFICATION.md).
+
+![HP demo home](docs/screenshots/home.png)
+
+The shared light-first shell uses the official owner-supplied HP logo with white keyline and local system fonts. Dark adaptation follows the system until a visitor selects a theme. No licensed HP font files or external marketing/font services are required. HP Z Toolkit and HP Z Runtime are explained as available HP capabilities; this demo actually uses its existing vLLM/gateway stack.
 
 ## Use the showcase
 
@@ -66,3 +74,26 @@ Generated code can fail validation; failed work stays diagnosable and is not sil
 If setup is interrupted, rerun `./launch.sh setup`; downloads resume through Hugging Face metadata. A checksum failure identifies the file to remove before retrying. For missing GPU/toolchain/Chromium/namespace prerequisites, see [troubleshooting](docs/PREREQUISITES.md). For occupied ports, stop the other installation using its own controller; never kill a process based only on a port. Inspect `logs/COMPONENT.log` and `./launch.sh diagnostics`. To recover a failed component, wait for active work, use guarded recovery, then retry your own job. Back up runtime output before deleting it. There is no automatic reset or infinite restart loop.
 
 [QUICKSTART](QUICKSTART.md) · [Architecture](docs/ARCHITECTURE.md) · [Assets/models](docs/ASSET-MANIFEST.md) · [Verification](docs/VERIFICATION.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [MIT source license](LICENSE)
+
+## Upgrade and rollback
+
+V1 remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
+
+For a Git checkout with clean tracked source:
+
+```bash
+./launch.sh stop
+git switch --detach v2.0.0
+./launch.sh
+```
+
+To roll back:
+
+```bash
+./launch.sh stop
+git switch --detach v1.0.0
+./launch.sh setup  # explicitly rebuild V1 editor; V1's old stamp does not hash UI source
+./launch.sh
+```
+
+For archive installs, keep the previous release directory and its own environments/output. Stop the current installation through its own launcher, then launch the previous one. Do not copy process registries between directories. Back up outputs first; this UI release changes no application database schema.

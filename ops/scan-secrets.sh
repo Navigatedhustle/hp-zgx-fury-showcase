@@ -24,4 +24,4 @@ for name in json.loads((root/'config/distribution-files.json').read_text()):
  p=dest/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(root/name,p)
 PY
 "$scanner/gitleaks" dir "$selected" --config .gitleaks.toml --redact
-if [[ -d .git ]]; then "$scanner/gitleaks" git . --config .gitleaks.toml --log-opts=--all --redact; fi
+if git rev-parse --git-dir >/dev/null 2>&1; then "$scanner/gitleaks" git . --config .gitleaks.toml --log-opts=--all --redact; fi

@@ -67,7 +67,7 @@ def icons() -> dict[str, str]:
 
 
 def default_logo() -> Path:
-    for p in (BRAND_DIR / "hp.svg", BRAND_DIR / "hp.svg", RUNTIME_DIR / "img" / "hp.svg"):
+    for p in (Path(__file__).resolve().parents[5] / "showcase_app/assets/hp-logo-keyline.png", BRAND_DIR / "hp.svg", RUNTIME_DIR / "img" / "hp.svg"):
         if p.exists():
             return p
     raise FileNotFoundError("HP logo missing")

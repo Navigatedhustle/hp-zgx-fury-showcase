@@ -23,3 +23,7 @@ The first cold engine launch also obtains architecture-specific FlashInfer kerne
 Setup also downloads version-pinned Python wheels (locks in `ops/`), Node 24.22.0 (SHA-256 in bootstrap), uv 0.13.1 (SHA-256 in bootstrap), Chromium from the pinned Playwright package and locked npm dependencies. It extracts Ubuntu Python headers locally from the recipient's configured OS repository. Wheels/browser/system dependencies retain upstream terms. No GPU driver, CUDA toolkit or kernel is redistributed. There are no bundled containers: the tested deployment uses three project-local Python environments.
 
 Excluded: personal credentials, SSH keys, authentication/browser profiles, network identity state, original Git history, internal planning documents, customer outputs, model caches/weights, old run logs/databases, private runtime image bundles, environments and machine reports. The reference consists only of reviewed source and fictional seed logic, with a newly initialized database when run.
+
+## V2 identity assets
+
+Bundled hp-logo-keyline.png is the owner-supplied official HP HEX PNG, unchanged (source and SHA-256 in assets/PROVENANCE.md). HP trademark rights apply separately from MIT source licensing. Raw logo/stripe ZIPs and licensed HP fonts are excluded. The optional stripe is unused. All shared shell assets render locally without external fonts or marketing services.

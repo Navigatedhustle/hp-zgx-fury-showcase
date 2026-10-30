@@ -11,3 +11,7 @@ Models are downloaded separately under their upstream licenses; exact sources an
 The frontend bundles React/React DOM (MIT), Vite tooling (MIT), dnd-kit (MIT), Radix (MIT), TanStack Query (MIT), Sigma/Graphology (MIT), and Lucide (ISC), among others. Exact versions and registry integrity values are in package-lock.json. `licenses/npm/` retains installed npm license/notice files, and `licenses/dependency-inventory.json` records installed dependency license metadata. Metadata is an inventory, not legal advice or a blanket compatibility claim. Source release excludes environments and node_modules; dependencies are installed from upstream distributions with their original notices.
 
 Inactive historical Atlas engines and optional presentation model launch scripts are retained as source for context; their models are not active requirements. Historical Atlas LICENSES.md describes those old variants and must not be interpreted as the current launch profile. Use the root asset manifest for active requirements.
+
+## HP identity in V2
+
+The official HP Electric Blue logo with white keyline is an unchanged asset supplied by the owner for this HP demonstration. HP trademarks remain HP property; the source MIT license does not cover the mark or confer general trademark permissions. No licensed HP fonts are distributed.

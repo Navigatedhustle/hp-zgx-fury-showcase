@@ -1,7 +1,7 @@
 'use strict';
 window.KnowledgeView=class {
  constructor(canvas){
-  this.canvas=canvas;this.ctx=canvas.getContext('2d');this.nodes=[];this.edges=[];this.active=new Set();this.zoom=1;this.pan={x:0,y:0};this.colors=['#74bdff','#67dfd0','#baa3ff','#f5c07c','#ff9ebf','#8ad3f0','#aaaaff','#c7dd91','#e3bca4','#7be7e3','#c69dff','#f2cfaa'];
+  this.canvas=canvas;this.ctx=canvas.getContext('2d');this.nodes=[];this.edges=[];this.active=new Set();this.zoom=1;this.pan={x:0,y:0};this.colors=['#1A1A1A','#6B6B6B','#1A1A1A','#6B6B6B'];
   this.yaw=.35;this.pitch=-.22;this.autoRotate=!matchMedia('(prefers-reduced-motion: reduce)').matches;this.pointerInside=false;this.frame=null;this.lastFrame=0;this.mesh=this.createMesh();
   const el=id=>document.getElementById(id);
   el('brain-search').oninput=()=>this.filter();el('brain-type').onchange=()=>this.filter();

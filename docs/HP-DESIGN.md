@@ -1,0 +1,17 @@
+# HP experience design reference
+
+Binding basis: owner-supplied V2 design requirements. Also checked [HP Brand Central](https://www.hp.com/us-en/hp-information/brandcentral/our-visual-identity.html) on 2026-10-30. Where general marketing guidance differs, the owner's software design requirements govern this implementation.
+
+One HP identity, light-first white surfaces, screen black #1A1A1A text, Electric Blue #024AD8 for the logo, links, focus, progress and primary actions. No decorative gradients, neon, glass, invented product mark or blue hero/card backgrounds. Information uses text and labels as well as state styling.
+
+Central tokens: showcase_app/assets/hp-tokens.css. Semantic aliases in hp-shell.css and the editor map existing components to those tokens. Spacing uses the 4px grid: 4, 8, 12, 16, 24, 32, 48, 64. Corners use 12/16px. Working gray values #F7F7F7/#F2F2F2/#E5E5E5/#6B6B6B remain owner-supplied approximations, not asserted official values. Dark panel #262626 and secondary text #D6D6D6 are explicitly provisional functional neutrals. Official status/interactive tones were not established; status remains neutral with explicit text. Official Brand Central palette images identify Orange Bloom baseline #FF5050 and Power Storm baseline #6D9AAB (orange_bloom.png / power_srtorm.png under /content/dam/sites/worldwide/hp-information/visual-identity/). They remain unused. No official status/interactive mapping was established; secondary brand colors are not assumed to mean success or error.
+
+Official supplied logo: original HEX/_logo_HP_Electric_Blue_keyline_HEX.png from HP_Logo_White_Keyline.zip, SHA-256 8512968c0c2f53d72a077fe0d482946d6f58f7b3105f497da111a60ee06fd5cb. It is unchanged, local, 48px square, proportional, with >=12px clear space and its original white keyline. The horizontal home lockup is at most two lines, black on light and white on dark. Owner supplied the approved asset for this authorized public demonstration. The HP mark remains HP property, is not MIT-licensed and grants no general trademark rights. No raw archive or licensed fonts are published. No SVG was supplied; the official PNG is used without tracing/conversion.
+
+Official stripe Illustrator assets were supplied in 100/500/1000 scales. Stripes are optional and omitted from the UI; no geometry has been invented. Primary buttons may therefore be blue. No fabricated supporting palette or image framing is required.
+
+Font stack: "Forma DJR UI", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif. No licensed HP fonts or Inter downloads are bundled/required. Locally installed licensed Forma can be used by its owner; public rendering works with system fonts. Bundled OFL fonts retained for existing export compatibility.
+
+Dark adaptation follows system preferences until the visitor selects a theme. The persisted hp-experience-theme key is UI preference only. Dark interactive elements/focus use white instead of core blue. The logo retains its original blue and white keyline. Reduced-motion rules disable decorative transitions; charts respect the preference.
+
+Accessibility target: WCAG 2.2 AA. Verification records measured contrast, browser audits and keyboard inspection; automation alone does not certify conformance. Native buttons/links, named controls, visible focus, skip links, >=44px controls and labeled previews are preserved. Generated customer applications and historical output are not restyled by this shell.

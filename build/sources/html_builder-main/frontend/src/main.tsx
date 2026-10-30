@@ -15,7 +15,7 @@ const Library = lazy(() => import("./pages/Library"));
 
 // apply saved theme before first paint
 try {
-  const t = localStorage.getItem("theme") || "dark";
+  const t = localStorage.getItem("hp-experience-theme") || "system";
   document.documentElement.classList.toggle("dark", t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches));
 } catch { /* storage unavailable */ }
 

@@ -1,1 +1,3 @@
 Product diagrams and hp.svg are original neutral workstation diagrams created for this distribution; they are not HP or NVIDIA logos. image-sample.png is a labeled prebuilt synthetic output, separate from live image generation. Archivo and IBM Plex Mono fonts: SIL Open Font License 1.1; notices in licenses/. No vendor product photographs are included.
+
+V2: hp-logo-keyline.png is the unchanged official owner-supplied HEX PNG from HP_Logo_White_Keyline.zip. SHA-256 8512968c0c2f53d72a077fe0d482946d6f58f7b3105f497da111a60ee06fd5cb. Used for this authorized HP demo; remains HP trademark property, excluded from MIT license. No broad trademark license implied. Original ZIPs, Illustrator/PDF files and licensed fonts are not bundled. See docs/HP-DESIGN.md.

@@ -1,15 +1,14 @@
-import * as Dropdown from "@radix-ui/react-dropdown-menu";
-import { BarChart3, Library, Monitor, Moon, Sun } from "lucide-react";
+import { BarChart3, Library } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { useHealth, useTheme } from "../lib/hooks";
+import { useHealth } from "../lib/hooks";
 import { cn } from "../lib/util";
 import { Tip } from "./ui";
 
 export function Logo() {
   return (
     <Link to="/" className="flex items-center gap-2.5 rounded-md" aria-label="Deck Builder home">
-      <img src="/showcase-assets/hp.svg" className="size-9 bg-white p-1.5 rounded-sm" alt="HP" />
+
       <span className="text-[15px] font-bold tracking-tight">Presentation Creator</span>
     </Link>
   );
@@ -29,7 +28,7 @@ function ModelStatus() {
   const line = (e: typeof llm) =>
     `${e?.model}${e?.max_model_len ? ` · ${Math.round(e.max_model_len / 1000)}k context` : ""}`;
   const detail = isError
-    ? "The Deck Builder server isn't responding. Start it with run.ps1."
+    ? "The Deck Builder server isn't responding. Use ./launch.sh status and diagnostics."
     : llm?.mock
       ? "LLM_MOCK is on: slides are built from templates, not by the model."
       : half
@@ -52,31 +51,9 @@ function ModelStatus() {
   );
 }
 
-function ThemeMenu() {
-  const [theme, setTheme] = useTheme();
-  const Icon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
-  return (
-    <Dropdown.Root>
-      <Dropdown.Trigger aria-label="Theme" className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-2 hover:text-ink">
-        <Icon className="size-4" />
-      </Dropdown.Trigger>
-      <Dropdown.Portal>
-        <Dropdown.Content align="end" sideOffset={6} className="z-50 min-w-36 rounded-xl border border-line bg-surface p-1 shadow-card">
-          {([["light", "Light", Sun], ["dark", "Dark", Moon], ["system", "Match system", Monitor]] as const).map(([k, l, I]) => (
-            <Dropdown.Item key={k} onSelect={() => setTheme(k)}
-              className={cn("flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm outline-none data-[highlighted]:bg-surface-2", theme === k && "font-semibold text-accent")}>
-              <I className="size-4" />{l}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Content>
-      </Dropdown.Portal>
-    </Dropdown.Root>
-  );
-}
-
 export function TopBar({ children }: { children?: ReactNode }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-canvas/90 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-line bg-surface">
       <div className="flex h-14 items-center gap-4 px-4 sm:px-6">
         <a href="http://localhost:8080" className="text-xs text-accent">← All experiences</a><Logo />
         <div className="flex min-w-0 flex-1 items-center gap-3">{children}</div>
@@ -91,7 +68,7 @@ export function TopBar({ children }: { children?: ReactNode }) {
             <BarChart3 className="size-4" />
           </Link>
         </Tip>
-        <ThemeMenu />
+
       </div>
     </header>
   );

@@ -1,3 +1,7 @@
+# HP ZGX Fury demo experience — V2
+
+Open the home page at http://localhost:8080 for Demos, Why HP ZGX Fury, Shared AI and the presenter guide. Use [PRESENTER.md](docs/PRESENTER.md) for talk tracks and recovery.
+
 # Quickstart
 
 Use the tested Ubuntu 24.04 ARM64 GB300 host with its existing working driver, CUDA toolkit and [prerequisites](docs/PREREQUISITES.md). Reserve 350 GiB free disk for first setup; models alone download about 194 GiB.
