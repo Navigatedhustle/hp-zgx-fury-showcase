@@ -3,6 +3,7 @@ import asyncio,json,re,threading,uuid,time,logging
 from contextvars import ContextVar
 import httpx
 from pathlib import Path
+from showcase_app.ui import header as hp_header
 from fastapi import APIRouter,HTTPException,Request
 from fastapi.responses import FileResponse,StreamingResponse,HTMLResponse,Response
 from pydantic import BaseModel,ConfigDict
@@ -236,12 +237,12 @@ async def resume():
 @router.get('/travel/{rid}')
 async def travel_page(rid:str):
  r=travel_lookup(rid)
- return HTMLResponse('''<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aster Journeys · Local demonstration</title><style>body{margin:0}iframe{border:0;width:100%;height:100vh}#notice{padding:20px;font-family:system-ui}</style></head><body><div id="notice">Loading the last verified application…</div><iframe id="app" sandbox="allow-scripts allow-forms allow-modals" title="Aster Journeys"></iframe><script>
+ return HTMLResponse('''<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aster Journeys · Local demonstration</title><link rel="stylesheet" href="/showcase-assets/hp-shell.css"><script defer src="/showcase-assets/hp-shell.js"></script><script defer src="/showcase-assets/device-navigation.js"></script><style>body{margin:0}iframe{border:0;width:100%;height:calc(100vh - 112px);min-height:600px}#notice{padding:20px;font-family:system-ui}</style></head><body>'''+hp_header()+'''<main id="main"><div id="notice">Loading the last verified application…</div><iframe id="app" sandbox="allow-scripts allow-forms allow-modals" title="Aster Journeys"></iframe><script>
  const rid='''+json.dumps(rid)+''';let token=sessionStorage.getItem('travel-token-'+rid)||'';
  const frame=document.getElementById('app');frame.src='/api/travel/'+rid+'/frame';
  window.addEventListener('message',async e=>{if(e.source!==frame.contentWindow||e.data?.kind!=='travel-api')return;const d=e.data;try{const response=await fetch('/api/travel/'+rid+'/backend',{method:'POST',headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})},body:JSON.stringify({method:d.method,path:d.path,body:d.body||{}})});const result=await response.json();if(!response.ok)throw Error(result.detail||'Backend unavailable');if(result.body?.token){token=result.body.token;sessionStorage.setItem('travel-token-'+rid,token)}if(d.path==='/logout'){token='';sessionStorage.removeItem('travel-token-'+rid)}e.source.postMessage({kind:'travel-result',id:d.id,response:result},'*')}catch(err){e.source.postMessage({kind:'travel-result',id:d.id,error:err.message},'*')}});
  frame.onload=()=>document.getElementById('notice').hidden=true;
- </script></body></html>''',headers={'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; frame-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"})
+ </script></main></body></html>''',headers={'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; frame-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"})
 @router.get('/api/travel/{rid}/frame')
 async def travel_frame(rid:str):
  r=travel_lookup(rid)

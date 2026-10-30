@@ -7,7 +7,7 @@ import argparse,asyncio,json,time
 from pathlib import Path
 from playwright.async_api import async_playwright
 ROOT=Path(__file__).resolve().parents[2]
-PAGES=[('home',8080,'/'),('atlas',8200,'/'),('slides',8765,'/booth'),('factory',8501,'/devteam'),('image',8800,'/'),('operator',8080,'/operator'),('editor',8765,'/'),('connect',8080,'/connect')]
+PAGES=[('home',8080,'/'),('atlas',8200,'/'),('slides',8765,'/booth'),('factory',8501,'/devteam'),('image',8800,'/'),('operator',8080,'/operator'),('editor',8765,'/'),('connect',8080,'/connect'),('methodology',8080,'/methodology')]
 def lum(value):
  v=[int(value[i:i+2],16)/255 for i in (0,2,4)];v=[x/12.92 if x<=.04045 else ((x+.055)/1.055)**2.4 for x in v];return sum(x*w for x,w in zip(v,[.2126,.7152,.0722]))
 def contrast(a,b):
@@ -19,6 +19,7 @@ async def main(a):
  async with async_playwright() as p:
   browser=await p.chromium.launch(args=['--no-sandbox'])
   for name,port,path in PAGES:
+   if a.only and name not in a.only:continue
    for mode,width,height in [('light',1440,1000),('light',1280,800),('light',390,844),('dark',1440,1000)]:
     ctx=await browser.new_context(viewport={'width':width,'height':height},color_scheme=mode,reduced_motion='reduce',bypass_csp=bool(a.axe));page=await ctx.new_page();errors=[];bad=[]
     page.on('pageerror',lambda e:errors.append(str(e)))
@@ -32,6 +33,8 @@ async def main(a):
     for sel in ['.hp-theme','.hp-shell nav a']:
      for item in await page.locator(sel).all():
       box=await item.bounding_box();assert box['height']>=44
+    if name in ['slides','image']:
+     assert not await page.get_by_role('button',name='Cancel job',exact=True).is_visible(),name+' idle cancel control'
     if name=='home':
      for anchor in ['catalog','why','concurrency','presenter']:assert await page.locator('#'+anchor).count()==1
      assert await page.locator('[data-copy]').count()==4
@@ -49,4 +52,4 @@ async def main(a):
   await browser.close()
  (out/'report.json').write_text(json.dumps({'contrast_ratios':ratios,'pages':results,'scope':'Chromium on tested host; automation is not complete WCAG certification'},indent=2));print(out)
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--host',default='localhost');p.add_argument('--output',type=Path,default=ROOT/'reports/hp-ui');p.add_argument('--axe',type=Path);asyncio.run(main(p.parse_args()))
+ p=argparse.ArgumentParser();p.add_argument('--host',default='localhost');p.add_argument('--only',nargs='+');p.add_argument('--output',type=Path,default=ROOT/'reports/hp-ui');p.add_argument('--axe',type=Path);asyncio.run(main(p.parse_args()))
