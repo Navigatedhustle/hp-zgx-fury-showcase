@@ -10,7 +10,7 @@ document.querySelector('form').addEventListener('submit',async e=>{e.preventDefa
 (async()=>{await furyApi('GET','/hotels');await refresh()})();'''
 @unittest.skipUnless(available(),'Linux isolation unavailable')
 class FeedbackTests(unittest.TestCase):
- def exercise(self,fixed,duplicate=False):
+ def exercise(self,fixed,duplicate=False,navigation=False,broken=False):
   with tempfile.TemporaryDirectory() as folder:
    root=Path(folder);code=root/'code';code.mkdir()
    (code/'backend.py').write_text((Path(__file__).parents[1]/'devteam_reference.py').read_text())
@@ -18,6 +18,9 @@ class FeedbackTests(unittest.TestCase):
    (code/'index.html').write_text(HTML.replace('<body>','<body><div id="hidden-history" hidden></div>') if duplicate else HTML);(code/'styles.css').write_text('body{color:black}')
    script=JS.replace('REPLACE','clearTimeout(timer);' if fixed else '')
    if duplicate:script=script.replace("document.getElementById('reservations').textContent=","document.getElementById('hidden-history').textContent=r.body.bookings.map(b=>b.guest).join(' ');document.getElementById('reservations').textContent=")
+   if navigation:
+    (code/'index.html').write_text(HTML.replace('<body>','<body><nav><button id=show>Bookings</button></nav><section id=pane hidden>').replace('</body>','</section></body>'))
+    if not broken:script="document.getElementById('show').onclick=()=>document.getElementById('pane').hidden=false;\n"+script
    (code/'app.js').write_text(script)
    asyncio.run(check_frontend(code,root/'data',inventory_checks=False))
  def test_stale_success_timer_is_rejected(self):
@@ -25,3 +28,8 @@ class FeedbackTests(unittest.TestCase):
  def test_cleared_prior_timer_preserves_conflict(self):self.exercise(True)
 
  def test_hidden_duplicate_does_not_hide_visible_reservation(self):self.exercise(True,duplicate=True)
+
+ def test_functional_button_navigation_is_accepted(self):self.exercise(True,navigation=True)
+
+ def test_broken_button_navigation_is_still_rejected(self):
+  with self.assertRaisesRegex(ValueError,'navigation'):self.exercise(True,navigation=True,broken=True)

@@ -55,14 +55,7 @@ async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inven
    # delayed-success timer that erased a later real409 during the long soak.
    controls=frame.get_by_label(re.compile('guest|your name|full name',re.I)).first
    if not await controls.count():raise ValueError('Generated booking form lacks an accessible guest field')
-   if not await controls.is_visible():
-    ancestors=await controls.evaluate('(x)=>{const ids=[];for(let p=x.parentElement;p;p=p.parentElement)if(p.id)ids.push(p.id);return ids}')
-    for target in ancestors:
-     link=frame.locator('a[href="#'+target+'"]')
-     if await link.count():
-      await link.first.focus();await link.first.press('Enter')
-      if await controls.is_visible():break
-   if not await controls.is_visible():raise ValueError('Generated navigation does not reveal the booking form')
+   await reveal_control(frame,controls)
    form=frame.locator('form').filter(has=controls).first
    selector=form.locator('select').first;day=form.locator('input[type=date]').first
    submit=form.locator('button[type=submit],button:not([type]),input[type=submit]').first
@@ -86,7 +79,7 @@ async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inven
 
 
 async def reveal_control(frame,control):
- if not await control.count():raise ValueError('Generated inventory needs accessible city and price sorting controls')
+ if not await control.count():raise ValueError('Generated application lacks a required accessible control')
  if await control.is_visible():return
  ancestors=await control.evaluate('(x)=>{const ids=[];for(let p=x.parentElement;p;p=p.parentElement)if(p.id)ids.push(p.id);return ids}')
  for target in ancestors:
@@ -94,7 +87,12 @@ async def reveal_control(frame,control):
   if await link.count():
    await link.first.focus();await link.first.press('Enter')
    if await control.is_visible():return
- raise ValueError('Generated navigation cannot reveal the inventory controls')
+ # Button and tab navigation is as valid as an anchor; exercise the actual UI.
+ for link in await frame.locator('nav button, nav [role=tab], [role=tablist] [role=tab]').all():
+  if await link.is_visible():
+   await link.focus();await link.press('Enter')
+   if await control.is_visible():return
+ raise ValueError('Generated navigation cannot reveal the requested control')
 
 async def inventory_cards(listing):
  cards=listing.locator('article:visible,.hotel-card:visible,.property-card:visible,[role="listitem"]:visible')

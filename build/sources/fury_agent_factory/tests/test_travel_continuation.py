@@ -241,3 +241,67 @@ def test_generated_tests_report_real_non_inference_progress(tmp_path,monkeypatch
  assert '2/2: test_two' in r.product['next_action']
  assert [e['name'] for e in r.events if e['kind']=='test case started']==['test_one','test_two']
  assert not r.calls
+
+
+def test_syntax_retry_receives_rejected_owned_file_without_merging_it(tmp_path):
+ r=TravelRun(store=tmp_path/'runs');seen=[];invalid='def broken():\nwrong indentation\n'
+ async def call(client,title,actor,model,prompt,source,task_id):
+  seen.append(source)
+  if len(seen)==1:return {'files':{'db.py':invalid},'summary':'intentional invalid fixture'}
+  assert (source/'db.py').read_text()==invalid
+  assert not (r.candidate/'db.py').exists(), 'Rejected source must stay unpublished'
+  assert 'indent' in prompt
+  r.calls.append({'id':'fixture'})
+  return {'files':{'db.py':'def connect(path):\n return None\n'},'summary':'syntax-only regression fixture'}
+ r.call=call
+ asyncio.run(r.ticket(None,'Travel database','db.py','fixture',r.tasks[1]))
+ assert len(seen)==2 and r.tasks[1]['status']=='merged'
+ assert (r.candidate/'db.py').read_text().startswith('def connect')
+
+
+@pytest.mark.parametrize('prompt_tokens,expected',[(7000,8192),(10000,6256)])
+def test_travel_qa_output_uses_available_verified_context(tmp_path,prompt_tokens,expected):
+ import httpx
+ r=TravelRun(store=tmp_path/'runs');seen=[]
+ def handle(request):
+  payload=json.loads(request.content)
+  if request.url.path.endswith('/tokenize'):return httpx.Response(200,json={'count':prompt_tokens,'max_model_len':16384})
+  seen.append(payload['max_tokens']);assert payload['max_tokens']+prompt_tokens+128<=16384
+  result=json.dumps({'summary':'explicit transport regression, no real inference','files':{'test_backend.py':'def test_fixture():\n assert True\n'}})
+  frame={'choices':[{'delta':{'content':result},'finish_reason':'stop'}],'usage':{'prompt_tokens':prompt_tokens,'completion_tokens':1,'total_tokens':prompt_tokens+1}}
+  return httpx.Response(200,text='data: '+json.dumps(frame)+'\n\ndata: [DONE]\n\n')
+ async def call():
+  async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as client:await r.call(client,'Travel independent QA','daniel',travel_run.LEAD,'fixture')
+ asyncio.run(call());assert seen==[expected]
+
+
+def test_travel_dependencies_describe_the_actual_sequential_generated_chain(tmp_path):
+ r=TravelRun(store=tmp_path/'runs');generated=[t for t in r.tasks if not t.get('source')]
+ assert generated[0]['dependencies']==[]
+ for before,after in zip(generated,generated[1:]):assert after['dependencies']==[before['title']]
+ assert all(t['status']=='merged' for t in r.tasks if t.get('source'))
+
+
+def test_missing_backend_import_is_repaired_before_merge(tmp_path):
+ from devteam_sandbox import available
+ if not available():pytest.skip('Requires the installed namespace runner')
+ r=TravelRun(store=tmp_path/'runs');attempts=[];invalid='import unavailable_admin_module\ndef handle(request,db_path):\n return {}\n'
+ async def call(client,title,actor,model,prompt,source,task_id):
+  attempts.append(prompt);r.calls.append({'id':'fixture-'+str(len(attempts))})
+  if len(attempts)==1:return {'files':{'backend.py':invalid},'summary':'Intentional invalid import fixture'}
+  assert 'unavailable_admin_module' in prompt
+  assert (source/'backend.py').read_text()==invalid
+  assert not (r.candidate/'backend.py').exists()
+  return {'files':{'backend.py':'def handle(request,db_path):\n return {"status":200,"body":{"ready":True}}\n'},'summary':'Health-only controller fixture'}
+ r.call=call
+ asyncio.run(r.ticket(None,'Travel API integration','backend.py','fixture',r.tasks[6]))
+ assert len(attempts)==2 and r.tasks[6]['status']=='merged'
+
+
+def test_qa_import_failure_is_returned_to_the_repair_loop(tmp_path):
+ from devteam_sandbox import available
+ if not available():pytest.skip('Requires the installed namespace runner')
+ r=TravelRun(store=tmp_path/'runs');(r.candidate/'test_backend.py').write_text('import unavailable_qa_fixture_module\n')
+ result=asyncio.run(r.generated_qa(0))
+ assert result['passed'] is False and result['tests']==0
+ assert 'unavailable_qa_fixture_module' in result['log']

@@ -9,6 +9,10 @@ async def reveal(frame,control):
   if await link.count():
    await link.first.focus();await link.first.press('Enter')
    if await control.is_visible():return
+ for link in await frame.locator('nav button, nav [role=tab], [role=tablist] [role=tab]').all():
+  if await link.is_visible():
+   await link.focus();await link.press('Enter')
+   if await control.is_visible():return
  raise AssertionError('No working navigation reveals the requested control')
 
 async def rendered_cards(listing):
@@ -17,7 +21,7 @@ async def rendered_cards(listing):
  return await items.evaluate_all('(xs)=>xs.filter(x=>!xs.some(y=>y!==x&&y.contains(x))).map(x=>({text:x.innerText,price:x.querySelector("[class*=price],[data-price]")?.textContent||""}))')
 
 async def verify_travel(page,row,cycle):
- await page.click('[data-tab="build"]');await page.click('#preview-refresh');await page.wait_for_timeout(1800)
+ await page.locator('#technical-details').evaluate('(el)=>el.open=true');await page.click('[data-tab="build"]');await page.click('#preview-refresh');await page.wait_for_timeout(1800)
  frame=page.frame_locator('#preview');await frame.locator('body').wait_for();row['site_text']=(await frame.locator('body').inner_text())[:12000]
  row['controls']=await frame.locator('input,select,button').evaluate_all('(xs)=>xs.map(x=>({tag:x.tagName,id:x.id,type:x.type,text:x.textContent.slice(0,100)}))')
  assert len(row['site_text'])>100;assert await frame.locator('form').count()>0
@@ -54,6 +58,7 @@ async def verify_travel(page,row,cycle):
  # Reloading the tested product must retain the reservation in its own SQLite DB.
  await page.click('#preview-refresh');await page.wait_for_timeout(1000);bookings_link=frame.locator('a[href="#bookings"]');
  if await bookings_link.count():await bookings_link.first.click()
+ await reveal(frame,frame.get_by_role('textbox',name=re.compile('guest|your name|full name',re.I),include_hidden=True).first)
  await expect(frame.locator('body')).to_contain_text(guest,use_inner_text=True,timeout=15000)
  assert not re.search(r'unknown\s+(hotel|property)',await frame.locator('body').inner_text(),re.I),'Persisted reservation lost its hotel name after refresh'
  row['persistent_booking']=True

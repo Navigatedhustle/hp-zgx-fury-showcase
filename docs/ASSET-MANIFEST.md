@@ -27,3 +27,7 @@ Excluded: personal credentials, SSH keys, authentication/browser profiles, netwo
 ## V2 identity assets
 
 Bundled hp-logo-keyline.png is the owner-supplied official HP HEX PNG, unchanged (source and SHA-256 in assets/PROVENANCE.md). HP trademark rights apply separately from MIT source licensing. Raw logo/stripe ZIPs and licensed HP fonts are excluded. The optional stripe is unused. All shared shell assets render locally without external fonts or marketing services.
+
+## v2.1 recorded demonstration
+
+The curated `build/sources/fury_agent_factory/examples/recorded-travel/` directory is an explicitly supplied application artifact with sanitized recorded events and endpoint usage from a successful development run. It includes no prompts, databases, sessions or GPU telemetry. Redistribution replaces private runtime destination images with the maintained public vector scenes; backend source and recorded usage remain unchanged. See its PROVENANCE.md and recording.json file checksums. Guided mode uses fresh fictional data and labels the compressed playback throughout. The final release also includes the Colorado deployment PDF, its HTML source, screenshots and presenter/verification guides.

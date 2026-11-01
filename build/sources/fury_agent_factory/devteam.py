@@ -173,13 +173,13 @@ class DevRun:
   self.tasks=[{'id':str(i+1),'title':title,'actor':actor,'model':model,'dependencies':DEPENDENCIES[title],'owns':sorted(FILE_SCOPES[title]),'reads':sorted(READ_SCOPES[title]),'status':'blocked'} for i,(title,actor,model,_) in enumerate(TICKETS)]
   self.save()
  def event(self,kind,**data):
-  with self.lock:self.seq+=1;self.events.append({'seq':self.seq,'time':time.time(),'kind':kind,**data});self.save()
+  with self.lock:self.seq+=1;self.events.append({'seq':self.seq,'job_id':self.id,'time':time.time(),'kind':kind,**data});self.save()
  def save(self):
   # Bounded run snapshots remain local; raw code is in candidate/version directories.
-  data={'id':self.id,'state':self.state,'calls':[{k:v for k,v in c.items() if not k.startswith('_')} for c in self.calls],'events':self.events[-300:],'versions':self.versions,'tests':self.tests,'error':self.error,'gate':self.gate,'automatic':self.automatic,'tasks':self.tasks,'max_parallel':MAX_PARALLEL}
+  data={'id':self.id,'state':self.state,'started':self.started,'mode':getattr(self,'mode','live'),'recorded_usage':getattr(self,'recorded_usage',None),'calls':[{k:v for k,v in c.items() if not k.startswith('_')} for c in self.calls],'events':self.events[-300:],'versions':self.versions,'tests':self.tests,'error':self.error,'gate':self.gate,'automatic':self.automatic,'tasks':self.tasks,'max_parallel':MAX_PARALLEL}
   tmp=self.root/'audit.tmp';tmp.write_text(json.dumps(json_safe(data),ensure_ascii=False,indent=2,allow_nan=False),encoding='utf-8');tmp.replace(self.root/'audit.json')
  def start(self):
-  self.started=time.time();self.state='running';self.thread=threading.Thread(target=self._thread,daemon=True);self.thread.start()
+  self.started=time.time();self.state='running';self.save();self.thread=threading.Thread(target=self._thread,daemon=True);self.thread.start()
  def stop(self):self.stop_event.set();self.approval.set()
  def approve(self,gate_id,decision,reviewer):
   with self.lock:
@@ -326,7 +326,10 @@ class DevRun:
    call['reported_context_limit']=reported
    call.update(prompt_tokens_preflight=count,context_limit=limit,stream_usage_updates=0,observed_output_increment_total=0)
    if not isinstance(count,int) or count<0 or count>limit-1024:raise RuntimeError(f'Prompt context budget exceeded or unavailable: {count} tokens, cap {limit}; narrow this ticket rather than truncating source silently')
-   payload['max_tokens']=min(6000 if model==LEAD else 8192,limit-count-128)
+   # Complete travel QA can exceed 6000 output tokens. Keep it bounded by
+   # the exact rendered prompt and the unchanged serving context.
+   requested_output=8192 if model!=LEAD or (getattr(self,'travel',False) and names==['test_backend.py']) else 6000
+   payload['max_tokens']=min(requested_output,limit-count-128)
    call['output_limit']=payload['max_tokens']
    if self.stop_event.is_set():raise asyncio.CancelledError()
   except BaseException:
@@ -431,12 +434,12 @@ class DevRun:
   n=len(self.versions)+1;dest=self.root/('version-'+str(n));copy_workspace(self.candidate,dest)
   digest=hashlib.sha256(b''.join(p.name.encode()+p.read_bytes() for p in sorted(dest.iterdir()))).hexdigest()
   self.versions.append({'version':n,'title':title,'hash':digest,'tests':copy.deepcopy(self.tests),'at':time.time()});self.event('preview promoted',version=n,hash=digest)
- def snapshot(self):
+ def snapshot(self,compact=False):
   with self.lock:
    now=time.monotonic();actors=copy.deepcopy(self.actors);calls=[]
    for c in self.calls:
     while c['_samples'] and now-c['_samples'][0][0]>5:c['_samples'].popleft()
-    rate=sum(n for _,n in c['_samples'])/5 if c['live_supported'] else None
+    rate=(sum(n for _,n in c['_samples'])/5 if c.get('status','generating')=='generating' else 0) if c.get('live_supported') else None
     row={k:v for k,v in c.items() if not k.startswith('_')};row['current_tps']=rate;row['text_preview']=c['_text'];calls.append(row)
    for a in actors:
     if a['type']=='human':
@@ -448,4 +451,4 @@ class DevRun:
     a['last_response_tps']=complete[-1]['usage']['completion_tokens']/complete[-1]['seconds'] if complete else None
     a['ttft_s']=own[-1].get('ttft_s') if own else None
     a['current_tps']=sum(c['current_tps'] or 0 for c in own) if own and all(c['current_tps'] is not None for c in own) else (None if own else 0)
-   return {'id':self.id,'state':self.state,'error':self.error,'sampled_at':time.time(),'seq':self.seq,'actors':actors,'calls':calls,'gate':copy.deepcopy(self.gate),'events':copy.deepcopy(self.events[-100:]),'versions':copy.deepcopy(self.versions),'tests':copy.deepcopy(self.tests),'changes':copy.deepcopy(self.changes),'elapsed_s':time.time()-self.started if self.started else 0,'automatic':self.automatic,'tasks':copy.deepcopy(self.tasks),'max_parallel':MAX_PARALLEL,'notice':'Simulated developers are fictional personas using real local inference. Operator is the actual operator. Manual actions have no inference rate.'}
+   return {'id':self.id,'state':self.state,'error':self.error,'sampled_at':time.time(),'seq':self.seq,'actors':actors,'calls':calls,'gate':copy.deepcopy(self.gate),'events':copy.deepcopy(self.events[-100:]),'versions':copy.deepcopy(self.versions),'tests':copy.deepcopy(self.tests),'changes':([] if compact else copy.deepcopy(self.changes[-50:])),'elapsed_s':max(0,(max((e['time'] for e in self.events if e.get('kind')=='terminal'),default=time.time()) if self.state!='running' else time.time())-self.started) if self.started else 0,'automatic':self.automatic,'tasks':copy.deepcopy(self.tasks),'max_parallel':MAX_PARALLEL,'notice':'Simulated developers are fictional personas using real local inference. Operator is the actual operator. Manual actions have no inference rate.'}

@@ -6,15 +6,15 @@ from datetime import date,timedelta
 from playwright.async_api import async_playwright
 HOST='localhost'
 async def main(a):
- out=Path(a.output)/time.strftime('%Y%m%dT%H%M%S');out.mkdir(parents=True);origin='http://'+HOST+':8501';base=origin+'/travel/'+a.run
+ out=Path(a.output)/time.strftime('%Y%m%dT%H%M%S');out.mkdir(parents=True);origin=getattr(a,'origin','http://'+HOST+':8501');base=origin+'/travel/'+a.run
  report={'run':a.run,'started':time.time(),'scope':'Chromium on Fury through local HTTP; no external-device claim','checks':[],'console_errors':[]}
  def passed(name):report['checks'].append(name);print('PASS '+name,flush=True)
  async with async_playwright() as p:
-  browser=await p.chromium.launch(args=['--no-sandbox']);ctx=await browser.new_context(viewport={'width':1440,'height':1000});page=await ctx.new_page();page.on('pageerror',lambda e:report['console_errors'].append(str(e)));page.on('dialog',lambda d:d.accept())
+  browser=await p.chromium.launch(args=['--no-sandbox']);ctx=await browser.new_context(viewport={'width':1440,'height':1000},storage_state=getattr(a,'storage_state',None));page=await ctx.new_page();page.on('pageerror',lambda e:report['console_errors'].append(str(e)));page.on('dialog',lambda d:d.accept())
   async def api(method,path,body=None,target=page):
    return await target.evaluate('''async a=>{const token=sessionStorage.getItem('travel-token-'+a.rid);const r=await fetch('/api/travel/'+a.rid+'/backend',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify({method:a.method,path:a.path,body:a.body||{}})});if(!r.ok)throw Error('Transport HTTP '+r.status);return r.json()}''',{'rid':a.run,'method':method,'path':path,'body':body or {}})
   async def response(method,path,action,target=page):
-   async with target.expect_response(lambda r:r.url.endswith('/backend') and r.request.method=='POST' and (r.request.post_data_json or {}).get('method')==method and (r.request.post_data_json or {}).get('path')==path) as pending:await action()
+   async with target.expect_response(lambda r:r.url.split('?')[0].endswith('/backend') and r.request.method=='POST' and (r.request.post_data_json or {}).get('method')==method and (r.request.post_data_json or {}).get('path')==path) as pending:await action()
    return await (await pending.value).json()
   async def register(target):
    await target.goto(base);f=target.frame_locator('#app');await f.locator('#listing-list [data-detail]').first.wait_for();await f.locator('#auth-nav').click();await f.locator('[data-target=register-form]').click();email='portal'+uuid.uuid4().hex[:10]+'@example.test';password='PortalCheck2028!';await f.locator('#register-form [name=email]').fill(email);await f.locator('#register-form [name=password]').fill(password);r=await response('POST','/register',lambda:f.locator('#register-form button[type=submit]').click(),target);assert r['status']==201;await f.locator('#listing-list [data-detail]').first.wait_for();return f,email,password
@@ -43,7 +43,7 @@ async def main(a):
    finally:assert (await api('PUT','/admin/listings/'+str(item['id']),{'price':item['price'],'active':item['active']}))['status']==200
    records=(await api('GET','/admin/reservations'))['body']['reservations'];assert records and all(not {'password','salt','token'}&set(row) for row in records);passed('Administrator reads sanitized records and edits actual inventory; original values restored')
    await page.set_viewport_size({'width':375,'height':812});assert await f.locator('body').evaluate('b=>b.scrollWidth<=innerWidth+1');assert not await f.locator('.main-nav').evaluate('n=>Array.from(n.querySelectorAll("button")).filter(b=>!b.hidden).some(b=>b.getBoundingClientRect().right>innerWidth+1)');await page.screenshot(path=str(out/'mobile-admin.png'));await f.locator('.nav-link[data-view=listings]').click();await f.locator('#listing-list .listing-card').first.wait_for();assert await f.locator('body').evaluate('b=>b.scrollWidth<=innerWidth+1');await page.screenshot(path=str(out/'mobile-discover.png'));passed('Mobile discovery, forms and administrator navigation fit375px')
-   await page.set_viewport_size({'width':1440,'height':1000});await page.goto(origin+'/devteam?watch='+a.run);await page.wait_for_function("()=>document.getElementById('run-state').textContent==='finished'");await page.locator('[data-tab=build]').click();await page.frame_locator('#preview').frame_locator('#app').locator('.hero-photo').wait_for();docs=await page.evaluate('async u=>(await fetch(u)).json()','/api/travel/'+a.run+'/docs');assert docs['health']=='verified';await page.locator('details.backend summary').click();await page.locator('#hotels').click();await page.wait_for_function("()=>document.getElementById('api-output').textContent.includes('listings')");passed('Factory application preview, backend explorer and completed development state')
+   await page.set_viewport_size({'width':1440,'height':1000});await page.goto(origin+'/devteam?watch='+a.run);await page.wait_for_function("()=>document.getElementById('run-state').textContent==='finished'");await page.frame_locator('#preview').frame_locator('#app').locator('.hero-photo').wait_for();docs=await page.evaluate('async u=>(await fetch(u)).json()','/api/travel/'+a.run+'/docs');assert docs['health']=='verified';await page.locator('details.backend summary').click();await page.locator('#hotels').click();await page.wait_for_function("()=>document.getElementById('api-output').textContent.includes('listings')");passed('Factory application preview, backend explorer and completed development state')
    assert not report['console_errors'],report['console_errors'];report['passed']=True
   except Exception as e:
    report.update(passed=False,error=str(e),traceback=traceback.format_exc());await page.screenshot(path=str(out/'failure.png'))
@@ -51,4 +51,4 @@ async def main(a):
    report['ended']=time.time();(out/'report.json').write_text(json.dumps(report,indent=2));await browser.close();print(json.dumps({'passed':report.get('passed'),'error':report.get('error'),'checks':len(report['checks']),'evidence':str(out)},indent=2))
  return report.get('passed',False)
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--run',required=True);p.add_argument('--output',default='reports/travel-portal');raise SystemExit(0 if asyncio.run(main(p.parse_args())) else 1)
+ p=argparse.ArgumentParser();p.add_argument('--run',required=True);p.add_argument('--origin',default='http://localhost:8501');p.add_argument('--storage-state');p.add_argument('--output',default='reports/travel-portal');raise SystemExit(0 if asyncio.run(main(p.parse_args())) else 1)

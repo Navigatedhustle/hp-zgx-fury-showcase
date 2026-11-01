@@ -2,14 +2,14 @@
 
 Run Atlas analytics, local presentation creation, an autonomous Agent Factory, image generation, speech, and a measured-token operator dashboard on one GB300. Use it to demonstrate several useful local AI workflows sharing a workstation, with generated applications, real browser previews, isolated Python backends and visible resource limits.
 
-This is a demonstration project, with fictional data and public demonstration accounts. It is not an officially supported or endorsed HP or NVIDIA product. HP and NVIDIA names identify the tested hardware; their trademarks remain their owners' property. Restricted product photography and logos are excluded.
+This is a demonstration project, with fictional data and public demonstration accounts. It is not an officially supported or endorsed HP or NVIDIA product. HP and NVIDIA names identify the tested hardware; their trademarks remain their owners' property. Restricted product photography and unapproved logos are excluded; the owner-supplied official HP mark is included under its separate trademark terms.
 
 **Supported/tested host:** Ubuntu 24.04 ARM64, NVIDIA GB300 with **256703 MiB HBM**, 743 GiB system RAM, existing working NVIDIA driver and CUDA toolkit. No Nano, smaller GPU, x86, Windows, or macOS compatibility is claimed. The complete profile requires at least 700 GiB RAM and 350 GiB free disk before setup. See [prerequisites](docs/PREREQUISITES.md) and [verification](docs/VERIFICATION.md).
 
 ## Download and launch
 
 ```bash
-git clone --branch v2.0.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
+git clone --branch v2.1.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
 cd hp-zgx-fury-showcase
 ./launch.sh
 ```
@@ -37,6 +37,10 @@ The pinned model files total **193.91 GiB**; allow another 20–40 GiB for depen
 ```
 
 A desktop copy may require the file manager's **Allow Launching / Trust** action. The shortcut opens a terminal so installation progress and errors remain visible. Setup does not require Git even when launched from a ZIP. Administrator prerequisite installation can be required; it is never performed silently.
+
+## Agent Factory presenter update
+
+Choose Live build for actual local development or Guided demonstration for a clearly labeled recorded successful run with a working application artifact. The main view shows stages, current tasks, evidence, elapsed time and endpoint usage; checked previews remain available until you refresh to a newer version. [Presenter details](docs/AGENT-FACTORY-PRESENTER.md) · [Colorado deployment PDF](docs/Colorado-Deployment-v2.1.0.pdf) · [Release verification](docs/FACTORY-VERIFICATION.md).
 
 ## Present the HP experience
 
@@ -77,13 +81,14 @@ If setup is interrupted, rerun `./launch.sh setup`; downloads resume through Hug
 
 ## Upgrade and rollback
 
-V1 remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
+The preceding V2 release remains available as v2.0.0. V1 also remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
 
 For a Git checkout with clean tracked source:
 
 ```bash
 ./launch.sh stop
-git switch --detach v2.0.0
+git fetch --tags origin
+git switch --detach v2.1.0
 ./launch.sh
 ```
 
@@ -91,9 +96,11 @@ To roll back:
 
 ```bash
 ./launch.sh stop
-git switch --detach v1.0.0
-./launch.sh setup  # explicitly rebuild V1 editor; V1's old stamp does not hash UI source
+git switch --detach v2.0.0
+./launch.sh setup  # restore the preceding V2 release
 ./launch.sh
 ```
 
 For archive installs, keep the previous release directory and its own environments/output. Stop the current installation through its own launcher, then launch the previous one. Do not copy process registries between directories. Back up outputs first; this UI release changes no application database schema.
+
+V2.0 predates Guided demonstration. Use a fresh browser profile when presenting a prior release; retained recorded artifacts remain recorded and must not be described as newly generated.

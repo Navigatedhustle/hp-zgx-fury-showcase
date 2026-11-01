@@ -75,6 +75,11 @@ class TravelRun(DevRun):
    for task in self.tasks:
     if task['owns'][0] in foundation['files']:task.update(status='merged',source='maintained frontend foundation')
    self.event('frontend foundation installed',**foundation)
+  previous=None
+  for task in self.tasks:
+   if task.get('source'):continue
+   task['dependencies']=[previous] if previous else []
+   previous=task['title']
   self.save()
  def save(self):
   super().save()
@@ -88,8 +93,8 @@ class TravelRun(DevRun):
   if self.versions and self.versions[-1]['hash']==digest:return
   self.promote('Development preview: API tests and browser bootstrap passed')
   self.versions[-1]['stage']='development';self.event('development preview available',version=self.versions[-1]['version'],full_acceptance=False)
- def snapshot(self):
-  data=super().snapshot();data['travel']=True;data['product']=copy.deepcopy(getattr(self,'product',{}));data['application_url']='/travel/'+self.id
+ def snapshot(self,compact=False):
+  data=super().snapshot(compact=compact);data['travel']=True;data['product']=copy.deepcopy(getattr(self,'product',{}));data['application_url']='/travel/'+self.id
   if self.started and self.state in ('finished','blocked','stopped'):
    ended=max((e['time'] for e in self.events if e.get('kind')=='terminal' and e.get('state')==self.state),default=time.time());data['elapsed_s']=ended-self.started
   data['cumulative_tokens']=sum(c['usage'].get('total_tokens',0) for c in self.calls if c.get('usage'))
@@ -100,7 +105,7 @@ class TravelRun(DevRun):
  def interrupt(self):
   self.recover_after_restart=True;super().stop()
  def start(self):
-  self.recover_after_restart=False;self.stop_event.clear();self.error='';self.started=self.started or time.time();self.state='running';self.thread=threading.Thread(target=self._thread,daemon=True);self.thread.start()
+  self.recover_after_restart=False;self.stop_event.clear();self.error='';self.started=self.started or time.time();self.state='running';self.save();self.thread=threading.Thread(target=self._thread,daemon=True);self.thread.start()
  def _thread(self):
   try:asyncio.run(self.work())
   except asyncio.CancelledError:self.state='interrupted' if getattr(self,'recover_after_restart',False) else 'stopped'
@@ -112,16 +117,21 @@ class TravelRun(DevRun):
   if self.stop_event.is_set():raise asyncio.CancelledError()
   if name=='app.js':prompt+=' Return complete app.js compactly within22000 characters: remove redundant comments/blank lines before editing logic, without removing any behavior.'
   task.update(status='generating');self.product['next_action']=title;self.event('task handoff',task_id=task['id'],title=title,files=[name])
-  feedback=''
+  feedback='';repair_source=self.candidate
   for attempt in range(3):
    try:
-    patch=await self.call(client,title,task['actor'],task['model'],prompt+'\n'+feedback,source=self.candidate,task_id=task['id'])
+    patch=await self.call(client,title,task['actor'],task['model'],prompt+'\n'+feedback,source=repair_source,task_id=task['id'])
     if set(patch['files'])!={name}:raise ValueError('Return exactly the owned file '+name)
     content=patch['files'][name]
+    staging=self.root/('ticket-candidate-'+task['id']+'-'+devteam.uuid.uuid4().hex[:8])
+    devteam.copy_workspace(self.candidate,staging);(staging/name).write_text(content)
+    repair_source=staging
     if name.endswith('.py'):ast.parse(content,filename=name)
-    staging=self.root/'syntax-check';staging.mkdir(exist_ok=True)
-    if name=='app.js':
-     (staging/name).write_text(content);await asyncio.to_thread(check_javascript,staging)
+    if name=='app.js':await asyncio.to_thread(check_javascript,staging)
+    if name=='backend.py':
+     probe=await asyncio.to_thread(execute,staging,self.root/('integration-check-'+devteam.uuid.uuid4().hex[:8]),'api',{'method':'GET','path':'/health','body':{},'headers':{}})
+     if probe.get('status')!=200:raise ValueError('Backend integration must import its declared modules and answer GET /health with status200 before merge; actual '+str(probe))
+     self.event('backend bootstrap checked',task_id=task['id'],passed=True,summary='Backend starts and answers its health check')
     self.apply(patch,actor=task['actor'],task_id=task['id'],call_id=self.calls[-1]['id']);task['status']='merged';self.event('task merged',title=title,task_id=task['id']);return
    except (ValueError,RuntimeError,SyntaxError,httpx.HTTPError,TimeoutError) as e:
     feedback='Previous attempt failed: '+str(e)[:2500]+'. Change approach: simplify and keep complete file compact; preserve all requirements.'
@@ -129,7 +139,8 @@ class TravelRun(DevRun):
   task['status']='blocked';raise RuntimeError(title+' failed after three different repair requests: '+feedback)
  async def generated_qa(self,n):
   if self.stop_event.is_set():raise asyncio.CancelledError()
-  names=(await asyncio.to_thread(execute,self.candidate,self.root/('qa-'+str(n)),'travellist')).get('tests',[])
+  try:names=(await asyncio.to_thread(execute,self.candidate,self.root/('qa-'+str(n)),'travellist')).get('tests',[])
+  except (RuntimeError,ValueError) as e:return {'passed':False,'tests':0,'log':'Generated QA discovery failed; repair its imports/setup: '+str(e)[-7000:]}
   if not 1<=len(names)<=64:return {'passed':False,'tests':0,'log':'Generated QA must contain1..64 bounded test cases'}
   rows=[]
   for index,name in enumerate(names,1):

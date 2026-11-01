@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "release": "v2.1.0",
+  "scope": "Actual Chromium workflows and local model/pipeline execution on the existing Ubuntu 24.04 ARM64 GB300; not a fresh Colorado OS installation or physical remote-client test.",
+  "factory_regressions": 155,
+  "core_regressions": 19,
+  "soak": {
+    "seconds": 2645.74,
+    "cycles": 4,
+    "workflow_counts": {
+      "atlas": 253,
+      "slides": 165,
+      "agent": 4,
+      "image": 267
+    },
+    "all_workflows_passed": true,
+    "measured_four_way_overlaps": 35,
+    "browser_exceptions": 0,
+    "network_failure_counts": {
+      "net::ERR_ABORTED": 501
+    },
+    "latency": {
+      "atlas": {
+        "minimum_s": 0.67,
+        "median_s": 1.74,
+        "maximum_s": 2.44
+      },
+      "slides": {
+        "minimum_s": 4.2,
+        "median_s": 8.2,
+        "maximum_s": 9.03
+      },
+      "agent": {
+        "minimum_s": 319.98,
+        "median_s": 375.87,
+        "maximum_s": 1408.74
+      },
+      "image": {
+        "minimum_s": 0.72,
+        "median_s": 0.76,
+        "maximum_s": 2.44
+      }
+    },
+    "minimum_reported_free_gpu_mib": 9810,
+    "initial_reported_free_gpu_mib": 9810,
+    "final_reported_free_gpu_mib": 9810,
+    "initial_component_rss_bytes": {
+      "text": 8954445824,
+      "lead": 5770641408,
+      "gateway": 77791232,
+      "asr": 245891072,
+      "tts": 3971612672,
+      "image": 2891776000,
+      "operator": 260833280,
+      "atlas": 504758272,
+      "slides": 172425216,
+      "agent": 95354880
+    },
+    "final_component_rss_bytes": {
+      "text": 8957460480,
+      "lead": 5771493376,
+      "gateway": 77856768,
+      "asr": 245891072,
+      "tts": 3971612672,
+      "image": 2891382784,
+      "operator": 260702208,
+      "atlas": 509018112,
+      "slides": 172556288,
+      "agent": 120193024
+    },
+    "host_disk_available_change_bytes": -1363611648,
+    "decoded_generated_png_files": 267,
+    "opened_three_slide_pptx_files": 165,
+    "minimum_editable_text_shapes_per_deck": 21
+  },
+  "live_runs": [
+    {
+      "project": "complete travel",
+      "job_elapsed_s": 401.16,
+      "browser_verified_latency_s": 425.91,
+      "first_checked_preview_s": 386.02,
+      "first_preview_output_tokens": 30863,
+      "input_tokens": 97056,
+      "output_tokens": 30863,
+      "requests": 13,
+      "models": [
+        "fury-lead",
+        "unsloth/Qwen3.6-27B-NVFP4"
+      ],
+      "passed": true
+    },
+    {
+      "project": "editorial short",
+      "job_elapsed_s": 320.37,
+      "browser_verified_latency_s": 325.82,
+      "first_checked_preview_s": 155.46,
+      "first_preview_output_tokens": 21599,
+      "input_tokens": 96953,
+      "output_tokens": 33929,
+      "requests": 15,
+      "models": [
+        "fury-lead",
+        "unsloth/Qwen3.6-27B-NVFP4"
+      ],
+      "passed": true
+    },
+    {
+      "project": "short travel",
+      "job_elapsed_s": 314.17,
+      "browser_verified_latency_s": 319.98,
+      "first_checked_preview_s": 142.37,
+      "first_preview_output_tokens": 20355,
+      "input_tokens": 94903,
+      "output_tokens": 34117,
+      "requests": 15,
+      "models": [
+        "fury-lead",
+        "unsloth/Qwen3.6-27B-NVFP4"
+      ],
+      "passed": true
+    },
+    {
+      "project": "complete travel",
+      "job_elapsed_s": 1380.01,
+      "browser_verified_latency_s": 1408.74,
+      "first_checked_preview_s": 1365.18,
+      "first_preview_output_tokens": 113642,
+      "input_tokens": 317808,
+      "output_tokens": 113642,
+      "requests": 50,
+      "models": [
+        "fury-lead"
+      ],
+      "passed": true
+    }
+  ],
+  "guided": {
+    "recorded_original_s": 429.7933032512665,
+    "playback_s": 120,
+    "recorded_calls": 12,
+    "recorded_input_tokens": 96555,
+    "recorded_output_tokens": 39599,
+    "repeated_completed_playbacks": 2,
+    "functional_browser_api_checks": 13,
+    "four_playbacks_and_fifth_busy_response_checked": true,
+    "private_https_reconnect_cookie_preview_and_download_checked": true
+  },
+  "additional_checks": {
+    "real_live_cancel_and_rerun": true,
+    "actual_failed_travel_run_recovered_from_saved_source": true,
+    "private_run_ownership_and_busy_response": true,
+    "pinned_preview_and_retained_visitor_dom": true,
+    "final_usage_and_elapsed_survive_factory_restart": true,
+    "six_viewport_theme_axe_states": true,
+    "original_travel_source_image_files_unchanged": 83,
+    "full_cached_model_file_rehash": true,
+    "independent_cached_setup": true
+  },
+  "publication_note": "Anonymous final repository/archive retrieval is recorded in the versioned release notes and publication verification asset after publication.",
+  "limitations": [
+    "One Live Factory build, at most two development requests; full travel tickets are sequential. Gateway four admissions with an Atlas reserve.",
+    "Guided playback is recorded, not live inference or GPU telemetry. Public artifact uses vector scenes instead of private runtime imagery.",
+    "Reported free GPU memory is measured directly; historical memory targets are not guaranteed for arbitrary contexts or additional workloads.",
+    "Generated code may need repairs or remain blocked. Failed attempts are retained separately and are not counted toward this passing soak.",
+    "Setup reused independent cached models/tools on the existing host. No fresh OS/driver installation, new 194 GiB download, cold model boot or physical remote-device claim."
+  ]
+}

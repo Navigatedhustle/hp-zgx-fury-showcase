@@ -1,3 +1,17 @@
 title = "Fury source secret scan"
 [extend]
 useDefault = true
+
+[[allowlists]]
+description = "Recorded artifact SHA-256 manifest entry, not an authentication key"
+condition = "AND"
+paths = ['''build/sources/fury_agent_factory/examples/recorded-travel/recording\.json$''']
+regexTarget = "line"
+regexes = ['''^\s*"auth\.py": "[0-9a-f]{64}",?$''']
+
+[[allowlists]]
+description = "Exact fictional idempotency fixture in recorded generated QA"
+condition = "AND"
+paths = ['''build/sources/fury_agent_factory/examples/recorded-travel/test_backend\.py$''']
+regexTarget = "line"
+regexes = ['''^\s*'request_key': 'test_key_123456789'\s*$''']

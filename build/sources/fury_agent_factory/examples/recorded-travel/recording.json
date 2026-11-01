@@ -1,0 +1,435 @@
+{
+  "schema": 1,
+  "mode": "recorded",
+  "description": "Authentic successful local travel development run. Compressed recorded walkthrough; supplied frontend, generated backend. No live inference or recorded GPU telemetry. Functional application uses isolated new demonstration data. Distribution replaces private runtime destination imagery with the maintained public vector scenes; backend and recorded usage are unchanged.",
+  "duration_s": 429.7933032512665,
+  "playback_s": 120,
+  "calls": [
+    {
+      "id": "recorded-1",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 12634,
+        "total_tokens": 14606,
+        "completion_tokens": 1972,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 17.879599571228027
+    },
+    {
+      "id": "recorded-2",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 4187,
+        "total_tokens": 5663,
+        "completion_tokens": 1476,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 31.21580743789673
+    },
+    {
+      "id": "recorded-3",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 5603,
+        "total_tokens": 7053,
+        "completion_tokens": 1450,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 44.326112031936646
+    },
+    {
+      "id": "recorded-4",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 6921,
+        "total_tokens": 8972,
+        "completion_tokens": 2051,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 62.78147864341736
+    },
+    {
+      "id": "recorded-5",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 6908,
+        "total_tokens": 8894,
+        "completion_tokens": 1986,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 80.65449357032776
+    },
+    {
+      "id": "recorded-6",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 6935,
+        "total_tokens": 9967,
+        "completion_tokens": 3032,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 107.80708003044128
+    },
+    {
+      "id": "recorded-7",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 6934,
+        "total_tokens": 7402,
+        "completion_tokens": 468,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 112.24332809448242
+    },
+    {
+      "id": "recorded-8",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 7412,
+        "total_tokens": 13412,
+        "completion_tokens": 6000,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 165.76296830177307
+    },
+    {
+      "id": "recorded-9",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 7466,
+        "total_tokens": 13466,
+        "completion_tokens": 6000,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 219.2649667263031
+    },
+    {
+      "id": "recorded-10",
+      "actor": "daniel",
+      "model": "fury-lead",
+      "usage": {
+        "prompt_tokens": 7466,
+        "total_tokens": 12067,
+        "completion_tokens": 4601,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 260.35987520217896
+    },
+    {
+      "id": "recorded-11",
+      "actor": "maya",
+      "model": "unsloth/Qwen3.6-27B-NVFP4",
+      "usage": {
+        "prompt_tokens": 12023,
+        "total_tokens": 17299,
+        "completion_tokens": 5276,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 332.19650316238403
+    },
+    {
+      "id": "recorded-12",
+      "actor": "maya",
+      "model": "unsloth/Qwen3.6-27B-NVFP4",
+      "usage": {
+        "prompt_tokens": 12066,
+        "total_tokens": 17353,
+        "completion_tokens": 5287,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "offset": 404.2320759296417
+    }
+  ],
+  "events": [
+    {
+      "offset": 17.897549152374268,
+      "kind": "task merged",
+      "title": "Travel architecture"
+    },
+    {
+      "offset": 31.233813762664795,
+      "kind": "task merged",
+      "title": "Travel database"
+    },
+    {
+      "offset": 44.34191703796387,
+      "kind": "task merged",
+      "title": "Travel authentication"
+    },
+    {
+      "offset": 62.80042910575867,
+      "kind": "task merged",
+      "title": "Travel catalog"
+    },
+    {
+      "offset": 80.67525553703308,
+      "kind": "task merged",
+      "title": "Travel private records"
+    },
+    {
+      "offset": 107.82633471488953,
+      "kind": "task merged",
+      "title": "Travel reservations"
+    },
+    {
+      "offset": 112.25753021240234,
+      "kind": "task merged",
+      "title": "Travel API integration"
+    },
+    {
+      "offset": 260.3792791366577,
+      "kind": "task merged",
+      "title": "Travel independent QA"
+    },
+    {
+      "offset": 260.3812634944916,
+      "kind": "checks started",
+      "title": "checks started"
+    },
+    {
+      "offset": 269.16492199897766,
+      "kind": "acceptance results",
+      "title": "acceptance results"
+    },
+    {
+      "offset": 290.7175204753876,
+      "kind": "browser acceptance",
+      "title": "browser acceptance"
+    },
+    {
+      "offset": 332.23191499710083,
+      "kind": "task merged",
+      "title": "Repair app.js"
+    },
+    {
+      "offset": 332.23461747169495,
+      "kind": "checks started",
+      "title": "checks started"
+    },
+    {
+      "offset": 341.0598945617676,
+      "kind": "acceptance results",
+      "title": "acceptance results"
+    },
+    {
+      "offset": 362.61776185035706,
+      "kind": "browser acceptance",
+      "title": "browser acceptance"
+    },
+    {
+      "offset": 404.2709391117096,
+      "kind": "task merged",
+      "title": "Repair app.js"
+    },
+    {
+      "offset": 404.27424335479736,
+      "kind": "checks started",
+      "title": "checks started"
+    },
+    {
+      "offset": 413.1092507839203,
+      "kind": "acceptance results",
+      "title": "acceptance results"
+    },
+    {
+      "offset": 414.6242814064026,
+      "kind": "preview promoted",
+      "title": "preview promoted"
+    },
+    {
+      "offset": 429.69838309288025,
+      "kind": "browser acceptance",
+      "title": "browser acceptance"
+    },
+    {
+      "offset": 429.7820634841919,
+      "kind": "preview promoted",
+      "title": "preview promoted"
+    },
+    {
+      "offset": 429.7933032512665,
+      "kind": "terminal",
+      "title": "terminal"
+    }
+  ],
+  "tasks": [
+    {
+      "title": "Travel architecture",
+      "owns": [
+        "architecture.md"
+      ],
+      "actor": "daniel"
+    },
+    {
+      "title": "Travel database",
+      "owns": [
+        "db.py"
+      ],
+      "actor": "daniel"
+    },
+    {
+      "title": "Travel authentication",
+      "owns": [
+        "auth.py"
+      ],
+      "actor": "daniel"
+    },
+    {
+      "title": "Travel catalog",
+      "owns": [
+        "catalog.py"
+      ],
+      "actor": "daniel"
+    },
+    {
+      "title": "Travel private records",
+      "owns": [
+        "private.py"
+      ],
+      "actor": "daniel"
+    },
+    {
+      "title": "Travel reservations",
+      "owns": [
+        "reservations.py"
+      ],
+      "actor": "daniel"
+    },
+    {
+      "title": "Travel API integration",
+      "owns": [
+        "backend.py"
+      ],
+      "actor": "daniel"
+    },
+    {
+      "title": "Travel interface",
+      "owns": [
+        "index.html"
+      ],
+      "actor": "maya"
+    },
+    {
+      "title": "Travel visual design",
+      "owns": [
+        "styles.css"
+      ],
+      "actor": "maya"
+    },
+    {
+      "title": "Travel browser behavior",
+      "owns": [
+        "app.js"
+      ],
+      "actor": "maya"
+    },
+    {
+      "title": "Travel independent QA",
+      "owns": [
+        "test_backend.py"
+      ],
+      "actor": "daniel"
+    },
+    {
+      "title": "Repair app.js",
+      "owns": [
+        "app.js"
+      ],
+      "actor": "maya"
+    },
+    {
+      "title": "Repair app.js",
+      "owns": [
+        "app.js"
+      ],
+      "actor": "maya"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "catalog",
+      "description": "Server search, filters, sorting, details and bounded pagination",
+      "passed": true
+    },
+    {
+      "id": "auth",
+      "description": "Registration, login, logout and persistent secure sessions",
+      "passed": true
+    },
+    {
+      "id": "private",
+      "description": "Favorites, itinerary CRUD and two-user ownership",
+      "passed": true
+    },
+    {
+      "id": "reservation",
+      "description": "Validated server quotes, persistent demo reservations, duplicate protection",
+      "passed": true
+    },
+    {
+      "id": "admin",
+      "description": "Admin inventory editing and reservation visibility with backend permissions",
+      "passed": true
+    },
+    {
+      "id": "browser",
+      "description": "Desktop/mobile real browser workflows, console and network checks",
+      "passed": true
+    },
+    {
+      "id": "restart",
+      "description": "Database survives generated application restart",
+      "passed": true
+    }
+  ],
+  "verification": {
+    "backend_passed": true,
+    "browser_passed": true
+  },
+  "files": {
+    "index.html": "ac25b2739ff5ef1bf350c50e356a8d00f0fd41bfe151ee0f12e91ccdee3916ff",
+    "styles.css": "2012b69209bcccdc56da66639ada807fd6bf0612df69bec8722454da3ef9b48b",
+    "app.js": "2a2c28397088e38ec4ceacb0a4f3edbc32438a10e5e20f94fa1e3bdfacc5aff5",
+    "db.py": "0adf15480443f8714fd0a86177b79a16ef685785753e9a626143a21bda5ed86b",
+    "auth.py": "4b66f80c247ce99b12a956f493d3b77daa671e983faf5a50922289f660bd6267",
+    "catalog.py": "69ba91ea1bf09a5497a29736ebefbf905ce093f8530f89c33ee83502f6d787c4",
+    "private.py": "df1d0258ac1a87bfb5000583ca32eb8501998a811fb25ebb837cef63d1ee6fbc",
+    "reservations.py": "5243f06955447e106a824a7dc7841c31a261e0514e1362bf45429bde6c350114",
+    "backend.py": "668e128433f721d2fbfb879e3090852f02a66f2cbaed84d3450fb0dd77bd0c67",
+    "test_backend.py": "b778a76d34b454845616f80a23f5a35bf71e85a837395750c0c1a18b7e19eb44"
+  }
+}

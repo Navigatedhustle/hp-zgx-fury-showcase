@@ -1,0 +1,7 @@
+# Curated recorded travel demonstration
+
+This example captures a successful local development run: twelve actual endpoint calls over 429.793 seconds. The recording contains relative milestones, endpoint usage totals, task titles and acceptance outcomes. It contains no private prompts, sessions, accounts, databases, host addresses or GPU telemetry. Guided playback compresses that run into 120 seconds and never submits inference.
+
+Backend modules and generated QA are the successful run's reviewed code. Blank-line indentation is normalized for redistribution; Python ASTs are unchanged. Frontend JavaScript and CSS are the disclosed maintained travel foundation. For redistribution, index.html uses that foundation with public local vector scenes in place of private runtime destination imagery. This cosmetic sanitization is explicit; recorded measurements describe the original development run, not fresh generation of this artifact. SHA-256 values in recording.json bind every application file installed by GuidedRun. The functional artifact initializes new fictional data for each run.
+
+No real travel services, payments, customer records, commercial photographs or licensed HP fonts are included. Existing private generated applications and their imagery are retained separately on the presenting host. See the root LICENSE and THIRD_PARTY_NOTICES.md. Recorded source is an illustrative demonstration, not a production travel service.

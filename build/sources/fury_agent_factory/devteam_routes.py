@@ -7,6 +7,7 @@ from showcase_app.ui import header as hp_header
 from fastapi import APIRouter,HTTPException,Request
 from fastapi.responses import FileResponse,StreamingResponse,HTMLResponse,Response
 from pydantic import BaseModel,ConfigDict
+from typing import Literal
 from devteam import DevRun,RetentionError
 from devteam_sandbox import execute,available
 router=APIRouter();ROOT=Path(__file__).resolve().parent;lock=threading.RLock()
@@ -19,7 +20,7 @@ def get_current():
   archived=ROOT/'devruns-archive'/r.id
   if archived.is_dir():r.root=archived;r.candidate=archived/'candidate';r.data=archived/'data'
  return r
-def active_runs():return [r for r in runs.values() if r.thread and r.thread.is_alive()]
+def active_runs():return [r for r in runs.values() if getattr(r,'mode','live')!='recorded' and r.thread and r.thread.is_alive()]
 def recover_sessions():
  from collections import deque
  from devteam import roster
@@ -44,7 +45,7 @@ def recover_sessions():
   if not folder.exists():folder=ROOT/'devruns-archive'/rid
   try:data=json.loads((folder/'audit.json').read_text())
   except (OSError,ValueError):continue
-  r=DevRun.__new__(DevRun);r.id=rid;r.root=folder;r.candidate=folder/'candidate';r.data=folder/'data';r.thread=None;r.started=min((c.get('started',time.time()) for c in data.get('calls',[])),default=time.time())
+  r=DevRun.__new__(DevRun);r.id=rid;r.root=folder;r.candidate=folder/'candidate';r.data=folder/'data';r.thread=None;r.started=data.get('started') or min((c.get('started',time.time()) for c in data.get('calls',[])),default=time.time())
   r.lock=threading.RLock();r.stop_event=threading.Event();r.approval=threading.Event();r.actors=roster();r.changes=[];r.seq=max((e.get('seq',0) for e in data.get('events',[])),default=0)
   for field,default in [('state','failed'),('error',''),('events',[]),('calls',[]),('versions',[]),('gate',None),('automatic',False),('tasks',[]),('tests',None)]:setattr(r,field,data.get(field,default))
   for c in r.calls:c.update(_samples=deque(),_text='',_mono=time.monotonic())
@@ -53,6 +54,10 @@ def recover_sessions():
    from travel_run import TravelRun
    state=json.loads(project_state.read_text());r.__class__=TravelRun;r.product=state['product'];r.tasks=state['tasks'];r.started=state.get('started') or r.started;r.base_url='http://127.0.0.1:8001/devteam/v1'
    if r.state in ('running','failed') and 'restarted' in r.error.lower():r.state='interrupted';r.error='Interrupted by service restart. Resume continues from durable merged files.'
+  if data.get('mode')=='recorded':
+   from guided_run import GuidedRun,EXAMPLE
+   r.__class__=GuidedRun;r.recording=json.loads((EXAMPLE/'recording.json').read_text());r.mode='recorded';r.recorded_usage=data.get('recorded_usage')
+   if r.state=='interrupted':r.state='stopped';r.error='Recorded playback interrupted; resume to replay.'
   runs[key]=r
  # A browser disconnect never stops work. After a server restart recover the
  # one previously active sustained run from durable merged tasks.
@@ -70,7 +75,7 @@ def set_current(value):
  # Bound idle session metadata. Complete artifacts and audits remain on disk.
  if len(runs)>100:
   for old,r in list(runs.items()):
-   if old!=key and not (r.thread and r.thread.is_alive()):runs.pop(old)
+   if old!=key and not ((r.thread and r.thread.is_alive()) or (getattr(r,'mode','live')=='recorded' and r.snapshot()['state']=='running')):runs.pop(old)
    if len(runs)<=100:break
  persist_sessions()
 
@@ -89,7 +94,8 @@ def runtime_identity(alias,record,pins,project=PROJECT):
 class Start(BaseModel):
  model_config=ConfigDict(extra='forbid')
  automatic:bool=False
- product:str="short"
+ product:Literal["short","travel","short-editorial"]="short"
+ mode:Literal["live","recorded"]="live"
 class Decision(BaseModel):
  model_config=ConfigDict(extra='forbid')
  gate_id:str;decision:str;reviewer:str
@@ -119,7 +125,7 @@ async def config():
    response=await client.get('http://127.0.0.1:8001/health');response.raise_for_status();models=response.json().get('backends',{})
   except (httpx.HTTPError,ValueError):pass
   records=dict(await asyncio.gather(*(inspect(alias,spec) for alias,spec in MODEL_DETAILS.items())))
- return {'task_limits':{'specialist_context':32768,'specialist_output':8192,'lead_output':6000},'sandbox_ready':await asyncio.to_thread(available),'models_ready':all(models.get(m) for m in MODEL_DETAILS),'backends':models,'model_details':{alias:runtime_identity(alias,records.get(alias),pins) for alias in MODEL_DETAILS},'event':'AI Week Frankfurt','lead':'fury-lead','specialist':'unsloth/Qwen3.6-27B-NVFP4'}
+ return {'task_limits':{'specialist_context':32768,'specialist_output':8192,'lead_output':6000,'lead_travel_qa_output':8192},'sandbox_ready':await asyncio.to_thread(available),'models_ready':all(models.get(m) for m in MODEL_DETAILS),'backends':models,'model_details':{alias:runtime_identity(alias,records.get(alias),pins) for alias in MODEL_DETAILS},'event':'AI Week Frankfurt','lead':'fury-lead','specialist':'unsloth/Qwen3.6-27B-NVFP4'}
 @router.get('/api/devteam/run')
 async def snapshot():
  current=get_current()
@@ -128,11 +134,17 @@ async def snapshot():
 async def start(body:Start):
  with lock:
   current=get_current()
-  if active_runs():raise HTTPException(429,'Development capacity is busy (one build). Your session is separate. Retry after the active build finishes.')
-  if current and current.thread and current.thread.is_alive():raise HTTPException(409,'Wait for worker shutdown')
+  if body.mode=='live' and active_runs():raise HTTPException(429,'Development capacity is busy (one build). Your session is separate. Retry after the active build finishes.')
+  if current and ((current.thread and current.thread.is_alive()) or (getattr(current,'mode','live')=='recorded' and current.snapshot()['state']=='running')):raise HTTPException(409,'A run is already active in this browser')
+  if body.mode=='recorded' and sum(getattr(r,'mode','live')=='recorded' and r.snapshot()['state']=='running' for r in runs.values())>=4:raise HTTPException(429,'Guided demonstration capacity is busy (four playbacks). Retry shortly.')
   try:
    from travel_run import TravelRun
-   candidate=TravelRun() if body.product=="travel" else DevRun(automatic=body.automatic)
+   if body.mode=='recorded':
+    from guided_run import GuidedRun
+    candidate=GuidedRun()
+   else:
+    candidate=TravelRun() if body.product=='travel' else DevRun(automatic=body.automatic)
+    if body.product=='short-editorial':candidate.design='Accessible editorial travel workspace with warm ivory, deep teal and a compact sidebar. Preserve the exact booking API, stable hooks and every required interaction.'
   except RetentionError as exc:raise HTTPException(409,str(exc)) from exc
   set_current(candidate);candidate.start();return candidate.snapshot()
 @router.post('/api/devteam/gate')
@@ -146,19 +158,24 @@ async def stop():run().stop();return {'state':'cancelling','notice':'Accepted en
 async def reset():
  with lock:
   current=get_current()
-  if current and current.thread and current.thread.is_alive():raise HTTPException(409,'Stop and wait for worker termination')
+  if current and ((current.thread and current.thread.is_alive()) or (getattr(current,'mode','live')=='recorded' and current.snapshot()['state']=='running')):raise HTTPException(409,'Stop and wait for the active run')
   set_current(None)
  return {'state':'ready'}
 @router.get('/api/devteam/events')
 async def events(request:Request):
  async def stream():
   while not await request.is_disconnected():
-   data=await snapshot();yield 'event: snapshot\ndata: '+json.dumps(data)+'\n\n';await asyncio.sleep(1)
+   current=get_current();data=current.snapshot(compact=True) if current else {'state':'ready','actors':[]}
+   data['compact']=True
+   for c in data.get('calls',[]):
+    c.pop('history',None);c.pop('text_preview',None)
+   yield 'id: '+str(data.get('id','idle'))+':'+str(data.get('seq',0))+'\nevent: snapshot\ndata: '+json.dumps(data)+'\n\n';await asyncio.sleep(1)
  return StreamingResponse(stream(),media_type='text/event-stream',headers={'Cache-Control':'no-store','X-Accel-Buffering':'no'})
 @router.get('/api/devteam/export')
 async def export():
  r=run()
- if r.thread and r.thread.is_alive():raise HTTPException(409,'Stop or complete before export')
+ if (r.thread and r.thread.is_alive()) or (getattr(r,'mode','live')=='recorded' and r.snapshot()['state']=='running'):raise HTTPException(409,'Stop or complete before export')
+ if getattr(r,'mode','live')=='recorded':return Response(json.dumps(r.snapshot()),media_type='application/json',headers={'Content-Disposition':'attachment; filename="recorded-walkthrough.json"'})
  return Response((r.root/'audit.json').read_bytes(),media_type='application/json',headers={'Content-Disposition':'attachment; filename="devteam-audit.json"'})
 @router.get('/api/devteam/preview')
 async def preview(version:int|None=None,run_id:str|None=None):
@@ -232,22 +249,27 @@ async def resume():
  with lock:
   r=run()
   if not getattr(r,'travel',False):raise HTTPException(409,'Resume is supported for sustained travel runs')
-  if active_runs():raise HTTPException(409,'Development is already active')
+  if active_runs() or r.snapshot()['state']=='running':raise HTTPException(409,'Development or playback is already active')
   r.start();return r.snapshot()
+def published_version(r,version=None):
+ if not r.versions:raise HTTPException(409,'No verified application version yet')
+ selected=next((v for v in r.versions if v['version']==version),None) if version is not None else r.versions[-1]
+ if selected is None:raise HTTPException(404,'Unknown checked application version')
+ return selected['version']
 @router.get('/travel/{rid}')
-async def travel_page(rid:str):
- r=travel_lookup(rid)
- return HTMLResponse('''<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aster Journeys · Local demonstration</title><link rel="stylesheet" href="/showcase-assets/hp-shell.css"><script defer src="/showcase-assets/hp-shell.js"></script><script defer src="/showcase-assets/device-navigation.js"></script><style>body{margin:0}iframe{border:0;width:100%;height:calc(100vh - 112px);min-height:600px}#notice{padding:20px;font-family:system-ui}</style></head><body>'''+hp_header()+'''<main id="main"><div id="notice">Loading the last verified application…</div><iframe id="app" sandbox="allow-scripts allow-forms allow-modals" title="Aster Journeys"></iframe><script>
- const rid='''+json.dumps(rid)+''';let token=sessionStorage.getItem('travel-token-'+rid)||'';
- const frame=document.getElementById('app');frame.src='/api/travel/'+rid+'/frame';
- window.addEventListener('message',async e=>{if(e.source!==frame.contentWindow||e.data?.kind!=='travel-api')return;const d=e.data;try{const response=await fetch('/api/travel/'+rid+'/backend',{method:'POST',headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})},body:JSON.stringify({method:d.method,path:d.path,body:d.body||{}})});const result=await response.json();if(!response.ok)throw Error(result.detail||'Backend unavailable');if(result.body?.token){token=result.body.token;sessionStorage.setItem('travel-token-'+rid,token)}if(d.path==='/logout'){token='';sessionStorage.removeItem('travel-token-'+rid)}e.source.postMessage({kind:'travel-result',id:d.id,response:result},'*')}catch(err){e.source.postMessage({kind:'travel-result',id:d.id,error:err.message},'*')}});
+async def travel_page(rid:str,version:int|None=None,embed:bool=False):
+ r=travel_lookup(rid);selected=published_version(r,version)
+ return HTMLResponse('''<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aster Journeys · Local demonstration</title><link rel="stylesheet" href="/showcase-assets/hp-shell.css"><script defer src="/showcase-assets/hp-shell.js"></script><script defer src="/showcase-assets/device-navigation.js"></script><style>body{margin:0}iframe{border:0;width:100%;height:calc(100vh - 112px);min-height:600px}#notice{padding:20px;font-family:system-ui}</style></head><body>'''+('' if embed else hp_header())+'''<main id="main"><div id="notice">Loading the last verified application…</div><iframe id="app" sandbox="allow-scripts allow-forms allow-modals" title="Aster Journeys"></iframe><script>
+ const version='''+str(selected)+''';const rid='''+json.dumps(rid)+''';let token=sessionStorage.getItem('travel-token-'+rid)||'';
+ const frame=document.getElementById('app');frame.src='/api/travel/'+rid+'/frame?version='+version;
+ window.addEventListener('message',async e=>{if(e.source!==frame.contentWindow||e.data?.kind!=='travel-api')return;const d=e.data;try{const response=await fetch('/api/travel/'+rid+'/backend?version='+version,{method:'POST',headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})},body:JSON.stringify({method:d.method,path:d.path,body:d.body||{}})});const result=await response.json();if(!response.ok)throw Error(result.detail||'Backend unavailable');if(result.body?.token){token=result.body.token;sessionStorage.setItem('travel-token-'+rid,token)}if(d.path==='/logout'){token='';sessionStorage.removeItem('travel-token-'+rid)}e.source.postMessage({kind:'travel-result',id:d.id,response:result},'*')}catch(err){e.source.postMessage({kind:'travel-result',id:d.id,error:err.message},'*')}});
  frame.onload=()=>document.getElementById('notice').hidden=true;
- </script></main></body></html>''',headers={'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; frame-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"})
+ </script></main></body></html>''',headers={'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"})
 @router.get('/api/travel/{rid}/frame')
-async def travel_frame(rid:str):
+async def travel_frame(rid:str,version:int|None=None):
  r=travel_lookup(rid)
  if not r.versions:return HTMLResponse('<p>No verified version yet. Development continues in Agent Factory.</p>',status_code=409)
- v=r.root/('version-'+str(r.versions[-1]['version']))
+ v=r.root/('version-'+str(published_version(r,version)))
  html=(v/'index.html').read_text();html=re.sub(r'<script\b[^>]*>[\s\S]*?</script>','',html,flags=re.I);html=re.sub(r'<link\b[^>]*>','',html,flags=re.I)
  bridge="let seq=0;const pending=new Map();window.furyApi=(method,path,body={})=>new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});parent.postMessage({kind:'travel-api',id,method,path,body},'*');setTimeout(()=>{if(pending.has(id)){pending.delete(id);reject(Error('Backend timeout'))}},15000)});addEventListener('message',e=>{if(e.source!==parent||e.data?.kind!=='travel-result')return;const p=pending.get(e.data.id);if(!p)return;pending.delete(e.data.id);e.data.error?p.reject(Error(e.data.error)):p.resolve(e.data.response)});"
  return HTMLResponse('<style>'+(v/'styles.css').read_text()+'</style>'+html+'<script>'+ ('(()=>{'+bridge+'})();\n'+(v/'app.js').read_text()).replace('</script','<\\/script')+'</script>',headers={'Cache-Control':'no-store','Content-Security-Policy':"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'"})
@@ -255,7 +277,7 @@ class TravelRequest(BaseModel):
  model_config=ConfigDict(extra='forbid')
  method:str;path:str;body:dict={}
 @router.post('/api/travel/{rid}/backend')
-async def travel_backend(rid:str,body:TravelRequest,request:Request):
+async def travel_backend(rid:str,body:TravelRequest,request:Request,version:int|None=None):
  r=travel_lookup(rid)
  if not r.versions:raise HTTPException(409,'No verified backend yet')
  if body.method not in ('GET','POST','PUT','DELETE') or not re.fullmatch(r'/(health|register|login|logout|me|listings(?:/\d+)?|favorites(?:/\d+)?|itineraries(?:/\d+)?|quote|reservations(?:/\d+)?|admin/(?:listings(?:/\d+)?|reservations))',body.path):raise HTTPException(422,'Outside demonstration API')
@@ -263,7 +285,7 @@ async def travel_backend(rid:str,body:TravelRequest,request:Request):
  payload=body.model_dump();payload['headers']={'authorization':request.headers.get('authorization','')[:300]}
  try:
   async with asyncio.timeout(15):
-   async with travel_slots:return await asyncio.to_thread(execute,r.root/('version-'+str(r.versions[-1]['version'])),r.data,'api',payload)
+   async with travel_slots:return await asyncio.to_thread(execute,r.root/('version-'+str(published_version(r,version))),r.data,'api',payload)
  except TimeoutError:raise HTTPException(503,'Demo API capacity timed out; retry shortly')
  except (RuntimeError,ValueError):raise HTTPException(503,'Generated application failed; last preview retained')
 @router.get('/api/travel/{rid}/docs')
@@ -274,7 +296,9 @@ async def travel_docs(rid:str):
 
 @router.get('/api/devteam/watch/{rid}')
 async def watch_travel(rid:str):
- r=travel_lookup(rid);snapshot=r.snapshot()
+ r=run()
+ if r.id!=rid:raise HTTPException(404,'Run is private to its owner')
+ snapshot=r.snapshot()
  # Viewers can inspect execution, never acquire another visitor's controls.
  if isinstance(snapshot.get('tests'),dict):snapshot['tests'].pop('persistence_probe',None)
  snapshot['read_only']=True

@@ -53,7 +53,7 @@ async def main(a):
   try:
    cycle=0
    while cycle<a.cycles or time.time()-report['started']<a.seconds:
-    cycle+=1;rows={};contexts=[];cycle_start=time.time();agent_started=asyncio.Event();agent_done=asyncio.Event();iterations={};prepared=asyncio.Barrier(3)
+    cycle+=1;product=('travel','short-editorial','short')[(cycle-1)%3] if a.agent_product=='mixed' else a.agent_product;rows={};contexts=[];cycle_start=time.time();agent_started=asyncio.Event();agent_done=asyncio.Event();iterations={};prepared=asyncio.Barrier(3)
     async def workflow(name,port,path):
      iterations[name]=iterations.get(name,0)+1;iteration=iterations[name]
      row={'started':time.time(),'errors':[],'failed_requests':[],'workflow':name,'iteration':iteration};rows[name+'-'+str(iteration)]=row
@@ -66,17 +66,21 @@ async def main(a):
       response=await page.goto(f'http://{HOST}:{port}{path}');assert response.status==200
       if name=='agent':
        await page.locator('#start').wait_for();await page.wait_for_function("() => !document.getElementById('start').disabled",timeout=30000)
-       await page.select_option('#product','short');await page.check('#automatic')
+       await page.select_option('#demo-mode','live');await page.select_option('#product',product);await page.locator('#advanced-controls').evaluate('(el)=>el.open=true');await page.check('#automatic')
        row['submitted']=time.time()
        async with page.expect_response(lambda r:'/api/devteam/runs' in r.url and r.request.method=='POST') as created:await page.click('#start')
        created=await created.value
        assert created.status==201,'Factory start was explicitly rejected: HTTP '+str(created.status)+' '+await created.text()
        await page.wait_for_function("() => document.getElementById('run-state').textContent==='running'",timeout=30000)
        await page.wait_for_function("() => document.querySelector('.actor.generating')!==null",timeout=60000);agent_started.set()
-       await page.wait_for_function("() => ['finished','failed','stopped'].includes(document.getElementById('run-state').textContent)",timeout=1800000)
-       d=await page.evaluate("fetch('/api/devteam/run').then(r=>r.json())");row['run']=d
+       await page.wait_for_function("() => ['finished','failed','stopped','blocked'].includes(document.getElementById('run-state').textContent)",timeout=1800000)
+       d=await page.evaluate("fetch('/api/devteam/run').then(r=>r.json())");assert d.get('mode','live')=='live','Recorded playback cannot qualify as live inference';row['run']=d
        assert d['state']=='finished',d.get('error');assert d['tests']['passed'];assert any(c['model']=='fury-lead' and c['status']=='complete' for c in d['calls'])
-       await verify_travel(page,row,cycle)
+       if product=='travel':
+        import importlib.util,types
+        spec=importlib.util.spec_from_file_location('portal',Path(__file__).with_name('travel-portal.py'));portal=importlib.util.module_from_spec(spec);spec.loader.exec_module(portal)
+        owner=out/'factory-owner.json';await ctx.storage_state(path=str(owner));assert await portal.main(types.SimpleNamespace(run=d['id'],output=str(out/'portal'),origin='http://localhost:8501',storage_state=str(owner)))
+       else:await verify_travel(page,row,cycle)
       elif name=='atlas':
        await page.wait_for_function('() => typeof config!=="undefined"&&!!config',timeout=30000)
        await page.evaluate('attract=false;voice=false');await page.fill('#question-input',f'What happens to Q4 profit if our Commit stage win rate drops by {3+(cycle+iteration)%18} percentage points?')
@@ -98,7 +102,7 @@ async def main(a):
         await page.frame_locator('#stage iframe').locator('body').wait_for();assert len(await page.frame_locator('#stage iframe').locator('body').inner_text())>80
         link=page.get_by_text('Download editable PPTX');href=await link.get_attribute('href');data=await page.evaluate('async u=>{const r=await fetch(u);if(!r.ok)throw Error(r.status);const b=new Uint8Array(await r.arrayBuffer());let s="";for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode(...b.subarray(i,i+8192));return btoa(s)}',href);raw=base64.b64decode(data)
         z=zipfile.ZipFile(io.BytesIO(raw));assert len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')])==3;(out/f'cycle-{cycle}-{iteration}.pptx').write_bytes(raw);row['pptx_bytes']=len(raw)
-      await page.screenshot(path=str(out/f'{cycle}-{name}-{iteration}.png'),full_page=True);assert not row['errors'],row['errors'];row['budget_seconds']={'atlas':15,'slides':45,'image':15,'agent':600}[name];assert time.time()-row.get('submitted',row['started'])<=row['budget_seconds'],'Measured latency exceeded the predeclared demo budget';row['passed']=True
+      await page.screenshot(path=str(out/f'{cycle}-{name}-{iteration}.png'),full_page=True);assert not row['errors'],row['errors'];row['budget_seconds']={'atlas':15,'slides':45,'image':15,'agent':1800 if product=='travel' else 600}[name];assert time.time()-row.get('submitted',row['started'])<=row['budget_seconds'],'Measured latency exceeded the predeclared demo budget';row['passed']=True
      except Exception as e:
       row['passed']=False;row['error']=str(e) or repr(e);row['failure_traceback']=traceback.format_exc();await page.screenshot(path=str(out/f'{cycle}-{name}-{iteration}-failure.png'),full_page=True)
      finally:
@@ -133,4 +137,4 @@ async def main(a):
    done.set();await monitor_task;await browser.close();save_report(out,report);print('EVIDENCE '+str(out),flush=True)
  return all(r['passed'] for c in report['cycles'] for r in c['results'].values())
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--cycles',type=int,default=1);p.add_argument('--seconds',type=int,default=0);p.add_argument('--only',choices=['all','atlas','slides','agent','image'],default='all');p.add_argument('--individual',action='store_true');p.add_argument('--output');p.add_argument('--wait-idle',action='store_true');p.add_argument('--sustain',action='store_true');a=p.parse_args();raise SystemExit(0 if asyncio.run(main(a)) else 1)
+ p=argparse.ArgumentParser();p.add_argument('--agent-product',choices=['short','short-editorial','travel','mixed'],default='short');p.add_argument('--cycles',type=int,default=1);p.add_argument('--seconds',type=int,default=0);p.add_argument('--only',choices=['all','atlas','slides','agent','image'],default='all');p.add_argument('--individual',action='store_true');p.add_argument('--output');p.add_argument('--wait-idle',action='store_true');p.add_argument('--sustain',action='store_true');a=p.parse_args();raise SystemExit(0 if asyncio.run(main(a)) else 1)

@@ -20,6 +20,8 @@ def check_product(code,data,stop=None):
   try:fn();results.append({'id':key,'passed':True})
   except Exception as e:
    item={'id':key,'passed':False,'error':str(e)[:2500]}
+   if key=='auth' and 'No item with that key' in str(e):
+    item['error']+=' SQLite Row lookup failed: compare SELECT projections with every later row[key] access. The login response reads user id, email and role; its query must include email as well as the password/salt fields (or use the validated email value). Preserve the exact schema and expected statuses.'
    if isinstance(e,RoutingContractError):item['repair_files']=e.files
    results.append(item)
  context={}
