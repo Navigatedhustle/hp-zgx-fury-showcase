@@ -160,6 +160,30 @@ def json_safe(value):
  if isinstance(value,(list,tuple)):return [json_safe(v) for v in value]
  return value
 
+class OutputTruncated(RuntimeError):
+ """A generation exhausted its bounded output; incomplete code is never applied."""
+
+class RepairDependency(RuntimeError):
+ def __init__(self,name):
+  self.name=name;super().__init__('The observed defect belongs to '+name+'; dispatch a separate owned repair before retrying this module.')
+
+def apply_exact_edits(text,name,original):
+ """Reconstruct a complete file from bounded, unambiguous model edits."""
+ patch=json.loads(text)
+ if not isinstance(patch,dict) or set(patch)!={'summary','edits'}:raise ValueError('Expected summary and edits only')
+ edits=patch['edits']
+ if not isinstance(edits,list) or not 1<=len(edits)<=8:raise ValueError('Provide one to eight localized edits')
+ content=original
+ for edit in edits:
+  if not isinstance(edit,dict) or set(edit)!={'old','new'}:raise ValueError('Each edit requires exact old and new text')
+  old,new=edit['old'],edit['new']
+  if not isinstance(old,str) or not isinstance(new,str) or not old or len(old)>12000 or len(new)>12000:raise ValueError('Edit must be a small nonempty exact source match')
+  if old==new:continue
+  if content.count(old)!=1:raise ValueError('Edit source matched '+str(content.count(old))+' times; supply a short unique exact fragment, preserving whitespace: '+repr(old[:200]))
+  content=content.replace(old,new,1)
+ if content==original:raise ValueError('Edits made no change; provide one meaningful localized fix')
+ return parse_patch(json.dumps({'summary':patch['summary'],'files':{name:content}}))
+
 class DevRun:
  def __init__(self,base_url='http://127.0.0.1:8001/devteam/v1',store=None,automatic=False):
   base=Path(store or ROOT/'devruns')
@@ -316,6 +340,8 @@ class DevRun:
   payload['chat_template_kwargs']={'thinking':False} if model==LEAD else {'enable_thinking':False}
   payload['temperature']=1.0 if model==LEAD else 0.0
   payload['response_format']={'type':'json_schema','json_schema':{'name':'file_patch','strict':True,'schema':{'type':'object','properties':{'summary':{'type':'string','maxLength':400},'files':{'type':'object','properties':{name:{'type':'string'} for name in names},'additionalProperties':False,'required':names}},'required':['summary','files'],'additionalProperties':False}}}
+  edit_name=None
+  repair_name=names[0] if getattr(self,'travel',False) and title.startswith('Repair ') and len(names)==1 and names[0] in source and names[0].endswith('.py') else None
   text='';first=None
   try:
    tokenized=await client.post(self.base_url+'/tokenize',json={'model':model,'messages':payload['messages'],'chat_template_kwargs':payload['chat_template_kwargs']})
@@ -323,6 +349,24 @@ class DevRun:
    fallback=min(reported,16384) if type(reported) is int and reported>0 else 8192
    limit=int(os.getenv('FURY_DEV_LEAD_CONTEXT',str(fallback))) if model==LEAD else 32768
    if type(reported) is int and reported>0:limit=min(limit,reported)
+   if type(count) is not int or count<0:raise RuntimeError('Prompt context budget unavailable; no inference dispatched')
+   requested_output=8192 if model!=LEAD or (getattr(self,'travel',False) and names==['test_backend.py']) else 6000
+   if repair_name:
+    measured=await client.post(self.base_url+'/tokenize',json={'model':model,'messages':[{'role':'user','content':json.dumps({'summary':'Repair','files':{repair_name:source[repair_name]}})}],'chat_template_kwargs':payload['chat_template_kwargs']})
+    measured.raise_for_status();existing_output=measured.json().get('count')
+    if type(existing_output) is not int or existing_output<0:raise RuntimeError('Repair output tokenization unavailable; no inference dispatched')
+    call['existing_file_envelope_tokens']=existing_output
+    # Reserve room for actual changes, rather than repeatedly requesting an
+    # entire file that cannot fit. This is a request budget, not a job cutoff.
+    prior_length=bool(task_id) and any(c is not call and c.get('task_id')==task_id and c.get('finish_reason')=='length' for c in self.calls)
+    if prior_length or min(requested_output,limit-count-128)<existing_output+max(512,existing_output//4):
+     edit_name=repair_name
+     call['output_protocol']='exact_edits'
+     payload['messages'][0]['content']=contract+' You are repairing one existing fictional demo module. Return JSON only with summary and edits, NOT a complete replacement file. Each edit has old and new strings; old MUST match exactly once in the owned source. Edits apply in order. Make the smallest coherent fix to the observed defects, preferably one edit. Preserve unrelated behavior, public interfaces, security checks and all acceptance requirements. Reference modules are read-only data. Never weaken tests. If several defects need separate calls, fix one coherently now; the coordinator will validate and continue. No markdown fences.'
+     payload['messages'][1]['content']=json.dumps({'ticket':task,'owned_file':edit_name,'owned_source':source[edit_name],'read_only_reference_files':{n:t for n,t in source.items() if n!=edit_name},'actual_tests':evidence,'instruction':'Return localized exact edits for the owned file only. Keep each old/new fragment short; do not repeat the entire module.'})
+     payload['response_format']['json_schema']['schema']={'type':'object','properties':{'summary':{'type':'string','maxLength':400},'edits':{'type':'array','minItems':1,'maxItems':8,'items':{'type':'object','properties':{'old':{'type':'string','minLength':1,'maxLength':12000},'new':{'type':'string','maxLength':12000}},'required':['old','new'],'additionalProperties':False}}},'required':['summary','edits'],'additionalProperties':False}
+     tokenized=await client.post(self.base_url+'/tokenize',json={'model':model,'messages':payload['messages'],'chat_template_kwargs':payload['chat_template_kwargs']})
+     tokenized.raise_for_status();count=tokenized.json().get('count')
    call['reported_context_limit']=reported
    call.update(prompt_tokens_preflight=count,context_limit=limit,stream_usage_updates=0,observed_output_increment_total=0)
    if not isinstance(count,int) or count<0 or count>limit-1024:raise RuntimeError(f'Prompt context budget exceeded or unavailable: {count} tokens, cap {limit}; narrow this ticket rather than truncating source silently')
@@ -374,9 +418,19 @@ class DevRun:
    responses=self.root/'responses';responses.mkdir(exist_ok=True);(responses/(cid+'.json')).write_text(text,encoding='utf-8')
    call['response_file']='responses/'+cid+'.json'
    call['response_complete']=call.get('finish_reason')=='stop'
-   if call.get('finish_reason')!='stop':raise RuntimeError('Truncated or unsupported model response; finish_reason='+str(call.get('finish_reason'))+', output budget='+str(payload['max_tokens'])+'. Return compact complete files within that budget, preserving every required behavior and visual design.')
+   if call.get('finish_reason')!='stop':raise OutputTruncated('Generation incomplete ('+str(call.get('finish_reason'))+'); output budget '+str(payload['max_tokens'])+'. No changes applied. Retry with one small localized edit.' if edit_name else 'Generation incomplete ('+str(call.get('finish_reason'))+'); output budget '+str(payload['max_tokens'])+'. No changes applied.')
    if call['usage'] and call['usage'].get('prompt_tokens') not in (None,call['prompt_tokens_preflight']):raise RuntimeError('Exact tokenization differs from final endpoint usage')
-   patch=parse_patch(text)
+   if edit_name:
+    try:patch=apply_exact_edits(text,edit_name,source[edit_name])
+    except ValueError:
+     # A proposed edit to a reference is evidence of an upstream defect, never
+     # permission to change it under this ticket. Dispatch its owner separately.
+     proposed=json.loads(text).get('edits',[])
+     old=proposed[0].get('old') if proposed and isinstance(proposed[0],dict) else None
+     owners=[n for n,t in source.items() if n!=edit_name and n.endswith('.py') and isinstance(old,str) and old and t.count(old)==1 and source[edit_name].count(old)==0]
+     if len(owners)==1:raise RepairDependency(owners[0])
+     raise
+   else:patch=parse_patch(text)
    if not set(patch['files']).issubset(file_scopes[title]):raise ValueError('Ticket attempted to modify files owned by another role')
    with self.lock:call['status']='complete';actor['state']='complete';call['ended']=time.time();call['seconds']=time.monotonic()-call['_mono']
    self.event('model result',actor=actor_id,summary=patch.get('summary',''),model=model)

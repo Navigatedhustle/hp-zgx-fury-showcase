@@ -9,7 +9,7 @@ This is a demonstration project, with fictional data and public demonstration ac
 ## Download and launch
 
 ```bash
-git clone --branch v2.1.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
+git clone --branch v2.1.1 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
 cd hp-zgx-fury-showcase
 ./launch.sh
 ```
@@ -40,7 +40,7 @@ A desktop copy may require the file manager's **Allow Launching / Trust** action
 
 ## Agent Factory presenter update
 
-Choose Live build for actual local development or Guided demonstration for a clearly labeled recorded successful run with a working application artifact. The main view shows stages, current tasks, evidence, elapsed time and endpoint usage; checked previews remain available until you refresh to a newer version. [Presenter details](docs/AGENT-FACTORY-PRESENTER.md) · [Colorado deployment PDF](docs/Colorado-Deployment-v2.1.0.pdf) · [Release verification](docs/FACTORY-VERIFICATION.md).
+Choose Live build for actual local development or Guided demonstration for a clearly labeled recorded successful run with a working application artifact. The main view shows stages, current tasks, evidence, elapsed time and endpoint usage; checked previews remain available until you refresh to a newer version. [Presenter details](docs/AGENT-FACTORY-PRESENTER.md) · [Colorado deployment PDF](docs/Colorado-Deployment-v2.1.1.pdf) · [Release verification](docs/FACTORY-VERIFICATION.md).
 
 ## Present the HP experience
 
@@ -88,7 +88,7 @@ For a Git checkout with clean tracked source:
 ```bash
 ./launch.sh stop
 git fetch --tags origin
-git switch --detach v2.1.0
+git switch --detach v2.1.1
 ./launch.sh
 ```
 

@@ -39,6 +39,21 @@ def qa_contract_diagnostics(source):
  return '\n'.join(lines)
 
 
+def backend_dispatch_diagnostics(source):
+ """Check the immutable two-argument generated module interface before merge."""
+ tree=ast.parse(source);aliases={}
+ modules={'auth','catalog','private','reservations'}
+ for node in ast.walk(tree):
+  if isinstance(node,ast.ImportFrom) and node.module in modules:
+   for alias in node.names:
+    if alias.name=='routes':aliases[alias.asname or alias.name]=node.module
+ for node in ast.walk(tree):
+  if not isinstance(node,ast.Call):continue
+  module=aliases.get(node.func.id) if isinstance(node.func,ast.Name) else node.func.value.id if isinstance(node.func,ast.Attribute) and node.func.attr=='routes' and isinstance(node.func.value,ast.Name) and node.func.value.id in modules else None
+  if module and (len(node.args)+len(node.keywords)!=2 or any(k.arg not in ('conn','request') for k in node.keywords)):
+   raise ValueError('Dispatcher interface violation at line '+str(node.lineno)+': '+module+'.routes requires exactly (conn, request), never a third current_user argument. Each module owns authentication. Dispatch auth, catalog, private and reservations in order, returning the first non-None response; do not send reservation paths exclusively to private.routes. Preserve public quote and unknown404.')
+
+
 def repair_targets(failure):
  if failure['id']=='routing':return [name for name in failure.get('repair_files',[]) if name in {'auth.py','catalog.py','private.py','reservations.py','backend.py'}] or ['backend.py']
  if failure['id']=='reservation' and '/quote' in str(failure.get('error','')) and "'status': 401" in str(failure.get('error','')):
@@ -113,7 +128,7 @@ class TravelRun(DevRun):
    if self.stop_event.is_set():self.state='interrupted' if getattr(self,'recover_after_restart',False) else 'stopped';self.error=''
    else:self.state='blocked';self.error=str(e)[:3000];logging.exception('Travel development blocked %s',self.id)
   finally:self.event('terminal',state=self.state,error=self.error)
- async def ticket(self,client,title,name,prompt,task):
+ async def ticket(self,client,title,name,prompt,task,dependency_chain=()):
   if self.stop_event.is_set():raise asyncio.CancelledError()
   if name=='app.js':prompt+=' Return complete app.js compactly within22000 characters: remove redundant comments/blank lines before editing logic, without removing any behavior.'
   task.update(status='generating');self.product['next_action']=title;self.event('task handoff',task_id=task['id'],title=title,files=[name])
@@ -129,14 +144,23 @@ class TravelRun(DevRun):
     if name.endswith('.py'):ast.parse(content,filename=name)
     if name=='app.js':await asyncio.to_thread(check_javascript,staging)
     if name=='backend.py':
+     backend_dispatch_diagnostics(content)
      probe=await asyncio.to_thread(execute,staging,self.root/('integration-check-'+devteam.uuid.uuid4().hex[:8]),'api',{'method':'GET','path':'/health','body':{},'headers':{}})
      if probe.get('status')!=200:raise ValueError('Backend integration must import its declared modules and answer GET /health with status200 before merge; actual '+str(probe))
      self.event('backend bootstrap checked',task_id=task['id'],passed=True,summary='Backend starts and answers its health check')
     self.apply(patch,actor=task['actor'],task_id=task['id'],call_id=self.calls[-1]['id']);task['status']='merged';self.event('task merged',title=title,task_id=task['id']);return
+   except devteam.RepairDependency as e:
+    if e.name in (*dependency_chain,name) or len(dependency_chain)>=2:raise RuntimeError('Repair dependency cycle detected; checked preview retained') from e
+    dependency={'id':'dependency-'+devteam.uuid.uuid4().hex[:12],'title':'Repair '+e.name,'actor':'daniel','model':LEAD,'owns':[e.name],'dependencies':[],'status':'pending'}
+    self.tasks.append(dependency);task['status']='waiting'
+    self.event('repair dependency identified',task_id=task['id'],file=name,dependency=e.name,summary='Repairing the upstream module before continuing')
+    await self.ticket(client,dependency['title'],e.name,'Repair the upstream integration defect identified while repairing '+name+'. '+prompt+' Preserve the exact module interfaces in the immutable contract. Change '+e.name+' only; follow the required response schema.',dependency,dependency_chain=(*dependency_chain,name))
+    task.update(status='merged',resolution='Upstream repair applied; independent checks must confirm resolution')
+    self.event('task resolved by dependency',task_id=task['id'],dependency=e.name,verification_pending=True);return
    except (ValueError,RuntimeError,SyntaxError,httpx.HTTPError,TimeoutError) as e:
-    feedback='Previous attempt failed: '+str(e)[:2500]+'. Change approach: simplify and keep complete file compact; preserve all requirements.'
+    feedback=('The previous response exceeded its output budget. Return exactly ONE small exact edit addressing the highest-priority defect; omit commentary and other changes.' if isinstance(e,devteam.OutputTruncated) else 'Previous attempt failed: '+str(e)[:1500]+'. Correct this defect with the smallest coherent change; preserve all requirements.')
     self.event('repair required',title=title,attempt=attempt+1,error=feedback)
-  task['status']='blocked';raise RuntimeError(title+' failed after three different repair requests: '+feedback)
+  task['status']='blocked';raise RuntimeError(title+' needs further repair; completed files and the last working preview are retained. '+feedback)
  async def generated_qa(self,n):
   if self.stop_event.is_set():raise asyncio.CancelledError()
   try:names=(await asyncio.to_thread(execute,self.candidate,self.root/('qa-'+str(n)),'travellist')).get('tests',[])
@@ -234,4 +258,4 @@ class TravelRun(DevRun):
      if name=='app.js':errors+=' When a click produces no API call, trace event target/closest selection and branch reachability FIRST. A target selected only by [data-view] cannot match a favorite/detail/itinerary action. Select a union of all action attributes, then branch by the actual attribute. Convert dataset IDs to integers for API bodies. Bind forms before initial asynchronous session lookup; supply all required data-detail/data-favorite/data-edit-itinerary/data-delete-itinerary hooks on actual rendered buttons. Each navigation must load its backend data. Generate request keys automatically (never require a visitor to fill a technical key) and reset only after confirmed success. Coerce all dataset IDs to integer API fields. Every required flow must genuinely work, not just the first failing action.'
      if name=='test_backend.py':errors=qa_contract_diagnostics((self.candidate/name).read_text())+'\nLogout revocation: POST /logout with an already revoked bearer may return200 or401; prove revocation using GET /me and GET /favorites returning401. Do not require repeat logout401.\n'+errors
      if name=='test_backend.py':errors+=' Test only documented routes. Itinerary retrieval is GET /itineraries, returning the owned list; GET /itineraries/{id} is not in the contract. Test ownership with list membership and cross-user PUT/DELETE returning404, then verify the owner can still read/edit/delete the record. Do not repeatedly change expected status on an undocumented route. Reminder: administrator is seeded; LOGIN admin@example.test rather than registering it (which correctly returns409). Preserve legitimate tests; compact comments/whitespace to fit output.'
-     await self.ticket(client,title,name,'Repair approach '+str(n+1)+': '+('inspect boundary validation and transaction behavior' if n%2==0 else 'simplify the failing handler and trace request/response state end to end')+'. Repair actual implementation against immutable acceptance. Observed failures: '+errors+'\nChange only '+name+'. Inspect its complete source. Preserve working behavior. Return complete file.',task)
+     await self.ticket(client,title,name,'Repair approach '+str(n+1)+': '+('inspect boundary validation and transaction behavior' if n%2==0 else 'simplify the failing handler and trace request/response state end to end')+'. Repair actual implementation against immutable acceptance. Observed failures: '+errors+'\nChange only '+name+'. Inspect its complete source. Preserve working behavior. '+'Follow the required response schema.',task)

@@ -42,3 +42,16 @@ Independent cached setup rebuilt the editor and verified the pinned model manife
 During the final long travel build, an actionable SQLite SELECT-projection diagnostic was added after observing the missing email-column lookup. Acceptance criteria were unchanged; the local model repaired the generated code itself. Its 23-minute repair sequence is included above, rather than hidden behind an average. No generated application source was manually patched.
 
 Earlier failed/interrupted attempts remain local and are excluded from the qualifying soak. Generative output can still fail checks; use the clearly recorded guided mode for predictable generalist presentations. The source and asset ZIP intentionally excludes private logs, databases, prompts, credentials, tailnet state, weights and licensed HP fonts.
+
+
+## v2.1.1 repair-budget correction
+
+A post-release travel repair exhausted a 3469-token output allowance three times while being required to return a complete 15 KB module. The underlying reservation failure also involved an upstream backend dispatcher, so rewriting the reservations module alone could not resolve it.
+
+The controller now measures the existing complete-file JSON envelope with the active serving tokenizer, including its chat template. It reserves output headroom and selects bounded localized exact edits when a complete replacement cannot safely fit. An unexpected length termination forces the next request for that ticket to use localized edits. Incomplete, ambiguous and unchanged patches never merge; safe redundant no-op fragments are ignored when the patch contains a real edit. Reference-file edits trigger a separately scoped owner repair, with dependency depth and cycle checks. Full independent acceptance follows every repair pass. The backend integration gate also checks the declared two-argument module dispatch interface before merging.
+
+Generated QA now supplies the actual rejected API status/reason and selected non-secret inputs; reservation diagnostics include the real listing capacity. This exposed a test attempting three guests in a two-person listing. The model corrected the fixture while preserving reservation success, duplicate conflict and cross-user ownership assertions. Credentials and authorization headers are omitted.
+
+The original blocked run was retained and resumed with real local inference. It finished with all six backend checks, all 15 generated tests, desktop/mobile browser acceptance and persistence verification passing. A browser reconnected after a Factory-only restart, showed Application ready with checked version 2 and six functional listing cards, and reported zero page exceptions. No generated application file was manually patched.
+
+Patch validation: 161 Factory regression tests and 19 core checks. New regressions cover the exact 3469-token limit, rejection of ambiguous or incomplete edits, scoped upstream handoff, dispatcher arity, sanitized real sandbox diagnostics and a forced protocol change after unexpected truncation. The earlier 44.10-minute soak remains the v2.1.0 baseline; it was not repeated for this patch. The serving models, admission limits, generated travel assets and recorded example remain unchanged.

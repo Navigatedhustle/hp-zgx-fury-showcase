@@ -305,3 +305,97 @@ def test_qa_import_failure_is_returned_to_the_repair_loop(tmp_path):
  result=asyncio.run(r.generated_qa(0))
  assert result['passed'] is False and result['tests']==0
  assert 'unavailable_qa_fixture_module' in result['log']
+
+
+def test_exact_repairs_reject_ambiguous_or_incomplete_edits():
+ from devteam import apply_exact_edits
+ original='def value():\n return 1\n'
+ assert apply_exact_edits(json.dumps({'summary':'fix','edits':[{'old':'return 1','new':'return 2'}]}),'reservations.py',original)['files']['reservations.py']=='def value():\n return 2\n'
+ for edits in ([{'old':'missing','new':'x'}],[{'old':'','new':'x'}],[{'old':'return 1','new':'return 1'}],[{'old':'return 1','new':'return 2'},{'old':'missing','new':'x'}]):
+  with pytest.raises(ValueError):apply_exact_edits(json.dumps({'summary':'fix','edits':edits}),'reservations.py',original)
+ with pytest.raises(ValueError):apply_exact_edits(json.dumps({'summary':'fix','edits':[{'old':'x','new':'y'}]}),'reservations.py','x x')
+ assert original=='def value():\n return 1\n'
+
+
+def test_length_repair_retries_one_edit_without_replacing_complete_module(tmp_path):
+ import httpx,devteam
+ from travel_run import TravelRun
+ r=TravelRun(store=tmp_path/'runs');name='reservations.py';original='def routes(conn,request):\n return None\n'+'# retained code\n'*800
+ (r.candidate/name).write_text(original)
+ task={'id':'repair-budget','title':'Repair '+name,'actor':'daniel','model':devteam.LEAD};r.tasks.append(task);requests=[]
+ def handler(req):
+  if req.url.path.endswith('/tokenize'):return httpx.Response(200,json={'count':7000 if len(json.loads(req.content).get('messages',[]))==1 else 12787,'max_model_len':16384})
+  payload=json.loads(req.content);requests.append(payload)
+  assert payload['max_tokens']==3469
+  assert set(payload['response_format']['json_schema']['schema']['properties'])=={'summary','edits'}
+  assert (r.candidate/name).read_text()==original
+  if len(requests)==1:text='{"summary":"cut off';reason='length'
+  else:text=json.dumps({'summary':'localized fix','edits':[{'old':'return None','new':"return {'status':200,'body':{}}"}]});reason='stop'
+  return httpx.Response(200,text='data: '+json.dumps({'choices':[{'delta':{'content':text},'finish_reason':reason}],'usage':{'prompt_tokens':12787,'completion_tokens':20}})+'\n\ndata: [DONE]\n\n')
+ async def run():
+  async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:await r.ticket(client,task['title'],name,'Fix the observed route response',task)
+ asyncio.run(run())
+ assert len(requests)==2 and task['status']=='merged'
+ assert 'exactly ONE small exact edit' in requests[1]['messages'][1]['content']
+ assert (r.candidate/name).read_text()==original.replace("return None","return {'status':200,'body':{}}")
+ assert r.calls[0]['status']=='failed' and r.calls[1]['status']=='complete'
+ assert all(c['output_protocol']=='exact_edits' for c in r.calls)
+
+
+def test_reference_edit_dispatches_separate_owner_and_preserves_reservations(tmp_path,monkeypatch):
+ import devteam,httpx
+ r=TravelRun(store=tmp_path/'runs');original='def routes(conn,request):\n return None\n'+'# retained code\n'*800
+ (r.candidate/'reservations.py').write_text(original)
+ (r.candidate/'backend.py').write_text('def handle(request,db_path):\n return None\n')
+ task={'id':'dependency-fixture','title':'Repair reservations.py','actor':'daniel','model':devteam.LEAD};r.tasks.append(task);seen=[]
+ monkeypatch.setattr(travel_run,'execute',lambda *args,**kwargs:{'status':200,'body':{}})
+ def handler(req):
+  if req.url.path.endswith('/tokenize'):
+   data=json.loads(req.content);count=(7000 if 'reservations.py' in data['messages'][0]['content'] else 1000) if len(data.get('messages',[]))==1 else 4000
+   return httpx.Response(200,json={'count':count,'max_model_len':16384})
+  payload=json.loads(req.content);ticket=json.loads(payload['messages'][1]['content']);seen.append(ticket.get('owned_file') or ticket['allowed_output_files'][0])
+  text=json.dumps({'summary':'dispatcher defect','edits':[{'old':'def handle(request,db_path):\n return None','new':"def handle(request,db_path):\n return {'status':200,'body':{}}"}]}) if len(seen)==1 else json.dumps({'summary':'dispatcher fixed','files':{'backend.py':"def handle(request,db_path):\n return {'status':200,'body':{}}\n"}})
+  return httpx.Response(200,text='data: '+json.dumps({'choices':[{'delta':{'content':text},'finish_reason':'stop'}],'usage':{'prompt_tokens':4000,'completion_tokens':40}})+'\n\ndata: [DONE]\n\n')
+ async def run():
+  async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:await r.ticket(client,task['title'],'reservations.py','Fix the reservation dispatcher',task)
+ asyncio.run(run())
+ assert seen==['reservations.py','backend.py']
+ assert (r.candidate/'reservations.py').read_text()==original
+ assert "'status':200" in (r.candidate/'backend.py').read_text()
+ assert task['status']=='merged' and 'independent checks' in task['resolution']
+ assert any(e['kind']=='task resolved by dependency' and e['verification_pending'] for e in r.events)
+
+
+def test_backend_dispatch_signature_catches_the_actual_reservation_root_defect():
+ from travel_run import backend_dispatch_diagnostics
+ for source in ('from private import routes as private_routes\nprivate_routes(conn,request,current_user)\n','import private\nprivate.routes(conn,request,current_user)\n'):
+  with pytest.raises(ValueError,match='never a third current_user'):backend_dispatch_diagnostics(source)
+ backend_dispatch_diagnostics('from private import routes as private_routes\nprivate_routes(conn,request)\n')
+
+
+def test_generated_qa_failure_reports_actual_capacity_without_credentials(tmp_path):
+ from devteam_sandbox import available,execute
+ if not available():pytest.skip('Requires installed namespace sandbox')
+ code=tmp_path/'code';code.mkdir()
+ (code/'backend.py').write_text("def handle(request,db_path):\n if request['method']=='GET':return {'status':200,'body':{'listing':{'id':1,'capacity':2,'active':1}}}\n return {'status':400,'body':{'error':'Party size exceeds capacity'}}\n")
+ (code/'test_backend.py').write_text("from backend import handle\ndef test_reservation():\n reply=handle({'method':'POST','path':'/reservations','body':{'listing_id':1,'party':3,'password':'fixture-private-password'},'headers':{'authorization':'fixture-private-bearer'}},'/data/test.sqlite')\n assert reply['status']==201\n")
+ result=execute(code,tmp_path/'data','traveltest')
+ assert not result['passed'] and 'Party size exceeds capacity' in result['log']
+ assert '"capacity": 2' in result['log'] and '"party": 3' in result['log']
+ assert 'fixture-private-password' not in result['log'] and 'fixture-private-bearer' not in result['log']
+
+
+def test_unexpected_complete_file_truncation_switches_protocol(tmp_path):
+ import devteam,httpx
+ r=TravelRun(store=tmp_path/'runs');original='def routes(conn,request):\n return None\n'
+ (r.candidate/'reservations.py').write_text(original)
+ task={'id':'unexpected-length','title':'Repair reservations.py','actor':'daniel','model':devteam.LEAD};r.tasks.append(task);protocols=[]
+ def handler(req):
+  data=json.loads(req.content)
+  if req.url.path.endswith('/tokenize'):return httpx.Response(200,json={'count':100 if len(data['messages'])==1 else 4000,'max_model_len':16384})
+  schema=data['response_format']['json_schema']['schema']['properties'];protocols.append('files' if 'files' in schema else 'edits')
+  text='{"files":' if len(protocols)==1 else json.dumps({'summary':'one small repair','edits':[{'old':'return None','new':"return {'status':200,'body':{}}"}]})
+  return httpx.Response(200,text='data: '+json.dumps({'choices':[{'delta':{'content':text},'finish_reason':'length' if len(protocols)==1 else 'stop'}],'usage':{'prompt_tokens':4000,'completion_tokens':20}})+'\n\ndata: [DONE]\n\n')
+ async def run():
+  async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:await r.ticket(client,task['title'],'reservations.py','Fix route',task)
+ asyncio.run(run());assert protocols==['files','edits'];assert task['status']=='merged'

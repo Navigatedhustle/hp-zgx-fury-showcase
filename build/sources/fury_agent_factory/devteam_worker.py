@@ -62,6 +62,21 @@ if sys.argv[1] in ('test','traveltest','travellist'):
      self.assertGreaterEqual(reply['status'],400,day)
     valid=handle({'method':'POST','path':'/bookings','body':{'hotel_id':hid,'guest':'Fictional Guest','date':'2028-02-29'}},db)
     self.assertIn(valid['status'],(200,201))
+ observed_rejections=[]
+ if sys.argv[1]=='traveltest' and os.path.isfile('/workspace/backend.py'):
+  import backend
+  actual_handle=backend.handle
+  def observed_handle(request,db_path):
+   reply=actual_handle(request,db_path)
+   if isinstance(request,dict) and isinstance(reply,dict) and reply.get('status',0)>=400:
+    body=request.get('body');body=body if isinstance(body,dict) else {}
+    observation={'method':request.get('method'),'path':request.get('path'),'status':reply.get('status'),'error':str(reply.get('body',{}).get('error',''))[:200],'input':{k:body[k] for k in ('listing_id','check_in','check_out','party') if k in body}}
+    if request.get('path') in ('/quote','/reservations') and type(body.get('listing_id')) is int:
+     listing=actual_handle({'method':'GET','path':'/listings/'+str(body['listing_id']),'body':{}},db_path).get('body',{}).get('listing',{})
+     observation['actual_listing']={k:listing[k] for k in ('id','capacity','active') if k in listing}
+    observed_rejections.append(observation);del observed_rejections[:-4]
+   return reply
+  backend.handle=observed_handle
  suite=unittest.defaultTestLoader.discover('/workspace',pattern='test_*.py')
  def flatten(suite):
   return [case for item in suite for case in (flatten(item) if isinstance(item,unittest.TestSuite) else [item])]
@@ -81,7 +96,7 @@ if sys.argv[1] in ('test','traveltest','travellist'):
  if sys.argv[1]=='test':suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(Acceptance))
  log=io.StringIO()
  with contextlib.redirect_stdout(log),contextlib.redirect_stderr(log):result=unittest.TextTestRunner(stream=log,verbosity=2).run(suite)
- diagnostic=''
+ diagnostic='\nActual rejected API calls (credentials omitted; invalid-input cases may be intentional): '+json.dumps(observed_rejections) if observed_rejections else ''
  if sys.argv[1]=='traveltest' and not result.wasSuccessful():
   import ast
   from pathlib import Path
@@ -97,7 +112,7 @@ if sys.argv[1] in ('test','traveltest','travellist'):
         if date.fromisoformat(value.value)<date.today():past.append(value.value)
        except ValueError:pass
       if isinstance(key,ast.Constant) and key.value=='request_key' and isinstance(value,ast.Constant) and isinstance(value.value,str) and len(value.value)<8:bad.append(value.value)
-   if bad:diagnostic='\nFixture diagnostic: generated QA supplies request_key strings shorter than the immutable minimum8: '+repr(sorted(set(bad)))+'. These inputs correctly return400. Use valid keys of8..100 characters for intended successful, duplicate and ownership scenarios; preserve assertions and all test cases.'
+   if bad:diagnostic+='\nFixture diagnostic: generated QA supplies request_key strings shorter than the immutable minimum8: '+repr(sorted(set(bad)))+'. These inputs correctly return400. Use valid keys of8..100 characters for intended successful, duplicate and ownership scenarios; preserve assertions and all test cases.'
    if past:diagnostic+='\nDate fixture diagnostic: current date is '+str(date.today())+'; literal check-in dates '+repr(sorted(set(past)))+' are past. For intended successful quotes/reservations use date.today()+timedelta(days=90), preserving intentional past-date rejection tests.'
    if oversized:diagnostic+='\nPagination fixture diagnostic: successful listing requests require page_size1..12; observed larger literal fixtures '+repr(sorted(set(oversized)))+'. Preserve invalid-pagination rejection cases; do not use oversized pages for success/sorting tests.'
    try:
