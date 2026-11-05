@@ -1,0 +1,108 @@
+{
+  "version": "v2.3.0",
+  "date": "2026-11-05",
+  "scope": "Actual local GB300 generation, real isolated backends, independent Chromium contexts on the Fury and existing private HTTPS/WSS; no physical remote device/audio-quality, fresh OS/model boot, or production security certification claim.",
+  "source_tests": {
+    "factory_passed": 169,
+    "core_passed": 34
+  },
+  "real_four_workflow_cycle": {
+    "all_workflows_passed": true,
+    "factory_elapsed_seconds": 423.8404586315155,
+    "factory_physical_model_calls": 18,
+    "factory_complete_calls": 16,
+    "factory_own_checks_passed": true,
+    "latencies_seconds": {
+      "atlas": 0.9435415267944336,
+      "slides": 6.702178955078125,
+      "agent": 428.1331787109375,
+      "image": 1.1826870441436768
+    },
+    "four_way_overlap_seconds": [
+      0.38659191131591797,
+      0.33351850509643555
+    ],
+    "minimum_sampled_free_HBM_MiB": 26519,
+    "ledger_and_pricing_matched": true,
+    "passive_urls_unchanged": true,
+    "operator_cpu_seconds": 3.2200000000000273,
+    "observed_wall_seconds": 438.4801299571991,
+    "controlled_before_after_performance_comparison": false
+  },
+  "visual_accessibility": {
+    "generated_viewports": [
+      [
+        1366,
+        768
+      ],
+      [
+        1280,
+        720
+      ],
+      [
+        1440,
+        900
+      ],
+      [
+        1920,
+        1080
+      ],
+      [
+        375,
+        812
+      ]
+    ],
+    "generated_reported_violations": 0,
+    "supplied_states": 18,
+    "supplied_reported_violations": 0,
+    "atlas_states": 6,
+    "atlas_reported_violations": 0,
+    "axe_version": "4.11.0",
+    "complete_WCAG_certification": false
+  },
+  "factory_shell": {
+    "normal_and_focused_states_passed": 10,
+    "local_and_private_https": true,
+    "same_preview_preserved": true
+  },
+  "guided": {
+    "final_portal_checks_passed": 13,
+    "recorded_backend_and_calls_unchanged": true,
+    "frontend_refreshed_and_disclosed_as_supplied": true
+  },
+  "atlas_voice": {
+    "actual_audio_analyser_deformation": true,
+    "local_and_private_https_viewports_each": 6,
+    "pause_resume_idle_hidden_reduced_motion_passed": true,
+    "enter_key_orb_real_WSS_ASR_passed": true,
+    "physical_device_quality_verified": false
+  },
+  "preservation": {
+    "original_generated_files_hash_matched": 247,
+    "original_generated_files_changed": 0,
+    "serving_sources_unchanged": {
+      "config/gb300.json": true,
+      "config/model-pins.json": true,
+      "config/model-files.json": true,
+      "showcase_app/gateway.py": true,
+      "ops/control.py": true,
+      "ops/runtime.py": true,
+      "ops/serve-text.sh": true,
+      "ops/serve-lead.sh": true
+    }
+  },
+  "supplied_artwork": {
+    "file": "build/sources/fury_agent_factory/travel_portal/assets/mediterranean-retreat.webp",
+    "origin": "Original fictional image created with built-in imagegen for this project; prompt in accompanying PROVENANCE.md",
+    "generated_during_visitor_build": false,
+    "pinned_per_new_short_run": true,
+    "network_access_added": false
+  },
+  "earlier_failures": [
+    "Preliminary generated output passed functional checks but failed mobile overflow/empty-state ARIA audit; persistent visual gate added.",
+    "First gated candidate failed safely on an invalid exact edit and no-op handling defect. Helper corrected; successful final run exercised real visual repair. Earlier failed receipts retained privately.",
+    "Synthetic scheduler fixtures updated to explicitly replace the new visual adapter, like their existing browser adapter; these are not hardware evidence.",
+    "Existing duplicate-check text race fixed and covered with a deterministic fictional guest ID containing409.",
+    "Supplied journal contrast corrected; final18states passed."
+  ]
+}

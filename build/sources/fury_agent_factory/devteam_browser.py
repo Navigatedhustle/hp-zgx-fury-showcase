@@ -3,15 +3,16 @@ import asyncio,html,re,uuid
 from pathlib import Path
 from playwright.async_api import async_playwright,expect
 from devteam_sandbox import execute
+from frontend_artwork import artwork_script
 
-async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inventory_checks=True):
+async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inventory_checks=True,visual=False,seed_reservation=True):
  required=('index.html','styles.css','app.js','backend.py')
  if not all((code/n).is_file() for n in required):return
  inventory=await asyncio.to_thread(execute,code,data,'api',{'method':'GET','path':'/hotels','body':{}})
  hotels=inventory.get('body',{}).get('hotels',[])
  if inventory.get('status')!=200 or not hotels:raise ValueError('Browser contract check needs real hotel inventory')
  hotel=hotels[0];guest='Fictional Browser Contract '+uuid.uuid4().hex[:8]
- booked=await asyncio.to_thread(execute,code,data,'api',{'method':'POST','path':'/bookings','body':{'hotel_id':hotel['id'],'guest':guest,'date':'2028-12-15'}})
+ booked=await asyncio.to_thread(execute,code,data,'api',{'method':'POST','path':'/bookings','body':{'hotel_id':hotel['id'],'guest':guest,'date':'2028-12-15'}}) if seed_reservation else {'status':201}
  # Every validation attempt uses its own data directory. No fixture or fabricated response.
  if booked.get('status') not in (200,201):raise ValueError('Generated backend could not seed a real browser test reservation')
  seen=set();errors=[];posted=[];write_enabled=False
@@ -33,7 +34,7 @@ async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inven
    source=re.sub(r'<script\b[^>]*>[\s\S]*?</script>','',(code/'index.html').read_text(),flags=re.I)
    source=re.sub(r'<link\b[^>]*>','',source,flags=re.I)
    bridge='window.furyApi=(...args)=>window.__furyBrowserRequest(...args);'
-   js=(bridge+'\n'+(code/'app.js').read_text()).replace('</script','<\\/script')
+   js=(bridge+'\n'+artwork_script(code)+'\n'+(code/'app.js').read_text()).replace('</script','<\\/script')
    document='<meta http-equiv="Content-Security-Policy" content="default-src \'none\';script-src \'unsafe-inline\';style-src \'unsafe-inline\';img-src data:;connect-src \'none\';form-action \'none\'">'+'<style>'+(code/'styles.css').read_text()+'</style>'+source+'<script>'+js+'</script>'
    await page.set_content('<iframe sandbox="allow-scripts allow-forms" style="width:1200px;height:900px" srcdoc="'+html.escape(document,quote=True)+'"></iframe>')
    frame=page.frame_locator('iframe');deadline=asyncio.get_running_loop().time()+8
@@ -47,9 +48,10 @@ async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inven
    # Include hidden tab text: reservations must bind to inventory regardless of
    # which tab is initially shown, and must remain correct after refresh.
    full=await frame.locator('body').evaluate('(el)=>{const copy=el.cloneNode(true);copy.querySelectorAll("script,style,noscript").forEach(n=>n.remove());return copy.textContent}')
-   if guest not in full:raise ValueError('Existing reservations are absent from the generated page')
+   if seed_reservation and guest not in full:raise ValueError('Existing reservations are absent from the generated page')
    if re.search(r'unknown\s+(hotel|property)',full,re.I):raise ValueError('Hotel/reservation loading race: load hotel inventory before rendering bookings, or rerender reservations after both requests settle; a real persisted reservation displayed Unknown Hotel')
    if errors:raise ValueError('Generated browser execution failed: '+errors[0][:400])
+   if visual:await audit_visual(page,frame)
    if not interactions:return
    # Exercise actual generated booking and conflict controls, including the
    # delayed-success timer that erased a later real409 during the long soak.
@@ -66,8 +68,13 @@ async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inven
    try:await expect(frame.locator('body')).to_contain_text(fresh_guest,use_inner_text=True,timeout=8000)
    except AssertionError as error:raise ValueError('Successful form booking must render its real persisted reservation; responses='+repr(posted[-1:])+'; errors='+repr(errors)+'; visible='+ (await frame.locator('body').inner_text())[-900:]) from error
    if not posted or posted[-1].get('status') not in (200,201):raise ValueError('Generated booking form did not create a real reservation')
-   await asyncio.sleep(2.5);await fill();await submit.click()
-   conflict=re.compile(r'conflict|already|409|duplicate|reserved',re.I)
+   await asyncio.sleep(2.5);await fill();before_posts=len(posted);await submit.click()
+   deadline=asyncio.get_running_loop().time()+8
+   while len(posted)==before_posts:
+    if errors:raise ValueError('Generated browser execution failed: '+errors[0][:400])
+    if asyncio.get_running_loop().time()>deadline:raise ValueError('Duplicate form submission did not reach the real backend')
+    await asyncio.sleep(.05)
+   conflict=re.compile(r'\b(?:conflict|already|409|duplicate|reserved)\b',re.I)
    try:await expect(frame.locator('body')).to_contain_text(conflict,use_inner_text=True,timeout=8000)
    except AssertionError as error:raise ValueError('Duplicate form booking must visibly explain the real409 conflict') from error
    if posted[-1].get('status')!=409:raise ValueError('Repeated hotel/date must return409')
@@ -76,6 +83,24 @@ async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inven
    if errors:raise ValueError('Generated browser execution failed: '+errors[0][:400])
    if inventory_checks:await check_inventory(frame,hotels)
   finally:await browser.close()
+
+async def audit_visual(page,frame):
+ embedded=page.frames[-1]
+ await embedded.add_script_tag(path=str(Path(__file__).resolve().parent/'vendor/axe/axe.min.js'))
+ for width in (1366,375):
+  await page.set_viewport_size({'width':width+24,'height':950})
+  await page.locator('iframe').evaluate('(el,w)=>el.style.width=w+"px"',width)
+  await asyncio.sleep(.1)
+  geometry=await frame.locator('body').evaluate('()=>({viewport:innerWidth,content:document.documentElement.scrollWidth,offenders:[...document.querySelectorAll("body *")].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1}).slice(0,3).map(e=>({tag:e.tagName,id:e.id,classes:e.className}))})')
+  if geometry['content']>geometry['viewport']+1:raise ValueError('Fix actual responsive overflow in HTML/CSS, preserving controls: '+str(geometry))
+  result=await frame.locator('body').evaluate('async body=>await axe.run(body,{runOnly:{type:"tag",values:["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]}})')
+  if result['violations']:
+   issues=[{'id':v['id'],'elements':[{'html':n['html'][:200],'why':n.get('failureSummary','')[:350]} for n in v['nodes'][:2]]} for v in result['violations'][:3]]
+   raise ValueError('Fix these actual accessibility defects without removing features. Prefer native semantic HTML and keep empty reservation states valid: '+str(issues))
+
+async def check_visual_frontend(code,data,stop=None):
+ await check_frontend(code,data/'empty',stop,interactions=False,visual=True,seed_reservation=False)
+ await check_frontend(code,data/'reserved',stop,visual=True)
 
 
 async def reveal_control(frame,control):

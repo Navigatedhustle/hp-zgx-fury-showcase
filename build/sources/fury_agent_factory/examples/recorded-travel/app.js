@@ -8,7 +8,7 @@ let statusTimer,searchSequence=0,quoteVersion=0;
 function status(message,type='error'){clearTimeout(statusTimer);const el=$('#status');el.textContent=message;el.className='status-bar visible '+type;if(type==='success')statusTimer=setTimeout(()=>el.classList.remove('visible'),6500);}
 function clearStatus(){clearTimeout(statusTimer);$('#status').classList.remove('visible');}
 function artwork(city){return $('#art-'+city)?.getAttribute('src')||'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="#cddcc3"/><circle cx="450" cy="90" r="45" fill="#f4df9f"/><path d="M0 350 180 130 380 350 500 210 600 350V400H0" fill="#749787"/></svg>');}
-function photo(city,cls=''){return '<img class="'+cls+'" src="'+artwork(city)+'" alt="AI-created illustrative destination scene in '+esc(city)+'" loading="lazy">';}
+function photo(city,cls=''){return '<img class="'+cls+'" src="'+artwork(city)+'" alt="Original illustrative destination scene in '+esc(city)+'" loading="lazy">';}
 function empty(title,message,action='Discover the collection',view='listings'){return '<div class="empty-state"><p class="eyebrow">A LITTLE SPACE FOR POSSIBILITY</p><h3>'+esc(title)+'</h3><p>'+esc(message)+'</p><button class="text-button" data-view="'+view+'">'+esc(action)+' \u2197</button></div>';
 }
 function loading(container,message='A moment. Finding your places\u2026'){container.innerHTML='<div class="loading" role="status">'+esc(message)+'</div>';

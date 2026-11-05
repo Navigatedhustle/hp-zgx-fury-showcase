@@ -22,6 +22,14 @@ A successfully accepted development preview can remain available while subsequen
 
 The [prebuilt reference](../examples/reference-travel/README.md) has its own server and database and a permanent label. It demonstrates an existing accepted backend with the supplied vector portal. It never enters the new-run workflow or satisfies a generation acceptance test.
 
+## Enterprise visual edition
+
+Fresh short projects use `enterprise_design.py` to author their actual HTML/CSS/JavaScript with a premium travel identity, rich imagery, real inventory filtering and clear booking controls. A final Visual acceptance ticket applies bounded exact edits to frontend files, then exercises the real backend in empty and populated reservation states. Local axe-core checks and desktop/mobile overflow checks must pass along with the existing booking, conflict and persistence checks. Earlier checked previews remain available during repairs; a failed visual gate does not report Ready.
+
+Short builds may use the supplied fictional hero through `window.furyArtwork.hero` and `--fury-artwork-hero`. The image is pinned and checksum-verified per new run, kept out of model context, and labeled supplied. Preview and independent browser validation receive the same artwork. This adds no network access or live image inference. Existing runs without a pinned image keep their original source/environment. Application code and original SVG details are authored by local models; supplied artwork is not counted as generated code or image output.
+
+Complete-travel and Guided use the visually refreshed supplied frontend, with a fictional Mediterranean hero and six original destination illustrations. Guided retains its original recorded backend, QA and usage; the refreshed frontend is explicitly supplied presentation work. Older generated applications are not overwritten. See the artwork provenance file and enterprise verification for exact testing scope.
+
 Hardware acceptance commands (after launch):
 
 ```bash

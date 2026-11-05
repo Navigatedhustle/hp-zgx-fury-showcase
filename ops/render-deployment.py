@@ -14,6 +14,6 @@ async def main(version):
   await page.pdf(path=str(ROOT/f'docs/Colorado-Deployment-{version}.pdf'),format='A4',print_background=True,prefer_css_page_size=True,display_header_footer=True,header_template='<span></span>',footer_template=f'<div style="font:9px Arial;width:100%;text-align:center;color:#555">HP ZGX Fury · {version} · <span class="pageNumber"></span> / <span class="totalPages"></span></div>')
   await browser.close()
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--version',default='v2.2.0');args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--version',default='v2.3.0');args=parser.parse_args()
  if not re.fullmatch(r'v\d+\.\d+\.\d+',args.version):parser.error('Use a numeric release version, such as v2.2.0')
  asyncio.run(main(args.version))

@@ -71,6 +71,7 @@ async def main(a):
        async with page.expect_response(lambda r:'/api/devteam/runs' in r.url and r.request.method=='POST') as created:await page.click('#start')
        created=await created.value
        assert created.status==201,'Factory start was explicitly rejected: HTTP '+str(created.status)+' '+await created.text()
+       owner=out/f'factory-owner-{cycle}.json';await ctx.storage_state(path=str(owner));owner.chmod(0o600)
        await page.wait_for_function("() => document.getElementById('run-state').textContent==='running'",timeout=30000)
        await page.wait_for_function("() => document.querySelector('.actor.generating')!==null",timeout=60000);agent_started.set()
        await page.wait_for_function("() => ['finished','failed','stopped','blocked'].includes(document.getElementById('run-state').textContent)",timeout=1800000)

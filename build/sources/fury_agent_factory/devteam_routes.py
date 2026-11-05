@@ -47,7 +47,7 @@ def recover_sessions():
   except (OSError,ValueError):continue
   r=DevRun.__new__(DevRun);r.id=rid;r.root=folder;r.candidate=folder/'candidate';r.data=folder/'data';r.thread=None;r.started=data.get('started') or min((c.get('started',time.time()) for c in data.get('calls',[])),default=time.time())
   r.lock=threading.RLock();r.stop_event=threading.Event();r.approval=threading.Event();r.actors=roster();r.changes=[];r.seq=max((e.get('seq',0) for e in data.get('events',[])),default=0)
-  for field,default in [('state','failed'),('error',''),('events',[]),('calls',[]),('versions',[]),('gate',None),('automatic',False),('tasks',[]),('tests',None)]:setattr(r,field,data.get(field,default))
+  for field,default in [('state','failed'),('error',''),('events',[]),('calls',[]),('versions',[]),('gate',None),('automatic',False),('tasks',[]),('tests',None),('product_kind','short')]:setattr(r,field,data.get(field,default))
   for c in r.calls:c.update(_samples=deque(),_text='',_mono=time.monotonic())
   project_state=folder/'project-state.json'
   if project_state.exists():
@@ -144,7 +144,9 @@ async def start(body:Start):
     candidate=GuidedRun()
    else:
     candidate=TravelRun() if body.product=='travel' else DevRun(automatic=body.automatic)
-    if body.product=='short-editorial':candidate.design='Accessible editorial travel workspace with warm ivory, deep teal and a compact sidebar. Preserve the exact booking API, stable hooks and every required interaction.'
+    if body.product=='short-editorial':
+     from enterprise_design import EDITORIAL_DESIGN
+     candidate.design=EDITORIAL_DESIGN;candidate.product_kind='short-editorial'
   except RetentionError as exc:raise HTTPException(409,str(exc)) from exc
   set_current(candidate);candidate.start();return candidate.snapshot()
 @router.post('/api/devteam/gate')
@@ -187,7 +189,8 @@ async def preview(version:int|None=None,run_id:str|None=None):
  v=r.root/('version-'+str(published['version']))
  def read(n):return (v/n).read_text(encoding='utf-8') if (v/n).exists() else ''
  # Parent places this as sandboxed srcdoc. No host credentials, direct network, or same origin.
- return {'html':read('index.html'),'css':read('styles.css'),'js':read('app.js'),'version':published,'run_id':r.id}
+ from frontend_artwork import artwork_for
+ return {'html':read('index.html'),'css':read('styles.css'),'js':read('app.js'),'artwork':artwork_for(v),'version':published,'run_id':r.id}
 @router.post('/api/devteam/backend')
 async def backend(body:BackendRequest):
  r=run()
@@ -209,7 +212,9 @@ async def preview_frame(v:int|None=None,run:str|None=None):
  html=re.sub(r'<link\b[^>]*>','',html,flags=re.I)
  bridge="(()=>{let seq=0;const pending=new Map();window.furyApi=(method,path,body={})=>new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});parent.postMessage({kind:'fury-api',id,method,path,body},'*');setTimeout(()=>{if(pending.has(id)){pending.delete(id);reject(Error('Backend timeout'))}},15000)});window.addEventListener('message',e=>{if(e.source!==parent||e.data?.kind!=='fury-result')return;const p=pending.get(e.data.id);if(!p)return;pending.delete(e.data.id);e.data.error?p.reject(Error(e.data.error)):p.resolve(e.data.response)})})();"
  bridge=bridge.replace("kind:'fury-api',id,method,path,body", "kind:'fury-api',id,method,path,body,version:"+str(data['version']['version'])+",run_id:"+json.dumps(data['run_id']))
- code=(bridge+'\n'+data['js']).replace('</script','<\\/script')
+ from frontend_artwork import script_for
+ artwork=script_for(data.get('artwork',{}))
+ code=(bridge+'\n'+artwork+'\n'+data['js']).replace('</script','<\\/script')
  return HTMLResponse('<style>'+data['css']+'</style>'+html+'<script>'+code+'</script>',headers={
   'Content-Security-Policy':"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'",
   'Cache-Control':'no-store'})

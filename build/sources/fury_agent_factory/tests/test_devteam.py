@@ -115,7 +115,7 @@ class DevTests(unittest.TestCase):
   def endpoint(req):return httpx.Response(200,json={'data':[{'id':LEAD,'ready':True},{'id':SPECIALIST,'ready':True}]})
   real_client=httpx.AsyncClient
   def client(**kwargs):return real_client(transport=httpx.MockTransport(endpoint))
-  with patch.object(devteam,'available',return_value=True),patch.object(devteam,'check_frontend',new=AsyncMock()),patch.object(devteam,'check_backend_contract'),patch.object(devteam,'check_generated_qa'),patch.object(r,'call',side_effect=fake_call),patch.object(devteam,'execute',side_effect=lambda code,data,mode,*payload: {'status':200,'body':{'hotels':[{'id':i} for i in range(1,6)]}} if mode=='api' else {'passed':True,'tests':1,'log':'SYNTHETIC ADAPTER'}),patch.object(devteam.httpx,'AsyncClient',side_effect=client):
+  with patch.object(devteam,'available',return_value=True),patch.object(devteam,'check_frontend',new=AsyncMock()),patch.object(devteam,'check_visual_frontend',new=AsyncMock()),patch.object(devteam,'check_backend_contract'),patch.object(devteam,'check_generated_qa'),patch.object(r,'call',side_effect=fake_call),patch.object(devteam,'execute',side_effect=lambda code,data,mode,*payload: {'status':200,'body':{'hotels':[{'id':i} for i in range(1,6)]}} if mode=='api' else {'passed':True,'tests':1,'log':'SYNTHETIC ADAPTER'}),patch.object(devteam.httpx,'AsyncClient',side_effect=client):
    r.start();r.thread.join(5)
   self.assertFalse(r.thread.is_alive());self.assertEqual(r.state,'finished');self.assertGreaterEqual(len(r.versions),3);self.assertEqual(r.versions[-1]['title'],'Release')
  def test_repair_http_payload_includes_its_rejected_owned_file(self):

@@ -1,5 +1,9 @@
 # Conference presenter guide — V2
 
+The v2.3 visual edition upgrades new generated travel applications and the supplied Guided interface. Keep the distinction explicit: short builds generate application code live, with labeled supplied artwork; complete travel supplies its frontend and generates backend/QA. Focus product expands the checked application while retaining compact progress/token information. Existing saved applications keep their original files.
+
+Atlas's voice orb responds to actual local speech and microphone audio. It enlarges while speaking/listening, pauses with audio and rests after speech. Hold it using a pointer, Space or Enter to ask; pause/resume/mute and typed questions remain available. Refresh the browser to load the new renderer. Reduced-motion settings and hidden-workspace rendering limits are respected. Physical microphone/speaker quality still depends on the presenting device.
+
 On each device, open `/stations` on the dashboard host. Choose Economics, Why HP, or Interactive and press Assign this screen. This stores only that browser's role. Bookmark `/operator`, `/why-hp`, or `/demos` for direct access. Present fullscreen is optional; use its Exit control or Escape.
 
 Recommended arrangement: one large Economics display, one Why HP display, and two visitor laptops on All demos. The laptops can choose different demos independently. Shared inference remains bounded: one Live Factory build, two development requests, four gateway admissions with an Atlas reserve. More endpoints do not increase those limits.

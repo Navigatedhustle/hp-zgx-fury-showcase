@@ -31,4 +31,6 @@ Cancel stops only the current browser's job; accepted upstream work can take tim
 
 ## Conference workspace
 
+The enterprise visual edition gives new short projects a stronger travel design brief and a final model-driven visual/accessibility check. The supplied illustrative hero is disclosed alongside live-generated code. Use Focus product to enlarge the application while retaining a compact stage/token strip, and use it again to return to the build overview. Refresh the browser to load the new shell; start a new build for the new generated design. Existing checked applications retain their original files.
+
 From `/demos`, Factory opens the short example by default. Start and model choices remain visible above compact stage/token metrics. Application, Backend and Development tabs share the existing checked preview and isolated backend. All demos retains mounted workspaces; reconnect uses the same browser ownership. Development details stay unavailable for recorded playback. Modes, model limits, acceptance gates, explicit preview refresh, cancellation and recorded/live labeling are unchanged.

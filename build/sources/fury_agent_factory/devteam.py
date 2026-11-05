@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import deque
 import httpx
 from devteam_sandbox import execute,available,check_javascript,check_backend_contract,check_generated_qa
-from devteam_browser import check_frontend
+from devteam_browser import check_frontend,check_visual_frontend
 ROOT=Path(__file__).resolve().parent
 ALLOWED={'index.html','styles.css','app.js','backend.py','test_backend.py','README.md','architecture.md','contract_review.md'}
 SPECIALIST='unsloth/Qwen3.6-27B-NVFP4';LEAD='fury-lead'
@@ -29,10 +29,10 @@ def parse_patch(text):
  for name,content in files.items():
   if name not in ALLOWED or not isinstance(content,str) or len(content.encode())>60000:raise ValueError('File patch outside allowed scope')
  return obj
-ENTERPRISE_DESIGN="""Design a finished enterprise business-travel workspace named Aster Travel, preserving the exact fictional hotel/booking API. Match the existing HP/NVIDIA showcase palette: charcoal #101112, surfaces #191b1d/#222527, borders #3b4043, off-white #f5f6f7, muted #b1b8bd, NVIDIA green #a4d943 for primary actions and HP blue #80c9ee for links/focus. Use excellent spacing, restrained gradients, rounded panels, crisp typography and an editorial hierarchy. Provide a compact branded sidebar or top navigation, an elegant hero/workspace header, a genuine inventory summary, refined property cards with locally drawn CSS/inline-SVG architectural concept illustrations with varied layered skylines, window grids, landscaping and restrained sky gradients, city filtering, price sorting, a premium booking panel and a real reservations list from GET /bookings. Derive all counts/prices/reservations from actual API data; no fabricated spend, charts, people, ratings, availability, authentication or integrations. Clearly label fictional inventory and concept illustrations. Give every sidebar navigation link a real static section ID target (for example dashboard and bookings); clicking each link must reach that section and update its active state. Use a system sans-serif font stack, accessible contrast, keyboard focus, responsive desktop/mobile layouts, useful empty/loading/error states and visible conflict feedback. Both 200 and201 are valid booking success. Do not fetch assets or use external fonts, libraries, images or network. Use window.furyApi only. Official HP/NVIDIA logos are in the parent showcase chrome: do not fabricate or redraw those marks. Produce the complete functioning frontend bundle in at most18000UTF8 bytes across HTML/CSS/JS, leaving room for complete-file repairs. Each task returns only its owned files, keeping HTML, CSS and JavaScript in their respective files. Preserve this design quality in every later frontend edit; do not replace it with a generic unstyled hotel list."""
+from enterprise_design import ENTERPRISE_DESIGN
 TICKETS=[
  ('Architecture','agent1',LEAD,'Create architecture.md only. Plan a fictional hotel browsing and booking application with exactly GET /hotels returning {hotels:[{id,name,city,price}]}, GET /bookings returning {bookings:[...]}, and POST /bookings accepting hotel_id, guest, date. Reject duplicate hotel/date with 409. SQLite is at the supplied db_path. No admin, authentication, payment, external network or additional routes. Describe validation and independent tests of this exact contract.'),
- ('Backend','agent8',SPECIALIST,'Implement backend.py only. Export handle(request, db_path) returning a JSON dict. request has method, path, body. GET /hotels returns {hotels:[{id,name,city,price}]}, using five fictional hotels in Frankfurt, Lisbon, Tokyo. GET /bookings returns {bookings:[...]}. POST /bookings validates hotel_id, guest, date and rejects a second booking for the same hotel/date with status 409. Use SQLite at db_path. Responses are native Python dictionaries: {"status": 200, "body": {"hotels": [...]}}. request.body and response.body must be Python dictionaries, NEVER JSON strings. The fixed coordinator performs JSON serialization. No network, shell, files beyond db_path, or dependencies outside Python stdlib.'),
+ ('Backend','agent8',SPECIALIST,'Implement backend.py only. Export handle(request, db_path) returning a JSON dict. request has method, path, body. GET /hotels returns {hotels:[{id,name,city,price}]}, using five fictional hotels with distinct memorable names (Mainline House, Alma Courtyard, Kanso House, Riverside Atelier, Jardim House) in Frankfurt, Lisbon, Tokyo. Do not use generic placeholder names such as Fictional Hotel 1; the site already labels all inventory fictional. GET /bookings returns {bookings:[...]}. POST /bookings validates hotel_id, guest, date and rejects a second booking for the same hotel/date with status 409. Use SQLite at db_path. Responses are native Python dictionaries: {"status": 200, "body": {"hotels": [...]}}. request.body and response.body must be Python dictionaries, NEVER JSON strings. The fixed coordinator performs JSON serialization. No network, shell, files beyond db_path, or dependencies outside Python stdlib.'),
  ('Frontend','agent2',SPECIALIST,'Implement index.html and styles.css ONLY. Design a finished enterprise travel workspace with clear dashboard, inventory and bookings sections, real static IDs for sidebar navigation, city filter container, sort control, hotel-list container, booking form and reservations-list container. Include stable IDs and accessible labels for property, guest name and check-in date. HTML links styles.css and app.js; a later task implements app.js. Keep JavaScript out of HTML. Preserve the exact documented API and provided enterprise design brief. No external assets, fonts or network. Clearly label fictional inventory and concept illustrations.'),
  ('Independent QA','agent14',SPECIALIST,'Implement test_backend.py only with Python unittest and temporary SQLite databases. Test only the public handle API; never import sqlite3 or manipulate database internals. Fresh GET /hotels MUST contain exactly five fictional hotels. An empty-inventory expectation contradicts the brief and is forbidden. Import backend.handle. Test hotel list, valid booking, missing guest and duplicate hotel/date returning 409. Use the actual documented contract: handle receives a native dict request whose body is a dict and returns {"status": int, "body": dict}. Assert response body is a dict and use it directly, never JSON parsing of response body. Do not weaken the test just to pass a defect.'),
  ('Accessibility and content','agent20',SPECIALIST,'Review and improve index.html ONLY: semantic headings, accessible form labels, live status containers, keyboard navigation, fictional notices and real static sidebar fragment targets. Preserve established IDs, CSS classes, styles.css/app.js links and enterprise visual structure. CSS and JavaScript are read-only and implemented by their own tasks. Do not inline scripts or styles into HTML.'),
@@ -65,7 +65,10 @@ DEPENDENCIES={
  'Integration review':['Validation QA'], 'Responsive polish':['Frontend refinement'],
  'Integration repair':['Integration review','Responsive polish'],
  'Frontend contract review':['Integration repair'], 'Release notes':['Frontend contract review']}
-ORDER=['Architecture','Frontend','Contract review','Backend','Accessibility and content','Independent QA','Input hardening','Frontend wiring','Validation QA','Frontend refinement','Integration review','Responsive polish','Integration repair','Frontend contract review','Release notes']
+FILE_SCOPES['Visual acceptance']={'index.html','styles.css','app.js'}
+TICKETS.append(('Visual acceptance','sofia',SPECIALIST,'Finish the actual generated application to an outstanding enterprise standard. Preserve every working control, API call, selector and reservation behavior. Use the supplied hero artwork in property card image areas through CSS background-image:var(--fury-artwork-hero), with varied object positions, elegant typography and useful whitespace. Use semantic native lists for reservations; do not misuse ARIA table/row roles, especially in empty state. Fix real mobile overflow at375px using responsive grids, min-width:0, wrapping navigation and fluid images. Keep visible high-contrast labels, keyboard focus and reduced-motion support. You own index.html/styles.css/app.js only; backend and QA are read-only. Return small exact edits, preserving functional source. Independent real-browser visual/accessibility AND booking checks will run after your edits.'))
+DEPENDENCIES['Visual acceptance']=['Frontend contract review'];DEPENDENCIES['Release notes']=['Visual acceptance']
+ORDER=['Architecture','Frontend','Contract review','Backend','Accessibility and content','Independent QA','Input hardening','Frontend wiring','Validation QA','Frontend refinement','Integration review','Responsive polish','Integration repair','Frontend contract review','Visual acceptance','Release notes']
 TICKETS.sort(key=lambda t:ORDER.index(t[0]))
 READ_SCOPES={
  'Architecture':set(), 'Contract review':{'architecture.md'},
@@ -80,6 +83,7 @@ READ_SCOPES={
  'Responsive polish':{'index.html','styles.css'},
  'Integration repair':{'backend.py'},
  'Frontend contract review':{'index.html','app.js','backend.py','architecture.md'},
+ 'Visual acceptance':{'index.html','styles.css','app.js'},
  'Release notes':{'architecture.md','contract_review.md','backend.py','test_backend.py'}}
 MAX_PARALLEL=2
 
@@ -184,12 +188,31 @@ def apply_exact_edits(text,name,original):
  if content==original:raise ValueError('Edits made no change; provide one meaningful localized fix')
  return parse_patch(json.dumps({'summary':patch['summary'],'files':{name:content}}))
 
+def apply_visual_edits(text,source):
+ patch=json.loads(text)
+ if not isinstance(patch,dict) or set(patch)!={'summary','changes'} or not isinstance(patch['changes'],list) or not 0<=len(patch['changes'])<=8:raise ValueError('Expected summary and up to eight owned frontend edits')
+ files={}
+ for edit in patch['changes']:
+  if not isinstance(edit,dict) or set(edit)!={'file','old','new'} or edit['file'] not in {'index.html','styles.css','app.js'} or edit['file'] not in source:raise ValueError('Visual edits may only change the existing frontend files')
+  if edit['old']==edit['new']:continue
+  name=edit['file'];current=files.get(name,source[name]);changed=apply_exact_edits(json.dumps({'summary':patch['summary'],'edits':[{'old':edit['old'],'new':edit['new']}]}),name,current)
+  files[name]=changed['files'][name]
+ if not files:
+  name=next((n for n in ('styles.css','index.html','app.js') if n in source),None)
+  if name is None:raise ValueError('No owned frontend source to review')
+  files={name:source[name]}
+ return parse_patch(json.dumps({'summary':patch['summary'],'files':files}))
+
 class DevRun:
  def __init__(self,base_url='http://127.0.0.1:8001/devteam/v1',store=None,automatic=False):
   base=Path(store or ROOT/'devruns')
   if shutil.disk_usage(base.parent if base.parent.exists() else ROOT).free<20*1024**3:raise RetentionError('Less than20GiB storage headroom. Ask the operator to archive outputs before another build.')
   archive_terminal_runs(base)
   self.id=uuid.uuid4().hex[:12];self.root=base/self.id;self.root.mkdir(parents=True)
+  self.product_kind='short'
+  if type(self) is DevRun:
+   from frontend_artwork import pin_artwork
+   pin_artwork(self.root)
   self.candidate=self.root/'candidate';self.candidate.mkdir();self.data=self.root/'data'
   self.actors=roster();self.calls=[];self.events=[];self.versions=[];self.gate=None;self.state='ready';self.error='';self.seq=0
   self.base_url=base_url;self.automatic=automatic;self.stop_event=threading.Event();self.approval=threading.Event();self.lock=threading.RLock()
@@ -200,7 +223,7 @@ class DevRun:
   with self.lock:self.seq+=1;self.events.append({'seq':self.seq,'job_id':self.id,'time':time.time(),'kind':kind,**data});self.save()
  def save(self):
   # Bounded run snapshots remain local; raw code is in candidate/version directories.
-  data={'id':self.id,'state':self.state,'started':self.started,'mode':getattr(self,'mode','live'),'recorded_usage':getattr(self,'recorded_usage',None),'calls':[{k:v for k,v in c.items() if not k.startswith('_')} for c in self.calls],'events':self.events[-300:],'versions':self.versions,'tests':self.tests,'error':self.error,'gate':self.gate,'automatic':self.automatic,'tasks':self.tasks,'max_parallel':MAX_PARALLEL}
+  data={'id':self.id,'state':self.state,'started':self.started,'mode':getattr(self,'mode','live'),'product_kind':getattr(self,'product_kind','short'),'recorded_usage':getattr(self,'recorded_usage',None),'calls':[{k:v for k,v in c.items() if not k.startswith('_')} for c in self.calls],'events':self.events[-300:],'versions':self.versions,'tests':self.tests,'error':self.error,'gate':self.gate,'automatic':self.automatic,'tasks':self.tasks,'max_parallel':MAX_PARALLEL}
   tmp=self.root/'audit.tmp';tmp.write_text(json.dumps(json_safe(data),ensure_ascii=False,indent=2,allow_nan=False),encoding='utf-8');tmp.replace(self.root/'audit.json')
  def start(self):
   self.started=time.time();self.state='running';self.save();self.thread=threading.Thread(target=self._thread,daemon=True);self.thread.start()
@@ -251,6 +274,12 @@ class DevRun:
      for path in source.iterdir():path.chmod(0o444)
      task.update(status='queued',input_hashes=file_hashes(source),workspace=str(source.relative_to(self.root)))
      self.event('task handoff',task_id=task['id'],title=title,actor=actor,dependencies=task['dependencies'],owns=task['owns'])
+     if title=='Visual acceptance':
+      try:
+       async with asyncio.timeout(45):await check_visual_frontend(source,workspace/'visual-precheck',self.stop_event)
+       prompt+='\nIndependent desktop/mobile and empty/populated accessibility precheck PASSED. Preserve working code. If the visual design is already good, return changes:[] with a truthful review summary. Do not make arbitrary edits just to change a file.'
+      except (ValueError,RuntimeError) as error:
+       prompt+='\nActual independent visual precheck failed: '+str(error)[:1800]+' Repair these measured defects with small exact edits. Copy old snippets verbatim from the current owned source; do not guess classes or indentation.'
      feedback='';repair_source=source
      for attempt in range(2):
       validation=None
@@ -266,6 +295,8 @@ class DevRun:
         if destination.exists():destination.chmod(0o644)
         destination.write_text(content,encoding='utf-8')
        validate_ticket_patch(patch)
+       if title=='Visual acceptance':
+        async with asyncio.timeout(45):await check_visual_frontend(validation,workspace/('visual-data-'+str(attempt)),self.stop_event)
        if {'backend.py','app.js','test_backend.py'} & set(patch['files']):
         await asyncio.to_thread(check_javascript,validation)
         if {'app.js','backend.py'} & set(patch['files']):
@@ -340,6 +371,10 @@ class DevRun:
   payload['chat_template_kwargs']={'thinking':False} if model==LEAD else {'enable_thinking':False}
   payload['temperature']=1.0 if model==LEAD else 0.0
   payload['response_format']={'type':'json_schema','json_schema':{'name':'file_patch','strict':True,'schema':{'type':'object','properties':{'summary':{'type':'string','maxLength':400},'files':{'type':'object','properties':{name:{'type':'string'} for name in names},'additionalProperties':False,'required':names}},'required':['summary','files'],'additionalProperties':False}}}
+  if title=='Visual acceptance':
+   call['output_protocol']='visual_edits'
+   payload['messages'][0]['content']=contract+' You are refining a working fictional application. Return JSON with summary and changes only. Each change has file, old, new. The old string must match exactly once in the named owned frontend source; edits apply in order. Copy short exact snippets, including actual whitespace; never invent class names. Prefer one to four coherent edits. If the independent checks pass and no meaningful improvement is necessary, return an empty changes list. Keep API behavior, selectors, validation and all working interactions. Backend and QA are read-only. No markdown. All imagery is supplied or illustrative, never a real property claim.'
+   payload['response_format']['json_schema']['schema']={'type':'object','properties':{'summary':{'type':'string','maxLength':400},'changes':{'type':'array','minItems':0,'maxItems':8,'items':{'type':'object','properties':{'file':{'type':'string','enum':names},'old':{'type':'string','minLength':1,'maxLength':12000},'new':{'type':'string','maxLength':12000}},'required':['file','old','new'],'additionalProperties':False}}},'required':['summary','changes'],'additionalProperties':False}
   edit_name=None
   repair_name=names[0] if getattr(self,'travel',False) and title.startswith('Repair ') and len(names)==1 and names[0] in source and names[0].endswith('.py') else None
   text='';first=None
@@ -420,7 +455,8 @@ class DevRun:
    call['response_complete']=call.get('finish_reason')=='stop'
    if call.get('finish_reason')!='stop':raise OutputTruncated('Generation incomplete ('+str(call.get('finish_reason'))+'); output budget '+str(payload['max_tokens'])+'. No changes applied. Retry with one small localized edit.' if edit_name else 'Generation incomplete ('+str(call.get('finish_reason'))+'); output budget '+str(payload['max_tokens'])+'. No changes applied.')
    if call['usage'] and call['usage'].get('prompt_tokens') not in (None,call['prompt_tokens_preflight']):raise RuntimeError('Exact tokenization differs from final endpoint usage')
-   if edit_name:
+   if title=='Visual acceptance':patch=apply_visual_edits(text,source)
+   elif edit_name:
     try:patch=apply_exact_edits(text,edit_name,source[edit_name])
     except ValueError:
      # A proposed edit to a reference is evidence of an upstream defect, never
@@ -505,4 +541,4 @@ class DevRun:
     a['last_response_tps']=complete[-1]['usage']['completion_tokens']/complete[-1]['seconds'] if complete else None
     a['ttft_s']=own[-1].get('ttft_s') if own else None
     a['current_tps']=sum(c['current_tps'] or 0 for c in own) if own and all(c['current_tps'] is not None for c in own) else (None if own else 0)
-   return {'id':self.id,'state':self.state,'error':self.error,'sampled_at':time.time(),'seq':self.seq,'actors':actors,'calls':calls,'gate':copy.deepcopy(self.gate),'events':copy.deepcopy(self.events[-100:]),'versions':copy.deepcopy(self.versions),'tests':copy.deepcopy(self.tests),'changes':([] if compact else copy.deepcopy(self.changes[-50:])),'elapsed_s':max(0,(max((e['time'] for e in self.events if e.get('kind')=='terminal'),default=time.time()) if self.state!='running' else time.time())-self.started) if self.started else 0,'automatic':self.automatic,'tasks':copy.deepcopy(self.tasks),'max_parallel':MAX_PARALLEL,'notice':'Simulated developers are fictional personas using real local inference. Operator is the actual operator. Manual actions have no inference rate.'}
+   return {'id':self.id,'state':self.state,'error':self.error,'sampled_at':time.time(),'seq':self.seq,'actors':actors,'calls':calls,'gate':copy.deepcopy(self.gate),'events':copy.deepcopy(self.events[-100:]),'versions':copy.deepcopy(self.versions),'tests':copy.deepcopy(self.tests),'changes':([] if compact else copy.deepcopy(self.changes[-50:])),'elapsed_s':max(0,(max((e['time'] for e in self.events if e.get('kind')=='terminal'),default=time.time()) if self.state!='running' else time.time())-self.started) if self.started else 0,'automatic':self.automatic,'tasks':copy.deepcopy(self.tasks),'max_parallel':MAX_PARALLEL,'product_kind':getattr(self,'product_kind','short'),'frontend_artwork':(self.root/'supplied-artwork.json').is_file(),'notice':'Simulated developers are fictional personas using real local inference. Operator is the actual operator. Manual actions have no inference rate.'}

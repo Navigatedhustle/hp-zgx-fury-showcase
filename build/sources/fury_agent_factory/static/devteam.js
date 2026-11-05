@@ -30,7 +30,7 @@
 
  function presenter(d){
   $('export-audit').hidden=!d.id||d.state==='running';
-  const calls=d.calls||[],tasks=d.tasks||[],events=d.events||[],running=d.state==='running',recorded=d.mode==='recorded';$('mode-label').textContent=recorded?'RECORDED DEMONSTRATION · COMPRESSED PLAYBACK · NO LIVE INFERENCE':'LIVE BUILD · REAL LOCAL INFERENCE';$('demo-mode').disabled=running;$('product').disabled=running;$('technical-details').hidden=recorded;
+  const calls=d.calls||[],tasks=d.tasks||[],events=d.events||[],running=d.state==='running',recorded=d.mode==='recorded';$('mode-label').textContent=recorded?'RECORDED DEMONSTRATION · COMPRESSED PLAYBACK · NO LIVE INFERENCE':d.frontend_artwork?'LIVE CODE · LOCAL INFERENCE · SUPPLIED ARTWORK':'LIVE BUILD · REAL LOCAL INFERENCE';if(running)$('product').value=d.travel?'travel':(d.product_kind||'short');$('demo-mode').disabled=running;$('product').disabled=running;$('technical-details').hidden=recorded;
   $('stop').textContent=recorded?'Stop playback':'Cancel build';
   const active=tasks.filter(t=>['generating','admitted','queued','running'].includes(t.status));
   const checking=running&&(!active.length)&&events.some(e=>['checks started','tests executed','generated tests executed','preview bootstrap checked','browser acceptance'].includes(e.kind));

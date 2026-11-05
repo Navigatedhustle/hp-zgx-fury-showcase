@@ -9,7 +9,7 @@ This is a demonstration project, with fictional data and public demonstration ac
 ## Download and launch
 
 ```bash
-git clone --branch v2.2.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
+git clone --branch v2.3.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
 cd hp-zgx-fury-showcase
 ./launch.sh
 ```
@@ -56,9 +56,15 @@ The primary acceptance viewport is **1366 × 768 CSS content pixels at 100% zoom
 
 Economics uses one shared five-second sampler regardless of viewer count. Counters cover the current resettable event window, use final reported physical-call identities once, and exclude recorded playback. API scenarios use cached dated official prices, not paid API requests or a claim of equal output quality. This host's measured energy is GPU-only; electricity is not ownership cost or ROI. See [conference operation and definitions](docs/CONFERENCE.md), [pricing configuration](config/event-pricing.json), and [verification](docs/CONFERENCE-VERIFICATION.md).
 
+## Enterprise application and voice edition — v2.3.0
+
+Fresh short Factory builds author a premium travel interface with real inventory, filtering, booking and persistent reservations. Supplied illustrative artwork is explicitly labeled and pinned per run. A final model-driven visual review checks empty/populated states, desktop/mobile layout and accessibility before Ready. The complete/Guided travel frontend is refreshed with a cinematic fictional hero, original destination scenes and refined responsive controls; its supplied status remains explicit. Existing generated applications are preserved. [Enterprise verification](docs/ENTERPRISE-VERIFICATION.md).
+
+Atlas now gives its real local voice a prominent audio-reactive orb. Its shape responds to actual speech/microphone audio, pauses with playback, and returns to idle. Hold the orb with pointer, Space or Enter to ask; text, audio controls, grounding and export remain available. Hidden workspaces stop rendering and reduced-motion preferences are respected.
+
 ## Agent Factory presenter update
 
-Choose Live build for actual local development or Guided demonstration for a clearly labeled recorded successful run with a working application artifact. The main view shows stages, current tasks, evidence, elapsed time and endpoint usage; checked previews remain available until you refresh to a newer version. [Presenter details](docs/AGENT-FACTORY-PRESENTER.md) · [Colorado deployment PDF](docs/Colorado-Deployment-v2.2.0.pdf) · [Release verification](docs/FACTORY-VERIFICATION.md).
+Choose Live build for actual local development or Guided demonstration for a clearly labeled recorded successful run with a working application artifact. The main view shows stages, current tasks, evidence, elapsed time and endpoint usage; checked previews remain available until you refresh to a newer version. [Presenter details](docs/AGENT-FACTORY-PRESENTER.md) · [Colorado deployment PDF](docs/Colorado-Deployment-v2.3.0.pdf) · [Release verification](docs/FACTORY-VERIFICATION.md).
 
 ## Present the HP experience
 
@@ -99,14 +105,14 @@ If setup is interrupted, rerun `./launch.sh setup`; downloads resume through Hug
 
 ## Upgrade and rollback
 
-Prior releases v2.1.1, v2.1.0 and v2.0.0 remain available and immutable. V1 also remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
+Prior releases v2.2.0, v2.1.1, v2.1.0 and v2.0.0 remain available and immutable. V1 also remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
 
 For a Git checkout with clean tracked source:
 
 ```bash
 ./launch.sh stop
 git fetch --tags origin
-git switch --detach v2.2.0
+git switch --detach v2.3.0
 ./launch.sh
 ```
 
@@ -114,8 +120,8 @@ To roll back:
 
 ```bash
 ./launch.sh stop
-git switch --detach v2.1.1
-./launch.sh setup  # restore the preceding presenter release
+git switch --detach v2.2.0
+./launch.sh setup  # restore the preceding conference release
 ./launch.sh
 ```
 

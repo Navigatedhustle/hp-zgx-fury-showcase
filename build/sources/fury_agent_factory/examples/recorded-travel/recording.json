@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "mode": "recorded",
-  "description": "Authentic successful local travel development run. Compressed recorded walkthrough; supplied frontend, generated backend. No live inference or recorded GPU telemetry. Functional application uses isolated new demonstration data. Distribution replaces private runtime destination imagery with the maintained public vector scenes; backend and recorded usage are unchanged.",
+  "description": "Authentic successful local travel development run. Compressed recorded walkthrough; supplied frontend, generated backend. No live inference or recorded GPU telemetry. Functional application uses isolated new demonstration data. Supplied frontend visually refreshed on 2026-11-05 with an explicitly supplied AI-created hero and original vector scenes; recorded backend, calls and usage are unchanged.",
   "duration_s": 429.7933032512665,
   "playback_s": 120,
   "calls": [
@@ -421,9 +421,9 @@
     "browser_passed": true
   },
   "files": {
-    "index.html": "ac25b2739ff5ef1bf350c50e356a8d00f0fd41bfe151ee0f12e91ccdee3916ff",
-    "styles.css": "2012b69209bcccdc56da66639ada807fd6bf0612df69bec8722454da3ef9b48b",
-    "app.js": "2a2c28397088e38ec4ceacb0a4f3edbc32438a10e5e20f94fa1e3bdfacc5aff5",
+    "index.html": "b651e7001d62003bfd96be9c9dd5f26b0f8709ec44ed2347ee420e8c9d218258",
+    "styles.css": "5dc2af5fe462db822f3049cf4c93be89369276e39bc59f2f2a0d4ceacb8063c8",
+    "app.js": "70ba0294ab116a7abe76c4c53e81330fa99323489fccebb4036535d9fedcfe8e",
     "db.py": "0adf15480443f8714fd0a86177b79a16ef685785753e9a626143a21bda5ed86b",
     "auth.py": "4b66f80c247ce99b12a956f493d3b77daa671e983faf5a50922289f660bd6267",
     "catalog.py": "69ba91ea1bf09a5497a29736ebefbf905ce093f8530f89c33ee83502f6d787c4",

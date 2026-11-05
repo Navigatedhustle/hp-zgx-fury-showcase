@@ -18,7 +18,7 @@ def main():
   if any(x in p.parts for x in ['.git','.venv','.model-venv','.image-venv','node_modules','__pycache__','.codex','.ssh','.tools','logs','reports','handoff','state']):reason.append('local/private directory')
   if p.name.startswith('.env') and p.name!='.env.example':reason.append('environment file')
   if p.name=='.publication.json':reason.append('old destination metadata')
-  approved_document = path in {'docs/Colorado-Deployment-v2.1.0.pdf', 'docs/Colorado-Deployment-v2.1.1.pdf', 'docs/Colorado-Deployment-v2.2.0.pdf'}
+  approved_document = path in {'docs/Colorado-Deployment-v2.1.0.pdf', 'docs/Colorado-Deployment-v2.1.1.pdf', 'docs/Colorado-Deployment-v2.2.0.pdf', 'docs/Colorado-Deployment-v2.3.0.pdf'}
   if not approved_document and p.suffix.lower() in {'.pdf','.zip','.safetensors','.gguf','.onnx','.pt','.pth','.pem','.key','.p12','.pfx','.sqlite','.db','.log','.wav','.mp4','.pptx'}:reason.append('private/runtime/large artifact type')
   secret_patterns=[rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',rb'\bgh[pousr]_[A-Za-z0-9]{30,}\b',rb'\bgithub_pat_[A-Za-z0-9_]{30,}\b',rb'\bAKIA[A-Z0-9]{16}\b',rb'\bsk-[A-Za-z0-9_-]{30,}\b',rb'tskey-[A-Za-z0-9_-]{20,}']
   if any(re.search(pattern,data) for pattern in secret_patterns):reason.append('credential-shaped content')

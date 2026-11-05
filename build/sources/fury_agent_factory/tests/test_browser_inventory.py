@@ -1,5 +1,7 @@
 """Real browser/sandbox fixtures for numeric inventory rendering; no GPU evidence."""
 import asyncio,json,tempfile,unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 from pathlib import Path
 from devteam_browser import check_frontend
 from devteam_sandbox import available
@@ -21,3 +23,5 @@ class InventoryBrowserTests(unittest.TestCase):
  def test_numeric_values_cannot_disappear_during_escaping(self):
   with self.assertRaisesRegex(ValueError,'price is missing'):self.exercise(False)
  def test_actual_numeric_prices_filter_and_sort(self):self.exercise(True)
+ def test_guest_identifier_containing_409_is_not_conflict_feedback(self):
+  with patch('devteam_browser.uuid.uuid4',return_value=SimpleNamespace(hex='409deadbeef')):self.exercise(True)

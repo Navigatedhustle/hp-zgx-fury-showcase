@@ -52,6 +52,7 @@ build/sources/fury_agent_factory/draft-inbox.sqlite*
 *.zip
 *.pdf
 !docs/Colorado-Deployment-v2.2.0.pdf
+!docs/Colorado-Deployment-v2.3.0.pdf
 *.pptx
 *.mp4
 *.wav

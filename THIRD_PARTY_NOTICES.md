@@ -12,6 +12,12 @@ The frontend bundles React/React DOM (MIT), Vite tooling (MIT), dnd-kit (MIT), R
 
 Inactive historical Atlas engines and optional presentation model launch scripts are retained as source for context; their models are not active requirements. Historical Atlas LICENSES.md describes those old variants and must not be interpreted as the current launch profile. Use the root asset manifest for active requirements.
 
+## Local visual validation and artwork
+
+The enterprise visual review uses unmodified axe-core 4.11.0 from Deque Systems, distributed under Mozilla Public License 2.0. Its original copyright header and license are retained in `build/sources/fury_agent_factory/vendor/axe/`. It runs locally during browser validation, without telemetry or an external service.
+
+The fictional Mediterranean hero is original AI-created supplied artwork, generated for this project on 5 November 2026. Its prompt/origin are documented in `build/sources/fury_agent_factory/travel_portal/assets/PROVENANCE.md`. Original destination SVG illustrations are authored in `travel_art.py`. These public illustrative assets are distinct from private runtime photography and from live image generation during a visitor's build.
+
 ## HP identity in V2
 
 The official HP Electric Blue logo with white keyline is an unchanged asset supplied by the owner for this HP demonstration. HP trademarks remain HP property; the source MIT license does not cover the mark or confer general trademark permissions. No licensed HP fonts are distributed.
