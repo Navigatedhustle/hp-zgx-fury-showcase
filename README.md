@@ -9,7 +9,7 @@ This is a demonstration project, with fictional data and public demonstration ac
 ## Download and launch
 
 ```bash
-git clone --branch v2.1.1 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
+git clone --branch v2.2.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
 cd hp-zgx-fury-showcase
 ./launch.sh
 ```
@@ -38,9 +38,27 @@ The pinned model files total **193.91 GiB**; allow another 20–40 GiB for depen
 
 A desktop copy may require the file manager's **Allow Launching / Trust** action. The shortcut opens a terminal so installation progress and errors remain visible. Setup does not require Git even when launched from a ZIP. Administrator prerequisite installation can be required; it is never performed silently.
 
+## Conference stations and laptop workspaces — v2.2.0
+
+Open **http://localhost:8080/stations** on each screen and assign its role. The choice is browser-local; changing one endpoint never navigates another.
+
+| Station | Direct local URL | Purpose |
+|---|---|---|
+| Economics | http://localhost:8080/operator | Actual live output tokens, activity, integrated GPU energy and sourced text API pricing scenarios |
+| Why HP | http://localhost:8080/why-hp | Deployment flexibility, system design, Toolkit, Runtime, and the qualified Red Hat collaboration story |
+| Interactive | http://localhost:8080/demos | Four choices visible on a laptop; opened workspaces stay mounted when returning to All demos |
+| Setup | http://localhost:8080/stations | Assign or clear this browser's role |
+| Presenter guide | http://localhost:8080/presenter | A short generalist walkthrough |
+
+On the site's existing private HTTPS host, use the same paths without port 8080. Component proxies remain on their existing ports. No Tailscale permission change, public exposure, second model stack, or new supervisor is introduced.
+
+The primary acceptance viewport is **1366 × 768 CSS content pixels at 100% zoom**. Also test 1280 × 720, 1440 × 900 and 1920 × 1080. Browser chrome and OS scaling reduce the content viewport; shorter 1366 × 640 and 1280 × 620 viewports are included. Fullscreen is optional and has a visible exit. Long evidence/code uses contained panels; no CSS scale or browser zoom is required.
+
+Economics uses one shared five-second sampler regardless of viewer count. Counters cover the current resettable event window, use final reported physical-call identities once, and exclude recorded playback. API scenarios use cached dated official prices, not paid API requests or a claim of equal output quality. This host's measured energy is GPU-only; electricity is not ownership cost or ROI. See [conference operation and definitions](docs/CONFERENCE.md), [pricing configuration](config/event-pricing.json), and [verification](docs/CONFERENCE-VERIFICATION.md).
+
 ## Agent Factory presenter update
 
-Choose Live build for actual local development or Guided demonstration for a clearly labeled recorded successful run with a working application artifact. The main view shows stages, current tasks, evidence, elapsed time and endpoint usage; checked previews remain available until you refresh to a newer version. [Presenter details](docs/AGENT-FACTORY-PRESENTER.md) · [Colorado deployment PDF](docs/Colorado-Deployment-v2.1.1.pdf) · [Release verification](docs/FACTORY-VERIFICATION.md).
+Choose Live build for actual local development or Guided demonstration for a clearly labeled recorded successful run with a working application artifact. The main view shows stages, current tasks, evidence, elapsed time and endpoint usage; checked previews remain available until you refresh to a newer version. [Presenter details](docs/AGENT-FACTORY-PRESENTER.md) · [Colorado deployment PDF](docs/Colorado-Deployment-v2.2.0.pdf) · [Release verification](docs/FACTORY-VERIFICATION.md).
 
 ## Present the HP experience
 
@@ -81,14 +99,14 @@ If setup is interrupted, rerun `./launch.sh setup`; downloads resume through Hug
 
 ## Upgrade and rollback
 
-The preceding V2 release remains available as v2.0.0. V1 also remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
+Prior releases v2.1.1, v2.1.0 and v2.0.0 remain available and immutable. V1 also remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
 
 For a Git checkout with clean tracked source:
 
 ```bash
 ./launch.sh stop
 git fetch --tags origin
-git switch --detach v2.1.1
+git switch --detach v2.2.0
 ./launch.sh
 ```
 
@@ -96,8 +114,8 @@ To roll back:
 
 ```bash
 ./launch.sh stop
-git switch --detach v2.0.0
-./launch.sh setup  # restore the preceding V2 release
+git switch --detach v2.1.1
+./launch.sh setup  # restore the preceding presenter release
 ./launch.sh
 ```
 

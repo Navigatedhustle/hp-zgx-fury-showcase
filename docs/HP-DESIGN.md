@@ -12,6 +12,8 @@ Official stripe Illustrator assets were supplied in 100/500/1000 scales. Stripes
 
 Font stack: "Forma DJR UI", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif. No licensed HP fonts or Inter downloads are bundled/required. Locally installed licensed Forma can be used by its owner; public rendering works with system fonts. Bundled OFL fonts retained for existing export compatibility.
 
-Dark adaptation follows system preferences until the visitor selects a theme. The persisted hp-experience-theme key is UI preference only. Dark interactive elements/focus use white instead of core blue. The logo retains its original blue and white keyline. Reduced-motion rules disable decorative transitions; charts respect the preference.
+The conference experience defaults to white. Visitors can choose light, dark, or explicit system adaptation; the browser-local choice survives refresh. The persisted hp-experience-theme key is UI preference only. Dark interactive elements/focus use white instead of core blue. The logo retains its original blue and white keyline. Reduced-motion rules disable decorative transitions; charts respect the preference.
 
 Accessibility target: WCAG 2.2 AA. Verification records measured contrast, browser audits and keyboard inspection; automation alone does not certify conformance. Native buttons/links, named controls, visible focus, skip links, >=44px controls and labeled previews are preserved. Generated customer applications and historical output are not restyled by this shell.
+
+Conference layouts use the 72px shared shell, retain the original 48px logo/clear space, and use black primary chooser actions. No stripe or new imagery is introduced. Graphs use the approved blue with restrained black/gray lines and explicit legends; dark rendering uses the documented functional neutrals. See CONFERENCE.md for content-viewport acceptance.

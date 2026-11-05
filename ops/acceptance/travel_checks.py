@@ -21,7 +21,10 @@ async def rendered_cards(listing):
  return await items.evaluate_all('(xs)=>xs.filter(x=>!xs.some(y=>y!==x&&y.contains(x))).map(x=>({text:x.innerText,price:x.querySelector("[class*=price],[data-price]")?.textContent||""}))')
 
 async def verify_travel(page,row,cycle):
- await page.locator('#technical-details').evaluate('(el)=>el.open=true');await page.click('[data-tab="build"]');await page.click('#preview-refresh');await page.wait_for_timeout(1800)
+ if await page.locator('#factory-tab-application').count():await page.click('#factory-tab-application')
+ else:
+  await page.locator('#technical-details').evaluate('(el)=>el.open=true');await page.click('[data-tab="build"]')
+ await page.click('#preview-refresh');await page.wait_for_timeout(1800)
  frame=page.frame_locator('#preview');await frame.locator('body').wait_for();row['site_text']=(await frame.locator('body').inner_text())[:12000]
  row['controls']=await frame.locator('input,select,button').evaluate_all('(xs)=>xs.map(x=>({tag:x.tagName,id:x.id,type:x.type,text:x.textContent.slice(0,100)}))')
  assert len(row['site_text'])>100;assert await frame.locator('form').count()>0

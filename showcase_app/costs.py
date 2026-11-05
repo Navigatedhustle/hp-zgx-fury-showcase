@@ -5,23 +5,12 @@ Sources checked 2026-10-16. This reprices local tokens; it does not call cloud A
 import math
 from datetime import date
 
-PRICING_CHECKED = '2026-10-16'
-MODELS = [
-    {'id': 'gpt-6-astra', 'name': 'GPT-6 Astra', 'provider': 'OpenAI',
-     'input': 10., 'output': 50., 'long_threshold': 272000, 'long_input': 20., 'long_output': 75.,
-     'note': 'Standard; prompts >272K use $20 input / $75 output.',
-     'source': 'https://developers.openai.com/api/docs/models/gpt-6-astra'},
-    {'id': 'claude-fable-5-1', 'name': 'Claude Fable 5.1', 'provider': 'Anthropic',
-     'input': 10., 'output': 50., 'note': 'Standard base-token rates.',
-     'source': 'https://platform.claude.com/docs/en/about-claude/pricing'},
-    {'id': 'claude-opus-5-5', 'name': 'Claude Opus 5.5', 'provider': 'Anthropic',
-     'input': 4., 'output': 20., 'note': 'Standard base-token rates.',
-     'source': 'https://platform.claude.com/docs/en/about-claude/pricing'},
-    {'id': 'gemini-4-argon', 'name': 'Gemini 4 Argon', 'provider': 'Google',
-     'input': 2., 'output': 10.,
-     'note': 'Promotional rates through 30 Nov 2026; $4 / $20 from 1 Dec 2026.',
-     'source': 'https://ai.google.dev/gemini-api/docs/pricing#gemini-4-argon'},
-]
+# The conference and retained API use the same locally cached official prices.
+import json
+from pathlib import Path
+_CONFIGURATION=json.loads((Path(__file__).resolve().parents[1]/'config/event-pricing.json').read_text())
+PRICING_CHECKED = _CONFIGURATION['checked']
+MODELS = _CONFIGURATION['models']
 TEXT_DEMOS = ('atlas', 'slides', 'agent')
 
 

@@ -1,4 +1,24 @@
-# Presenter guide
+# Conference presenter guide — V2
+
+On each device, open `/stations` on the dashboard host. Choose Economics, Why HP, or Interactive and press Assign this screen. This stores only that browser's role. Bookmark `/operator`, `/why-hp`, or `/demos` for direct access. Present fullscreen is optional; use its Exit control or Escape.
+
+Recommended arrangement: one large Economics display, one Why HP display, and two visitor laptops on All demos. The laptops can choose different demos independently. Shared inference remains bounded: one Live Factory build, two development requests, four gateway admissions with an Atlas reserve. More endpoints do not increase those limits.
+
+The chooser keeps its opened workspaces mounted. All demos switches views without cancelling their jobs or disconnecting their streams. Refresh reconnects using the same browser session; a new browser cannot inherit private Factory controls. Direct component bookmarks remain supported; their All demos link opens a chooser tab to preserve the original work.
+
+Factory opens in short travel mode from the conference chooser. Live creates new code using the original models and checks. Guided is clearly recorded and produces no live inference. Application, Backend, and Development tabs share one retained preview and its original isolated backend. Refresh validated preview only when ready to move to a newer checked version.
+
+Economics counts actual terminal live calls with reported usage, including known usage of failed calls. Final output totals can jump as responses finish; there is no invented live token rate. Recorded playback is excluded. API estimates reprice observed text tokens, and GPU energy includes measured session idle power. GPU electricity is not the complete Fury power bill or ROI. Expand Assumptions for dated sources and browser-local tariff/currency settings.
+
+An authorized presenter can reset only the event window through the host shell:
+
+```bash
+.venv/bin/python ops/event-session.py reset --name "My conference"
+```
+
+For a browser reset, retrieve a private presenter code in your SSH terminal using `.venv/bin/python ops/event-session.py presenter-code`. Enter it only in the protected reset form. Keep it out of shared documentation. Reset affects every Economics display's counter window, not station assignments, jobs, or artifacts. Clearing a station assignment is a separate local action on `/stations`.
+
+## Working demo flows
 
 Open the home page, then choose Demos for direct launch actions. All examples use fictional data. Ask the customer which task and operating constraint matters first.
 

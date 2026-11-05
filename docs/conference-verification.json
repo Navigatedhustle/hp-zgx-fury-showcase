@@ -1,0 +1,163 @@
+{
+  "version": "v2.2.0",
+  "verification_dates": [
+    "2026-11-04",
+    "2026-11-05"
+  ],
+  "scope": "Independent Chromium contexts on one GB300 Fury, local HTTP and actual existing private HTTPS/WSS. No physically separate client, physical microphone/speaker, fresh hardware installation, or new model boot claim.",
+  "source_tests": {
+    "factory_passed": 161,
+    "core_passed": 34,
+    "event_fixtures_included_in_core": 15
+  },
+  "layouts": {
+    "cases": 72,
+    "passed": 72,
+    "content_viewports": [
+      [
+        1366,
+        768
+      ],
+      [
+        1280,
+        720
+      ],
+      [
+        1440,
+        900
+      ],
+      [
+        1920,
+        1080
+      ],
+      [
+        1366,
+        640
+      ],
+      [
+        1280,
+        620
+      ]
+    ],
+    "zoom_percent": 100,
+    "retained_output_cases_passed": 20
+  },
+  "accessibility": {
+    "axe_version": "4.11.0",
+    "states": 48,
+    "reported_wcag_A_AA_violations": 0,
+    "browser_exceptions": 0,
+    "complete_conformance_certification": false
+  },
+  "concurrent_workflows": {
+    "actual_live_builds": 1,
+    "factory_elapsed_seconds": 308.86073780059814,
+    "factory_model_calls": 15,
+    "factory_own_tests_passed": true,
+    "atlas_seconds": 2.1963465213775635,
+    "slides_seconds": 9.546308040618896,
+    "image_seconds": 8.193731307983398,
+    "four_way_overlap_seconds": [
+      0.33330345153808594,
+      0.2264549732208252,
+      0.9107115268707275
+    ],
+    "ledger_and_pricing_matched": true,
+    "passive_urls_unchanged": true,
+    "operator_cpu_seconds": 2.3400000000000003,
+    "observed_wall_seconds": 348.202716588974,
+    "minimum_sampled_free_HBM_MiB": 30511,
+    "original_hardware_browser_exit": 1,
+    "original_failure": "Advanced controls intercepted the final preview-refresh click after successful generation. Fixed in-flow layout and close-on-start. The same retained run passed browser/backend/persistence/conflict/filter/sort/tab rechecks. Original failure retained privately; no replacement live build claimed.",
+    "passive_performance_scope": "Small measured operator CPU use while two passive displays were open; no controlled before/after latency experiment."
+  },
+  "preservation": {
+    "original_generated_files_hash_matched": 61,
+    "original_generated_files_changed": 0,
+    "serving_source_unchanged": {
+      "config/gb300.json": true,
+      "showcase_app/gateway.py": true,
+      "ops/runtime.py": true,
+      "ops/control.py": true,
+      "ops/serve-lead.sh": true,
+      "ops/serve-text.sh": true,
+      "config/model-pins.json": true,
+      "config/model-files.json": true
+    },
+    "resident_model_and_gateway_process_identities_unchanged": true
+  },
+  "downloads": [
+    {
+      "demo": "atlas-brief-png",
+      "private_https": false,
+      "bytes": 90927,
+      "decoded": true
+    },
+    {
+      "demo": "atlas-brief-pdf",
+      "private_https": false,
+      "bytes": 97711,
+      "decoded": true
+    },
+    {
+      "demo": "slides",
+      "private_https": false,
+      "bytes": 77519,
+      "sha256": "7027299033a874df195e7eae1815ad150e0466fa014c811ff186df8bfdcae9e1",
+      "decoded": true
+    },
+    {
+      "demo": "image",
+      "private_https": false,
+      "bytes": 1330336,
+      "sha256": "2c0ed68f2ef297d4148cebc03688dbaf87695bf3b4261871f70a5d43aab240a8",
+      "decoded": true
+    },
+    {
+      "demo": "atlas-brief-png",
+      "private_https": true,
+      "bytes": 90927,
+      "decoded": true
+    },
+    {
+      "demo": "atlas-brief-pdf",
+      "private_https": true,
+      "bytes": 97711,
+      "decoded": true
+    },
+    {
+      "demo": "slides",
+      "private_https": true,
+      "bytes": 77519,
+      "sha256": "326dcc9bcbd2ad963c8495e8fade3a4c0434f58c2279975408e12b33c7b5a908",
+      "decoded": true
+    },
+    {
+      "demo": "image",
+      "private_https": true,
+      "bytes": 1330336,
+      "sha256": "2c0ed68f2ef297d4148cebc03688dbaf87695bf3b4261871f70a5d43aab240a8",
+      "decoded": true
+    }
+  ],
+  "earlier_harness_errors": [
+    "Initial layout suite completed 72 passing cases before an import-path error in its reset assertion; focused station/reset suite passed after correcting the harness.",
+    "Hidden-frame wait initially relied on requestAnimationFrame; explicit polling verified the retained real Atlas stream.",
+    "Fullscreen assertion raced its browser event; independent awaited fullscreen test passed.",
+    "Final retained-output harness initially expected an obsolete nested frame and injected sessionStorage into opaque sandbox frames. Harness corrected; 20 output-layout cases and local/private downloads passed."
+  ],
+  "limits": [
+    "GPU-only energy, measured coverage and missing gaps; no wall-meter hardware tested.",
+    "Tariff USD 0.25/kWh is a configurable planning assumption; electricity excludes ownership and operating costs.",
+    "API scenarios use cached dated official input/output prices; no paid calls or model-quality equivalence.",
+    "Generated content scrolls within its preview; generated applications are not restyled.",
+    "Cold setup and four-cycle soak evidence in earlier verification documents are historical, not repeated by this UI release."
+  ],
+  "final_chart": {
+    "light_dark_layout_states_passed": 12,
+    "legend_matches_distinct_plot_patterns": true,
+    "model_selection_passed": true,
+    "final_dark_axe_violations": 0,
+    "browser_exceptions": 0
+  }
+}

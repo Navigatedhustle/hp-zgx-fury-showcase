@@ -28,3 +28,7 @@ SSE retains one-second sampling, ordered job/event identifiers, timestamps and b
 ## Recovery
 
 Cancel stops only the current browser's job; accepted upstream work can take time to release. Keep checked output open during repairs. Resume retained run continues sustained travel from merged files. A short blocked run can be rerun. Service restart reconciles interrupted jobs, preserving artifacts and app data. Use launch status/diagnostics/recover only after checking current work. Recordings never resume as live inference after restart.
+
+## Conference workspace
+
+From `/demos`, Factory opens the short example by default. Start and model choices remain visible above compact stage/token metrics. Application, Backend and Development tabs share the existing checked preview and isolated backend. All demos retains mounted workspaces; reconnect uses the same browser ownership. Development details stay unavailable for recorded playback. Modes, model limits, acceptance gates, explicit preview refresh, cancellation and recorded/live labeling are unchanged.

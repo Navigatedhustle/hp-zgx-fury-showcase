@@ -1,0 +1,7 @@
+{
+  "station_routes": {"economics":"/operator","why_hp":"/why-hp","interactive":"/demos","setup":"/stations"},
+  "browser_preferences": {"storage_key":"fury-station-v2","default_role":"demos","electricity_price_per_kwh":0.25,"currency":"USD","currency_per_usd":1},
+  "telemetry": {"sample_seconds":5,"default_power_scope":"GPU only","max_integrated_gap_seconds":20},
+  "optional_environment": {"FURY_POWER_METER_FILE":"/absolute/private/path/from-your-actual-meter.json","FURY_PRESENTER_KEY_FILE":"/absolute/private/path/outside-repository/presenter.key"},
+  "notes": "Illustrative configuration reference, not automatically loaded. Set browser preferences in the UI and optional environment values in the host shell before restarting only the idle operator. Never put actual credentials in this file."
+}

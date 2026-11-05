@@ -51,6 +51,7 @@ build/sources/fury_agent_factory/draft-inbox.sqlite*
 # Private/generated documents and original archives stay local
 *.zip
 *.pdf
+!docs/Colorado-Deployment-v2.2.0.pdf
 *.pptx
 *.mp4
 *.wav

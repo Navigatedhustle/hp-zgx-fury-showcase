@@ -57,7 +57,7 @@ async def main(a):
     async def workflow(name,port,path):
      iterations[name]=iterations.get(name,0)+1;iteration=iterations[name]
      row={'started':time.time(),'errors':[],'failed_requests':[],'workflow':name,'iteration':iteration};rows[name+'-'+str(iteration)]=row
-     ctx=await browser.new_context(viewport={'width':1440,'height':1000});contexts.append(ctx);page=await ctx.new_page()
+     ctx=await browser.new_context(viewport={'width':a.width,'height':a.height});contexts.append(ctx);page=await ctx.new_page()
      def browser_error(error):
       row['errors'].append(str(error));row.setdefault('browser_error_stacks',[]).append(error.stack)
      page.on('pageerror',browser_error);page.on('requestfailed',lambda r:row['failed_requests'].append({'url':r.url,'error':r.failure}))
@@ -83,11 +83,11 @@ async def main(a):
        else:await verify_travel(page,row,cycle)
       elif name=='atlas':
        await page.wait_for_function('() => typeof config!=="undefined"&&!!config',timeout=30000)
-       await page.evaluate('attract=false;voice=false');await page.fill('#question-input',f'What happens to Q4 profit if our Commit stage win rate drops by {3+(cycle+iteration)%18} percentage points?')
+       await page.evaluate('attract=false;voice=false');await page.fill('#question-input',f'What happens to Q4 profit if our Commit stage win rate drops by {a.atlas_drop if a.atlas_drop is not None else 3+(cycle+iteration)%18} percentage points?')
        if iteration==1 and not a.individual and a.only=='all':await asyncio.wait_for(prepared.wait(),30)
        row['submitted']=time.time();await page.locator('#question-form button').click()
        await page.wait_for_function('() => last && last.grounding && state!=="thinking"',timeout=180000)
-       row['result']=await page.evaluate('last');assert row['result']['question']==f'What happens to Q4 profit if our Commit stage win rate drops by {3+(cycle+iteration)%18} percentage points?','Atlas answered a superseded question';assert row['result']['grounding']['passed'];assert row['result']['routing']['engine']=='local language model','Atlas used fallback instead of actual inference';assert row['result'].get('answer') or row['result'].get('speech') or len(str(row['result']))>500
+       row['result']=await page.evaluate('last');assert row['result']['question']==f'What happens to Q4 profit if our Commit stage win rate drops by {a.atlas_drop if a.atlas_drop is not None else 3+(cycle+iteration)%18} percentage points?','Atlas answered a superseded question';assert row['result']['grounding']['passed'];assert row['result']['routing']['engine']=='local language model','Atlas used fallback instead of actual inference';assert row['result'].get('answer') or row['result'].get('speech') or len(str(row['result']))>500
        await page.click('#sources-toggle')
       else:
        await page.fill('#prompt',('Explain reliable local AI workflows, evidence, human review, and next steps.' if name=='slides' else 'A detailed botanical illustration of a red fox in an autumn garden, natural light, no text')+f' Run {cycle}.')
@@ -137,4 +137,4 @@ async def main(a):
    done.set();await monitor_task;await browser.close();save_report(out,report);print('EVIDENCE '+str(out),flush=True)
  return all(r['passed'] for c in report['cycles'] for r in c['results'].values())
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--agent-product',choices=['short','short-editorial','travel','mixed'],default='short');p.add_argument('--cycles',type=int,default=1);p.add_argument('--seconds',type=int,default=0);p.add_argument('--only',choices=['all','atlas','slides','agent','image'],default='all');p.add_argument('--individual',action='store_true');p.add_argument('--output');p.add_argument('--wait-idle',action='store_true');p.add_argument('--sustain',action='store_true');a=p.parse_args();raise SystemExit(0 if asyncio.run(main(a)) else 1)
+ p=argparse.ArgumentParser();p.add_argument('--width',type=int,default=1366);p.add_argument('--height',type=int,default=768);p.add_argument('--atlas-drop',type=int);p.add_argument('--agent-product',choices=['short','short-editorial','travel','mixed'],default='short');p.add_argument('--cycles',type=int,default=1);p.add_argument('--seconds',type=int,default=0);p.add_argument('--only',choices=['all','atlas','slides','agent','image'],default='all');p.add_argument('--individual',action='store_true');p.add_argument('--output');p.add_argument('--wait-idle',action='store_true');p.add_argument('--sustain',action='store_true');a=p.parse_args();raise SystemExit(0 if asyncio.run(main(a)) else 1)

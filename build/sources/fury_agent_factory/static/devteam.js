@@ -4,6 +4,7 @@
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  async function api(url,body){const r=await fetch(url,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(16000)});const raw=await r.text();let d;try{d=JSON.parse(raw)}catch{throw Error('Coordinator returned HTTP '+r.status+' with an unexpected response. Check service logs and retry.')}if(!r.ok)throw Error(typeof d.detail==='string'?d.detail:'Coordinator request failed (HTTP '+r.status+')');return d}
  function tab(name){document.body.classList.toggle('build-screen',name==='build');document.body.classList.toggle('stack-screen',name==='stack');document.body.classList.remove('product-focus');for(const n of ['team','build','stack','evidence'])$(n+'-view').hidden=n!==name;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('selected',b.dataset.tab===name));if(name==='stack')requestAnimationFrame(()=>document.getElementById('llm-stack').scrollIntoView({block:'start'}))}
+ window.FuryFactoryTabs=tab;
  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));tab(location.hash==='#llm-stack'?'stack':'build');
  function canStart(){return $('demo-mode').value==='recorded'?isolationReady:prerequisites}
  function fail(e){actionError=e.message||String(e);$('error').textContent=actionError}

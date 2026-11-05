@@ -1,0 +1,222 @@
+/* Conference layouts use the browser content viewport, never zoom or transforms. */
+.hp-shell.hp-shell{padding:0 16px!important;min-height:72px!important;height:72px!important;gap:12px!important;flex-wrap:nowrap!important;flex-shrink:0}
+.hp-shell .hp-home{font-size:14px;gap:4px;max-width:280px;flex-shrink:0}
+.hp-shell .hp-logo{width:48px!important;height:48px!important;margin:12px!important}
+.hp-shell nav{gap:4px!important;flex-wrap:nowrap!important}
+.hp-shell nav a,.hp-shell nav button{font-size:14px!important;padding:8px 12px!important;min-height:44px;white-space:nowrap}
+.hp-shell .hp-present{background:var(--text);color:var(--page);border:1px solid var(--text);border-radius:12px;cursor:pointer}
+html[data-fury-embedded] .hp-shell,html[data-fury-embedded] .hp-demo-heading{display:none!important}
+.conference-page{height:var(--fury-height,100dvh);min-height:560px;display:flex;flex-direction:column;margin:0!important;padding:0!important;max-width:none!important}
+.conference-main{flex:1;min-height:0;padding:16px 24px;display:flex;flex-direction:column;gap:12px;width:100%;max-width:1800px;margin:auto}
+.conference-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-shrink:0}
+.conference-heading h1{font-size:32px;margin:0;line-height:1.1;letter-spacing:-.035em}
+.conference-heading p{margin:4px 0 0;font-size:16px;color:var(--subtle)}
+.conference-page .eyebrow{margin:0 0 4px;font-size:12px}
+.conference-page button,.conference-page .button{min-height:44px}
+.conference-page .primary{background:var(--text);color:var(--page);border-color:var(--text)}
+.conference-note{font-size:14px;color:var(--subtle);margin:0}
+.conference-page [hidden]{display:none!important}
+.conference-grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:12px}
+.conference-card{border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0;background:var(--page)}
+.conference-card h2{font-size:25px;margin:0;line-height:1.2}
+.conference-card p{margin:0;font-size:16px}
+.conference-card blockquote{margin:0;padding:8px 12px;background:var(--panel);border-radius:8px;font-size:15px;line-height:1.4}
+.conference-card .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.conference-card .readiness{font-size:14px;color:var(--subtle)}
+.conference-card .button{align-self:flex-start;margin-top:auto;padding:8px 20px}
+.station-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:24px 0}
+.station-choice{display:block;border:1px solid var(--border);border-radius:12px;padding:24px;cursor:pointer}
+.station-choice:has(input:checked){outline:2px solid var(--focus);outline-offset:2px}
+.station-choice input{margin-right:8px}.station-choice strong{font-size:24px;display:block;margin:12px 0}
+.station-choice p{font-weight:400;font-size:16px}
+.station-workspaces{flex:1;min-height:0;position:relative}
+.station-workspaces iframe{width:100%;height:100%;border:0;display:block;background:var(--page)}
+.chooser-active .conference-main{padding:0;gap:0;max-width:none}.chooser-active #chooser{display:none}
+.chooser-active .station-workspaces{min-height:0}
+.why-grid-event{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:12px}
+.why-grid-event article{padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--panel);display:flex;flex-direction:column;justify-content:center}
+.why-grid-event h2{font-size:clamp(23px,2.1vw,36px);line-height:1.15;margin:0 0 10px}
+.why-grid-event p{font-size:clamp(16px,1.4vw,22px);line-height:1.45;margin:0}
+.why-grid-event small{font-size:13px;display:block;margin-top:10px;color:var(--subtle)}
+.event-metrics{display:grid;grid-template-columns:1.7fr repeat(4,minmax(0,1fr));gap:12px}
+.event-metric{border:1px solid var(--border);border-radius:12px;padding:16px;min-width:0}
+.event-metric h2{font-size:16px;margin:0 0 8px;line-height:1.3;letter-spacing:0}
+.event-metric strong{display:block;font-size:clamp(28px,2.9vw,52px);line-height:1.15;font-weight:600;font-variant-numeric:tabular-nums}
+.event-metric:first-child strong{font-size:clamp(42px,4.6vw,80px)}
+.event-metric small{display:block;margin-top:8px;font-size:14px;color:var(--subtle);line-height:1.3}
+.event-chart-panel{flex:1;min-height:200px;border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.event-chart-panel h2{font-size:20px;margin:0}.event-chart-panel .chart-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.event-chart-panel canvas{display:block;width:100%!important;flex:1;min-height:0}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}.chart-legend span{display:inline-flex;align-items:center;gap:6px}
+.chart-legend i{width:24px;height:0;border-top:3px solid currentColor;display:inline-block}
+.conference-dialog{width:min(900px,calc(100vw - 32px));max-height:calc(var(--fury-height,100dvh) - 32px);padding:24px;color:var(--text);background:var(--page);border:1px solid var(--border);border-radius:16px;overflow:auto}
+.conference-dialog::backdrop{background:rgb(0 0 0 / .35)}.conference-dialog .dialog-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;position:sticky;top:-24px;background:var(--page);padding-block:12px;z-index:2}
+.conference-dialog h2{font-size:24px;margin:0}.conference-dialog h3{font-size:19px;margin:24px 0 8px}
+.conference-dialog .fields{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.conference-dialog .fields label{font-size:14px}.conference-dialog input,.conference-dialog select{width:100%;min-width:0}
+.conference-dialog fieldset{border:1px solid var(--border);margin:16px 0;padding:12px}
+.conference-dialog label.check{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-right:16px}
+.conference-dialog .check input{width:18px;height:18px;min-height:18px}
+.conference-dialog pre{font-size:14px;white-space:pre-wrap;word-break:break-word}
+#fury-shell-status{position:fixed;bottom:12px;left:12px;background:var(--page);color:var(--text);border:1px solid var(--border);padding:12px 16px;border-radius:12px;z-index:10000;max-width:calc(100vw - 24px)}
+
+/* The existing prompt/job controls and their resumable jobs are retained. */
+body[data-workflow=slides],body[data-workflow=image]{height:var(--fury-height,100dvh);min-height:560px;display:flex;flex-direction:column}
+body[data-workflow] .shell{padding:16px 24px;max-width:1800px;width:100%;flex:1;min-height:0;display:flex;flex-direction:column;gap:8px}
+body[data-workflow] .shell>.eyebrow{margin:0;flex-shrink:0}
+body[data-workflow] .workspace{grid-template-columns:minmax(300px,.8fr) minmax(0,1.3fr);gap:20px;flex:1;min-height:0;align-items:stretch}
+body[data-workflow] .workspace>section{min-width:0;min-height:0;overflow:auto}
+body[data-workflow] .workspace h1{font-size:32px;line-height:1.15;margin:0 0 12px}
+body[data-workflow] .intro{font-size:16px;margin:0 0 12px;max-width:none}
+body[data-workflow] .chips{margin:8px 0;gap:8px}
+body[data-workflow] textarea{height:128px;min-height:96px;resize:vertical;margin:8px 0!important;font-size:16px}
+body[data-workflow] .panel{padding:16px;display:flex;flex-direction:column;overflow:visible!important}
+body[data-workflow] .panel .section-head{margin:0 0 8px;gap:8px}
+body[data-workflow] .panel .section-head h3{font-size:22px}
+body[data-workflow] .stage{flex:1;min-height:160px;padding:8px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+body[data-workflow] .stage .result-preview{width:100%;height:100%;position:absolute;inset:0;border:0}
+body[data-workflow] .stage img.result-image{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);max-height:none;object-fit:contain}
+body[data-workflow] .status{margin:8px 0;min-height:24px;font-size:16px}
+body[data-workflow] #result .actions{margin:0 0 8px;gap:8px}
+body[data-workflow] #result .button{padding:8px 12px;font-size:14px}
+body[data-workflow] #again{align-self:flex-start;min-height:44px;padding:8px 12px}
+body[data-workflow] .footer{margin:0;padding:8px 0 0;font-size:12px;flex-shrink:0}
+body[data-workflow] details{margin-top:8px}
+
+/* Factory: controls, compact progress column, and a persistent preview workspace. */
+body[data-hp-app=factory]{height:var(--fury-height,100dvh);min-height:600px;display:flex;flex-direction:column}
+body[data-hp-app=factory] .hp-demo-heading{display:none}
+body[data-hp-app=factory]>main{padding:12px 20px;max-width:none;width:100%;flex:1;min-height:0;display:grid;grid-template-columns:310px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:12px}
+body[data-hp-app=factory] main>.hero{grid-column:1/-1;display:block!important;margin:0}
+body[data-hp-app=factory] .hero>div:first-child{display:none!important}
+body[data-hp-app=factory] .brief{padding:10px 12px;display:grid;grid-template-columns:minmax(160px,.85fr) minmax(175px,1fr) minmax(200px,1.1fr) auto auto;align-items:center;gap:12px;position:relative}
+body[data-hp-app=factory] .brief>.eyebrow,body[data-hp-app=factory] .brief>p,body[data-hp-app=factory] .brief>small{display:none}
+body[data-hp-app=factory] .brief h2{font-size:18px;line-height:1.25;margin:0}
+body[data-hp-app=factory] .brief label{margin:0;font-size:13px;line-height:1.3}
+body[data-hp-app=factory] .brief select{padding:8px;font-size:14px;border-radius:8px}
+body[data-hp-app=factory] .brief .actions{margin:0;gap:8px;flex-wrap:nowrap}
+body[data-hp-app=factory] #advanced-controls{margin:0;font-size:14px}
+body[data-hp-app=factory] #advanced-controls[open]{position:absolute;right:12px;top:8px;width:320px;background:var(--page);border:1px solid var(--border);padding:12px;z-index:20}
+body[data-hp-app=factory] #advanced-controls[open] .actions{margin-top:12px}
+body[data-hp-app=factory] .presenter-progress{grid-column:1;grid-row:2;margin:0;padding:12px;min-height:0;overflow:auto;display:block!important}
+body[data-hp-app=factory] .progress-heading{display:block;font-size:13px}
+body[data-hp-app=factory] .progress-heading .eyebrow{font-size:11px;line-height:1.4;display:block}
+body[data-hp-app=factory] #elapsed{display:block;margin-top:4px;font-size:14px}
+body[data-hp-app=factory] .presenter-stages{margin:12px 0;gap:4px}
+body[data-hp-app=factory] .presenter-stages li{font-size:14px;padding:8px 4px}
+body[data-hp-app=factory] #stage-title{font-size:23px;line-height:1.15;margin:12px 0}
+body[data-hp-app=factory] .presenter-progress p,body[data-hp-app=factory] #current-work{font-size:14px;line-height:1.4;margin:10px 0;min-height:0}
+body[data-hp-app=factory] #current-work{padding-left:20px}
+body[data-hp-app=factory] #current-work li{margin:5px 0}
+body[data-hp-app=factory] .presenter-progress .metrics{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px;margin:12px 0 0}
+body[data-hp-app=factory] .metrics article{padding:8px;background:var(--panel);border-radius:8px}
+body[data-hp-app=factory] .metrics small{font-size:12px;line-height:1.3}
+body[data-hp-app=factory] .metrics strong{font-size:20px;margin:6px 0}
+body[data-hp-app=factory] .metrics span{font-size:11px;line-height:1.3}
+body[data-hp-app=factory] .statusline{grid-row:3;grid-column:1/-1;margin:0;padding:4px 0;min-height:32px;font-size:12px;gap:12px;display:flex!important}
+body[data-hp-app=factory] main>footer{display:none}
+body[data-hp-app=factory] #factory-workspace{grid-row:2;grid-column:2;min-width:0;min-height:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;padding:12px}
+.factory-tabs{display:flex;gap:8px;margin-bottom:8px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.factory-tabs button{background:var(--page);color:var(--text);border:0;border-bottom:3px solid transparent;border-radius:0;padding:8px 16px;font-size:15px;min-height:44px}
+.factory-tabs button[aria-selected=true]{border-color:var(--focus);font-weight:700}
+.factory-pane{flex:1;min-height:0;min-width:0;display:flex;flex-direction:column}
+body[data-hp-app=factory] #build-view{height:100%;min-height:0;display:flex;flex-direction:column}
+body[data-hp-app=factory] #build-view .sectiontitle{margin:0 0 8px;gap:8px;flex-shrink:0}
+body[data-hp-app=factory] #build-view .sectiontitle h2{font-size:20px;margin:0}
+body[data-hp-app=factory] #build-view .eyebrow{display:none}
+body[data-hp-app=factory] #build-view .actions{gap:6px;flex-wrap:wrap}
+body[data-hp-app=factory] #build-view .actions button,body[data-hp-app=factory] #build-view .actions a{font-size:13px;padding:8px;min-height:44px}
+body[data-hp-app=factory] .build-grid{display:flex;flex:1;min-height:0}
+body[data-hp-app=factory] .preview-wrap{width:100%;min-width:0;min-height:0;display:flex;flex-direction:column;padding:8px}
+body[data-hp-app=factory] #preview-title{font-size:13px;line-height:1.35;margin:0 0 6px;flex-shrink:0}
+body[data-hp-app=factory] .preview-wrap iframe{flex:1;width:100%;height:100%;min-height:0!important;border:0}
+body[data-hp-app=factory] .backend{padding:12px;margin:0;overflow:auto;flex:1}
+body[data-hp-app=factory] .backend pre{font-size:14px;max-height:220px;background:var(--panel);color:var(--text)}
+body[data-hp-app=factory] #technical-details{margin:0;min-height:0;overflow:auto;flex:1;display:block!important}
+body[data-hp-app=factory] #technical-details>summary{font-size:16px}
+body[data-hp-app=factory] #technical-details .tabs{margin:8px 0;flex-wrap:wrap}
+body[data-hp-app=factory] .actor{min-height:0;font-size:14px}
+body[data-hp-app=factory] pre{font-size:13px;background:var(--panel);color:var(--text)}
+body[data-hp-app=factory] #gate{position:fixed;inset:12px;z-index:100;overflow:auto;background:var(--page);border:2px solid var(--text);padding:24px}
+
+/* Atlas retains its orb, speech controls, camera, analytics, and evidence. */
+body[data-workflow=atlas]{height:var(--fury-height,100dvh);min-height:600px;display:flex;flex-direction:column;padding:0 16px!important;max-width:none}
+body[data-workflow=atlas]>.hp-shell{margin:0 -16px}
+body[data-workflow=atlas]>.header{height:52px!important;min-height:52px;gap:16px;flex-shrink:0}
+body[data-workflow=atlas] .header .brand h1{font-size:26px;letter-spacing:-1px}
+body[data-workflow=atlas] .header .brand p{display:none}
+body[data-workflow=atlas] .header .cloud-counter{display:none}
+body[data-workflow=atlas] .persona-switch button{padding:8px 16px;font-size:14px}
+body[data-workflow=atlas] .network{padding:8px 12px;font-size:11px}
+body[data-workflow=atlas] .context-row{height:auto;min-height:44px;margin:0 0 8px;padding:0 12px;gap:12px;flex-shrink:0}
+body[data-workflow=atlas] .context-row #organization{font-size:15px}
+body[data-workflow=atlas] .context-row .v2-controls{gap:8px}
+body[data-workflow=atlas] .context-row button{font-size:12px}
+body[data-workflow=atlas] .context-row label{font-size:12px}
+body[data-workflow=atlas] .workspace{height:auto;min-height:200px;flex:1;grid-template-columns:minmax(230px,.9fr) minmax(360px,1.65fr) minmax(260px,1fr);gap:12px}
+body[data-workflow=atlas] .left-column,body[data-workflow=atlas] .right-column,body[data-workflow=atlas] .center-column{min-height:0;overflow:auto}
+body[data-workflow=atlas] .local-note{display:none}
+body[data-workflow=atlas] .block{padding:12px}
+body[data-workflow=atlas] .transcript-block{min-height:0;margin:0 0 8px}
+body[data-workflow=atlas] .transcript-block #transcript{font-size:16px;max-height:none;margin:8px 0}
+body[data-workflow=atlas] .transcript-hint,body[data-workflow=atlas] .waveform{display:none}
+body[data-workflow=atlas] .device-controls{font-size:12px}
+body[data-workflow=atlas] .device-controls select{font-size:13px}
+body[data-workflow=atlas] .orb-hero{height:90px!important;min-height:0;padding:0!important;display:flex;align-items:center;justify-content:center;position:relative}
+body[data-workflow=atlas] .orb-button,body[data-workflow=atlas] #voice-orb{width:80px!important;height:80px!important}
+body[data-workflow=atlas] .orb-stage{position:static!important;font-size:12px;margin-left:12px}
+body[data-workflow=atlas] .orb-caption{display:none}
+body[data-workflow=atlas] .headline-wrap{height:76px;padding-top:4px}
+body[data-workflow=atlas] .headline-wrap #headline{font-size:52px;letter-spacing:-2px}
+body[data-workflow=atlas] .headline-wrap p{margin:0;font-size:11px}
+body[data-workflow=atlas] .key-metrics{min-height:44px;margin-bottom:6px;gap:20px}
+body[data-workflow=atlas] .key-metrics strong{font-size:22px}
+body[data-workflow=atlas] .answer-block{padding:8px 0 0}
+body[data-workflow=atlas] .answer-block #answer{font-size:17px;line-height:1.45;max-height:none;overflow:visible;margin:8px 0}
+body[data-workflow=atlas] .answer-foot{flex-wrap:wrap;font-size:11px}
+body[data-workflow=atlas] .chart-wrap{height:170px;margin-top:8px}
+body[data-workflow=atlas] .method-block{max-height:none;overflow:visible}
+body[data-workflow=atlas] .method-tool{margin:12px 0}
+body[data-workflow=atlas] .method-tool strong{font-size:20px}
+body[data-workflow=atlas] .method-block #formula{font-size:13px;line-height:1.5}
+body[data-workflow=atlas] .method-block dl{font-size:12px}
+body[data-workflow=atlas] .source-details{font-size:13px}
+body[data-workflow=atlas] .latency-block{padding:8px 0}
+body[data-workflow=atlas] .latency-primary{margin:4px 0}
+body[data-workflow=atlas] .latency-primary strong{font-size:30px}
+body[data-workflow=atlas] .action-bar{height:88px;min-height:88px;grid-template-columns:1.4fr 1fr 170px;gap:12px;flex-shrink:0}
+body[data-workflow=atlas] .action-bar .talk-button{height:64px;padding:8px 16px}
+body[data-workflow=atlas] .action-bar .talk-button strong{font-size:16px}
+body[data-workflow=atlas] .question-form input{font-size:15px;min-height:44px}
+body[data-workflow=atlas] .secondary-actions button{font-size:13px;min-height:36px;padding:6px 12px}
+body[data-workflow=atlas]>footer{height:32px;min-height:32px;padding:4px 0;margin:0;font-size:11px;gap:8px}
+body[data-workflow=atlas]>footer button{min-height:28px;font-size:12px}
+.atlas-secondary{flex-shrink:0;font-size:13px;position:relative}
+.atlas-secondary>summary{padding:4px 8px;min-height:36px}
+.atlas-secondary[open]>.atlas-secondary-content{position:absolute;bottom:36px;left:0;width:min(650px,90vw);max-height:65vh;overflow:auto;background:var(--page);padding:16px;border:1px solid var(--border);z-index:40}
+.atlas-secondary .model-strip{height:auto;min-height:60px;margin:0;padding:12px;flex-wrap:wrap}
+.atlas-secondary .camera-view{height:150px}
+.atlas-secondary .camera-block{display:inline-block;width:280px;vertical-align:top}
+@media(min-width:1700px){.conference-main{padding:24px 32px}.conference-card{padding:24px}.conference-card p{font-size:20px}.conference-card blockquote{font-size:18px}.conference-card h2{font-size:32px}}
+@media(max-width:900px){.hp-shell.hp-shell{height:auto!important;min-height:72px!important;flex-wrap:wrap!important}.hp-shell nav{overflow:auto;max-width:100%}.conference-page,body[data-workflow],body[data-hp-app=factory]{height:auto!important;min-height:100dvh}.conference-grid{grid-template-rows:auto}.station-grid,.why-grid-event{grid-template-columns:1fr 1fr;grid-template-rows:auto}.event-metrics{grid-template-columns:repeat(2,1fr)}.event-chart-panel{min-height:300px}.conference-main{min-height:600px}.station-workspaces{height:calc(100dvh - 120px);flex:none}body[data-workflow] .workspace{grid-template-columns:1fr}body[data-workflow] .stage{min-height:300px}body[data-hp-app=factory]>main{display:flex;flex-direction:column}body[data-hp-app=factory] .brief{display:flex;flex-wrap:wrap}body[data-hp-app=factory] #factory-workspace{min-height:500px}body[data-workflow=atlas] .workspace{grid-template-columns:1fr}body[data-workflow=atlas] .action-bar{height:auto;display:flex;flex-wrap:wrap}.conference-dialog .fields{grid-template-columns:1fr}}
+@media(max-width:600px){.conference-grid,.station-grid,.why-grid-event{grid-template-columns:1fr}.conference-heading{align-items:flex-start}.conference-heading h1{font-size:28px}.hp-shell .hp-home span{display:none}.event-metrics{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){.conference-page *,body[data-workflow] *,body[data-hp-app=factory] *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+#chooser{display:contents}.chooser-active #chooser{display:none!important}.event-chart-panel canvas{height:0!important;flex:1 1 0}
+
+body[data-hp-app=factory] .factory-tabs button{background:var(--page)!important;color:var(--text)!important;border-bottom:3px solid transparent!important}
+body[data-hp-app=factory] .factory-tabs button[aria-selected=true]{border-bottom-color:var(--focus)!important}
+body[data-workflow=atlas] .right-column{display:flex!important;flex-direction:column;gap:8px}
+body[data-workflow=atlas] .right-column .method-block{flex:1 1 0;min-height:0!important;overflow:auto!important}
+body[data-workflow=atlas] .right-column .latency-block{flex:0 0 auto;position:static!important;min-height:0}
+body[data-workflow=atlas] .right-column #latency-note{display:none}
+body[data-workflow=atlas]>footer{min-height:31px;height:31px}
+
+.conference-page{min-height:480px}body[data-hp-app=factory]{min-height:480px}body[data-workflow=atlas]{min-height:520px}body[data-workflow=slides],body[data-workflow=image]{min-height:480px}body[data-workflow=atlas] .workspace{min-height:160px}
+
+body[data-hp-app=factory] .metrics article:last-child{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}body[data-hp-app=factory] .metrics article:last-child span{display:none}
+html[data-hp-theme=dark] .chart-legend i{color:var(--text)!important}
+body[data-hp-app=factory] #advanced-controls[open]{top:calc(100% + 4px)}
+body[data-hp-app=factory] #advanced-controls[open]{position:static!important;grid-column:1/-1;grid-row:2;width:auto;margin:0;padding:8px 12px;border:1px solid var(--border)}
+body[data-hp-app=factory] .brief>.actions{grid-column:5;grid-row:1}
+body[data-hp-app=factory] #advanced-controls:not([open]){grid-column:4;grid-row:1}

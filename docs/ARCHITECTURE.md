@@ -34,3 +34,9 @@ Runtime data lives in `state/`, component `data/`, `artifacts/`, `runs/`, `devru
 ## Presenter and recording layer
 
 Agent Factory retains its existing workers, models, sandbox and gateway. The presenter view summarizes real tasks/checks. Compact SSE carries job/sequence/time snapshots; detailed file evidence is fetched on demand. Checked travel frames and backend calls accept the same explicit version, preventing an open visitor session from silently moving to new code. GuidedRun reuses only the isolated travel application transport and per-run data. Its curated recording is checksum-bound, contains no private runtime data, issues no model requests, and is recovered as recorded mode after restart.
+
+## Conference station layer (v2.2)
+
+The existing operator process serves `/stations`, `/demos`, `/operator`, `/why-hp`, and `/presenter`. Browser-local assignment and retained application frames provide independent screen control. The frame policy permits only the same site's chooser origin (loopback port 8080 or the current validated Tailscale hostname), while generated frames retain network/form restrictions and their existing sandbox. No Tailscale permissions, serving model settings, queues, worker lifetimes or process ownership rules change.
+
+`showcase_app/event.py` runs one five-second collector in the operator lifespan. It reuses the gateway ledger and health collection, persists aggregate session samples in additive `state/event-session.sqlite`, and serves cached `/api/live` plus aggregate-only `/api/event`. Energy integrates measured readings with gaps excluded; cached official prices live in `config/event-pricing.json`. Presenter reset changes only the measurement window and requires host-shell authority or an external private presenter key. No second supervisor, external inference API, or telemetry daemon is added.

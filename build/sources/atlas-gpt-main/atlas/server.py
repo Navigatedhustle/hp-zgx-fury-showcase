@@ -50,8 +50,10 @@ app.mount('/artifacts',StaticFiles(directory=ROOT/'artifacts'),name='artifacts')
 
 @app.middleware('http')
 async def headers(request,call_next):
+    from showcase_app.frame_policy import station_ancestors
     response=await call_next(request)
     response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' ws://localhost:8200 ws://127.0.0.1:8200 ; object-src 'none'; frame-ancestors 'none'"
+    if request.url.path=='/':response.headers['Content-Security-Policy']=response.headers['Content-Security-Policy'].replace("frame-ancestors 'none'",'frame-ancestors '+station_ancestors(request.url.hostname))
     response.headers['Cache-Control']='no-store' if request.url.path.startswith('/api/') else 'no-cache'
     return response
 

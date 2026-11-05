@@ -1,13 +1,23 @@
 import asyncio,json,sqlite3,time,subprocess
 from pathlib import Path
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
+from contextlib import asynccontextmanager
+from showcase_app.event import Monitor, authorized
 from fastapi.responses import FileResponse,HTMLResponse
 from showcase_app.gateway import connect,ROOT
 from fastapi.staticfiles import StaticFiles
 from showcase_app.ui import ASSETS
 from showcase_app.costs import comparison
-app=FastAPI()
+monitor=Monitor()
+@asynccontextmanager
+async def lifespan(app):
+ task=asyncio.create_task(monitor.run(collect_live))
+ try:yield
+ finally:
+  task.cancel()
+  await asyncio.gather(task,return_exceptions=True)
+app=FastAPI(lifespan=lifespan)
 app.mount("/showcase-assets",StaticFiles(directory=ASSETS),name="showcase-assets")
 def sync_agent():
  for path in (ROOT/'build/sources/fury_agent_factory/runs').glob('*.sqlite'):
@@ -22,8 +32,7 @@ def sync_agent():
      # Upsert same physical call ID; never create a second row for the source ledger.
      dest.execute('INSERT OR REPLACE INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)',(cid,'agent',call['agent'],call['model'],call['status'],started,(call.get('ended_at') or time.time())-started,u.get('input'),u.get('output'),u.get('cached'),'source call failed' if call['status']=='failed' else ''))
   except (OSError,sqlite3.Error,KeyError,ValueError):continue
-@app.get('/api/live')
-async def live():
+async def collect_live():
  await asyncio.to_thread(sync_agent)
  async with httpx.AsyncClient(timeout=2,trust_env=False) as c:
   async def health(name,url):
@@ -71,3 +80,36 @@ async def device_access_qr():
  if not status.get('connect_url'):raise HTTPException(503,'Tailscale DNS is unavailable')
  qr=qrcode.make(status['connect_url'],image_factory=qrcode.image.svg.SvgPathImage)
  return Response(qr.to_string(),media_type='image/svg+xml',headers={'Cache-Control':'no-store'})
+
+
+@app.get('/api/live')
+async def live():
+ if monitor.latest_live is None:
+  async with monitor.lock:
+   if monitor.latest_live is None:monitor.latest_live=await collect_live()
+ return monitor.latest_live
+
+@app.get('/api/event')
+async def event_telemetry():
+ if monitor.latest is None:raise HTTPException(503,'Event telemetry is starting')
+ return monitor.latest
+
+@app.post('/api/event/reset')
+async def reset_event(request:Request):
+ if not authorized(request.headers.get('x-fury-presenter')):raise HTTPException(403,'Presenter code required; retrieve it through your authorized SSH terminal')
+ body=await request.json()
+ try:session=await asyncio.to_thread(monitor.store.reset,body.get('name','Conference session'))
+ except (ValueError,AttributeError):raise HTTPException(422,'Use an event name between 1 and 80 characters')
+ return {'session':session,'jobs_preserved':True}
+
+@app.get('/demos')
+async def demos():return FileResponse(ROOT/'showcase_app/launcher.html')
+
+@app.get('/stations')
+async def stations():return FileResponse(ROOT/'showcase_app/stations.html')
+
+@app.get('/why-hp')
+async def why_hp():return FileResponse(ROOT/'showcase_app/why-hp.html')
+
+@app.get('/presenter')
+async def presenter():return FileResponse(ROOT/'showcase_app/presenter.html')

@@ -20,3 +20,9 @@ The navigation helper maps loopback component links to the browser's remote host
 Do not expose these demonstration services directly to the public internet. Remote proxy access control belongs to your deployment. The public demo administrator password is intentionally public; never reuse it elsewhere.
 
 The [Colorado deployment guide](COLORADO-DEPLOYMENT.html) provides the exact private Serve commands and recipient steps. [Tailscale's current sharing documentation](https://tailscale.com/docs/features/sharing) requires an Owner, Admin or IT admin on both the sharing side and the receiving tailnet to create/accept a machine share. Shared machines use their fully qualified site hostname. Review site access policy so presenters receive demo access separately from SSH/host administration.
+
+## Independent conference stations
+
+Use the existing dashboard HTTPS origin with `/stations`, `/operator`, `/why-hp`, or `/demos`. Keep all five documented private proxies: the chooser opens the original demo ports on the same hostname. Existing Tailscale policy and Serve configuration are not changed by station assignment. The chooser explicitly allows microphone/camera/fullscreen features for its own demo frames; browser permissions and the client device still govern access.
+
+Production framing allows the current private dashboard origin, not arbitrary internet sites. Generated-code frames remain sandboxed with no network/form access and retain the existing validated message bridge. The same browser owns and reconnects to its Factory run; another browser cannot acquire its private controls by selecting a station. Direct application URLs retain their intentionally shareable application behavior.

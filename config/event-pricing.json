@@ -1,0 +1,10 @@
+{
+  "checked": "2026-11-04",
+  "currency": "USD",
+  "scope": "Standard text API pricing scenario per million observed tokens; no cache discounts, paid API calls, tools, taxes, images or audio.",
+  "models": [
+    {"id":"gpt-6-astra","name":"GPT-6 Astra","provider":"OpenAI","input":10,"output":50,"long_threshold":272000,"long_input":20,"long_output":75,"source":"https://developers.openai.com/api/docs/models/gpt-6-astra","note":"Standard tier. Above 272K input tokens, the whole request uses $20 input / $75 output."},
+    {"id":"claude-opus-5-5","name":"Claude Opus 5.5","provider":"Anthropic","input":4,"output":20,"source":"https://platform.claude.com/docs/en/about-claude/pricing","note":"Standard global routing, no prompt-cache or batch discount."},
+    {"id":"gemini-4-argon","name":"Gemini 4 Argon","provider":"Google","input":2,"output":10,"effective_until":"2026-11-30","subsequent_input":4,"subsequent_output":20,"source":"https://aistudio.google.com/docs/pricing#gemini-4-argon","note":"Promotional standard rates through 30 November 2026; $4 / $20 from 1 December 2026. Thinking tokens count as output."}
+  ]
+}

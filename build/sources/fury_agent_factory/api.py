@@ -11,6 +11,7 @@ from fastapi import FastAPI,HTTPException
 from fastapi.responses import FileResponse,JSONResponse,RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import devteam_routes
+from showcase_app.frame_policy import station_ancestors
 ROOT=Path(__file__).resolve().parent
 SHOWCASE=ROOT.parents[2]/'showcase_app/assets'
 ACTIVE_STATIC={'devteam.css','devteam.js','devteam-stack.css','devteam-stack.js'}
@@ -46,6 +47,9 @@ async def security_headers(request,call_next):
         response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'"
     if request.url.path.startswith('/api/travel/') and request.url.path.endswith('/frame'):
         response.headers['Content-Security-Policy']="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'"
+    if request.url.path in ('/devteam','/devteam/build','/api/devteam/preview-frame') or request.url.path.startswith('/travel/') or (request.url.path.startswith('/api/travel/') and request.url.path.endswith('/frame')):
+        policy=response.headers['Content-Security-Policy']
+        response.headers['Content-Security-Policy']=__import__('re').sub(r"frame-ancestors [^;]+",'frame-ancestors '+station_ancestors(request.url.hostname),policy)
     return response
 @app.get('/static/{filename}')
 async def static_file(filename:str):
