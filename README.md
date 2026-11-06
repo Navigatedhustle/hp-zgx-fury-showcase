@@ -50,6 +50,8 @@ Conference stations remain at `/stations`; assignments belong to each browser. U
 
 **Customer Skin** makes presenter controls and settings available directly on every station, without a PIN, presenter code, account or role assignment. Choose **Customize for customer** to research public identity/logo candidates through the local gateway, preview accessible colors and apply across station shells. HP ZGX Fury stays visible; branding stays in ignored `state/skin/`, outside generated apps and downloads. Offline uploads, eight recent confirmed skins and `./launch.sh skin prep|list|clear` support preparation. [Presenter steps and privacy](docs/CUSTOMER_SKIN.md).
 
+**Default appearance** in the left navigation opens the demo with customization bypassed. You can also open `/demos?skin=off`; that browser loads no skin script, styles or API requests, including inside retained workspaces. Optional appearance failures fall back to the native shell without stopping core telemetry.
+
 For the unmerged Customer Skin review build, clone with `git clone --branch customer_skin https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git`. Open Mission Control and use **Customize for customer**, **Presenter guide** or **Assumptions & presenter controls** directly.
 
 Customer Skin remains a draft: its fixed Factory latency acceptance gate did not pass. [Measured results and retained failures](docs/verification/customer_skin.json).

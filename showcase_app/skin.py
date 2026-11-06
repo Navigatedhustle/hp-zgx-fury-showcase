@@ -3,6 +3,7 @@ import asyncio
 import fcntl
 import hashlib
 import json
+import math
 import os
 import re
 import secrets
@@ -31,7 +32,12 @@ INDUSTRIES={
  'Q837171':'financial_services','Q2151621':'energy','Q11661':'technology','Q7397':'technology'}
 
 
-def settings():return json.loads((ROOT/'config/skin.json').read_text())
+def settings():
+ value=read_json(ROOT/'config/skin.json',{})
+ if not isinstance(value,dict):value={}
+ hours=value.get('idle_hours',8)
+ if type(hours) not in (int,float) or not math.isfinite(hours) or not 0<hours<=168:hours=8
+ return {'idle_hours':hours,'presentations_booth_palette':value.get('presentations_booth_palette') is True}
 
 
 def write_json(path,value):
@@ -48,22 +54,65 @@ def initialize():
  STATE.mkdir(parents=True,exist_ok=True,mode=0o700);STATE.chmod(0o700)
 
 
-def public_count():return read_json(STATE/'web-counter.json',{}).get('requests',0)
+def public_count():
+ value=read_json(STATE/'web-counter.json',{} if not (STATE/'web-counter.json').exists() else None)
+ count=value.get('requests',0) if isinstance(value,dict) else None
+ return count if type(count) is int and count>=0 else None
 
 
 def count_request():
  with COUNTER_LOCK:
   STATE.mkdir(parents=True,exist_ok=True,mode=0o700)
   with (STATE/'web-counter.lock').open('a') as lock:
-   fcntl.flock(lock,fcntl.LOCK_EX);write_json(STATE/'web-counter.json',{'requests':public_count()+1})
+   fcntl.flock(lock,fcntl.LOCK_EX)
+   count=public_count()
+   if count is None:raise research.LookupError('Public request counter unavailable. Use manual upload.')
+   write_json(STATE/'web-counter.json',{'requests':count+1})
+
+
+THEME_KEYS=set('--mc-bg --mc-panel --mc-raise --mc-blue --mc-cyan --mc-line --mc-text --mc-muted --bg --page --panel --surface --surface-raised --action --accent --border --text --subtle --on-action --focus'.split())
+
+
+def valid_skin(value):
+ """Reject broken persisted state before it reaches CSS, SSE or a station."""
+ if not isinstance(value,dict):return False
+ try:json.dumps(value,allow_nan=False)
+ except (ValueError,TypeError):return False
+ slug=value.get('id');name=value.get('name');theme=value.get('theme');colors=value.get('colors')
+ if not isinstance(slug,str) or not re.fullmatch('[a-f0-9]{24}',slug):return False
+ if not isinstance(name,str) or not 1<=len(name)<=80 or any(ord(c)<32 for c in name):return False
+ if value.get('logo') not in ('/skin/logo/'+slug+'/logo.svg','/skin/logo/'+slug+'/logo.png'):return False
+ if not (STATE/'cache'/slug/Path(value['logo']).name).is_file():return False
+ if not isinstance(value.get('pack'),str) or not isinstance(theme,dict):return False
+ variables=theme.get('variables')
+ if not isinstance(variables,dict) or not set(variables)<=THEME_KEYS:return False
+ if any(not isinstance(c,str) or not re.fullmatch('#[0-9a-fA-F]{6}',c) for c in variables.values()):return False
+ for key in ('primary','accent'):
+  if not isinstance(theme.get(key),str) or not re.fullmatch('#[0-9a-fA-F]{6}',theme[key]):return False
+ if not isinstance(theme.get('note'),str) or not isinstance(theme.get('swatches'),list):return False
+ if any(not isinstance(c,str) or not re.fullmatch('#[0-9a-fA-F]{6}',c) for c in theme['swatches']):return False
+ checks=theme.get('contrast')
+ if not isinstance(checks,dict):return False
+ for key,minimum in (('text',4.5),('accent',4.5),('ui',3)):
+  if type(checks.get(key)) not in (int,float) or not math.isfinite(checks[key]) or checks[key]<minimum:return False
+ if not isinstance(colors,list):return False
+ for pair in colors:
+  if not isinstance(pair,(list,tuple)) or len(pair)!=2:return False
+  color,weight=pair
+  if not isinstance(color,str) or not re.fullmatch('#[0-9a-fA-F]{6}',color):return False
+  if type(weight) not in (float,int) or not math.isfinite(weight) or weight<0:return False
+ return True
 
 
 def active():
  path=STATE/'active.json';value=read_json(path)
- try:touched=max(value.get('touched',0),path.stat().st_mtime) if value else 0
- except FileNotFoundError:return None
+ if not valid_skin(value):return None
+ try:touched=path.stat().st_mtime
+ except OSError:return None
  if value and time.time()-touched>settings()['idle_hours']*3600:
-  reset();return None
+  try:reset()
+  except OSError:pass
+  return None
  return value
 
 
@@ -76,17 +125,21 @@ def snapshot():
  identity={k:v for k,v in value.items() if k not in ('touched','used')} if value else None
  booth=settings()['presentations_booth_palette']
  revision={'skin':identity,'booth_palette':booth}
- return {'active':value,'sample_pack':packs().get(value['pack']) if value else None,'booth_palette':booth,
+ return {'active':value,'sample_pack':packs().get(value['pack']) if value else None,'booth_palette':booth,'available':True,
          'public_web_lookups':public_count(),'revision':hashlib.sha256(json.dumps(revision,sort_keys=True).encode()).hexdigest()[:16]}
 
 
 def recent():
  rows=[read_json(p) for p in (STATE/'cache').glob('*/skin.json')]
- return sorted((v for v in rows if v and v.get('confirmed')),key=lambda v:v.get('used',v.get('retrieved',0)),reverse=True)[:8]
+ return sorted((v for v in rows if valid_skin(v) and v.get('confirmed')),key=lambda v:v.get('used',0) if type(v.get('used')) in (int,float) else 0,reverse=True)[:8]
 
 
 def packs():
- return {p.stem:json.loads(p.read_text()) for p in (ROOT/'config/skin_packs').glob('*.json')}
+ result={}
+ for p in (ROOT/'config/skin_packs').glob('*.json'):
+  value=read_json(p)
+  if isinstance(value,dict) and value.get('fictional') is True and all(isinstance(value.get(k),str) for k in ('label','atlas','slides','vision','translate','image','video')):result[p.stem]=value
+ return result
 
 
 def pack_for(industries):return next((INDUSTRIES[q] for q in industries if q in INDUSTRIES),'default')
@@ -104,9 +157,9 @@ def cache_candidate(name,candidate,asset,industry='default',sources=None):
 
 
 def apply_skin(slug,theme=None,pack=None):
- if not re.fullmatch(r'[a-f0-9]{24}',slug):raise ValueError('Unknown cached skin')
+ if not isinstance(slug,str) or not re.fullmatch(r'[a-f0-9]{24}',slug):raise ValueError('Unknown cached skin')
  value=read_json(STATE/'cache'/slug/'skin.json')
- if not value:raise ValueError('Unknown cached skin')
+ if not valid_skin(value):raise ValueError('Cached appearance is unavailable. Upload the logo again.')
  if theme:value['theme']=theme
  if pack is not None:
   if pack not in packs():raise ValueError('Unknown sample pack')
@@ -321,11 +374,11 @@ async def upload(request:Request):
 @router.post('/preview')
 async def preview(request:Request):
  require(request);data=await json_body(request);slug=data.get('id','')
- if not re.fullmatch(r'[a-f0-9]{24}',slug):raise HTTPException(404)
+ if not isinstance(slug,str) or not re.fullmatch(r'[a-f0-9]{24}',slug):raise HTTPException(404)
  value=read_json(STATE/'cache'/slug/'skin.json')
- if not value:raise HTTPException(404)
+ if not valid_skin(value):raise HTTPException(404,'Cached appearance unavailable')
  colors={k:data.get(k) for k in ('primary','accent')}
- if any(v is not None and not re.fullmatch(r'#[0-9a-fA-F]{6}',v) for v in colors.values()):raise HTTPException(422,'Use a six digit hex color')
+ if any(v is not None and (not isinstance(v,str) or not re.fullmatch(r'#[0-9a-fA-F]{6}',v)) for v in colors.values()):raise HTTPException(422,'Use a six digit hex color')
  value['theme']=palette(value['colors'],**colors)
  return value
 
@@ -335,11 +388,11 @@ async def apply(request:Request):
  require(request);data=await json_body(request)
  # Recompute all tokens server-side; callers cannot inject CSS or semantic colors.
  slug=data.get('id','')
- if not re.fullmatch(r'[a-f0-9]{24}',slug):raise HTTPException(404)
+ if not isinstance(slug,str) or not re.fullmatch(r'[a-f0-9]{24}',slug):raise HTTPException(404)
  cached=read_json(STATE/'cache'/slug/'skin.json')
- if not cached:raise HTTPException(404)
+ if not valid_skin(cached):raise HTTPException(404,'Cached appearance unavailable')
  colors={k:data.get(k) for k in ('primary','accent')}
- if any(v is not None and not re.fullmatch(r'#[0-9a-fA-F]{6}',v) for v in colors.values()):raise HTTPException(422,'Use a six digit hex color')
+ if any(v is not None and (not isinstance(v,str) or not re.fullmatch(r'#[0-9a-fA-F]{6}',v)) for v in colors.values()):raise HTTPException(422,'Use a six digit hex color')
  theme=palette(cached['colors'],**colors) if any(colors.values()) else cached['theme']
  try:value=apply_skin(slug,theme,data.get('pack'))
  except ValueError as exc:raise HTTPException(422,str(exc)) from None

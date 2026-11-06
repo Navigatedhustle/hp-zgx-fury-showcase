@@ -9,9 +9,17 @@ The V3 shell always identifies **HP ZGX Fury, prepared for CUSTOMER**. Customer 
 3. Watch real research steps, elapsed time and local model routing. DeepSeek is selected only if its existing slot is free; otherwise the gateway chooses Qwen. Cancel stops the lookup. A ranking failure is disclosed and leaves source-order selection to the presenter.
 4. Resolve ambiguity using up to four entity cards with descriptions and official domains. Inspect up to six logo candidates on light and dark tiles. Choose **Use this logo**, **None of these — upload**, or **Try a different name**.
 5. Inspect swatches and current/proposed top bar, launcher and gauge. Text contrast meets 4.5:1 and UI contrast 3:1. Adjust primary/accent colors and choose a fictional industry sample pack. A monochrome mark keeps the default V3 accent until a color is explicitly selected.
-6. **Apply across stations** uses existing telemetry SSE. Transitions take 450 ms; reduced motion swaps instantly. **Skins** offers reset and the eight most recently confirmed cached selections.
+6. **Apply across stations** uses existing telemetry SSE. Explicit Apply fades colors for 450 ms; reduced motion, initial load and background sync swap instantly. **Skins** offers reset and the eight most recently confirmed cached selections.
 
 The hero uses the actual launcher tile count. Healthy, queued and failed colors retain their meaning. Red brands receive separated dark surfaces plus status icons/text. Low-contrast logos receive a light plate. Logos render only through `img`, preserving aspect ratio without intentional recoloring or cropping.
+
+## Keep the demo available
+
+If customization misbehaves, choose **Default appearance** in the left navigation, or open `/demos?skin=off`. This recovery link belongs to the core shell and works without the customization script or service. The bypass follows navigation and retained workspaces in that browser, without cancelling jobs or changing other stations. **Enable customization** returns to the normal shell. **Skins → Reset to default** clears the shared active skin; `./launch.sh skin clear` also removes cached skins. Neither requires a PIN.
+
+Appearance storage, imports and telemetry are isolated behind `skin_runtime.py`. Missing optional dependencies, damaged state/configuration and missing logo files cannot stop the core collector. Invalid skins use default colors. A damaged public request counter displays unknown and prevents further public fetching instead of inventing a zero count; manual upload remains available. Requests time out; Close dismisses immediately, and late research responses cannot reopen the dialog. The skin stylesheet changes the top bar layout only after its wrapper is ready, and initialization failure restores the native bar.
+
+For simpler recovery, whole-document View Transitions were removed in favor of the bounded color-only CSS fade. This supersedes the original animation implementation: skin changes never create a full-page transition overlay over demo controls. Fault-injection checks cover missing scripts/styles, initialization errors, service failures, malformed state, timeouts, Cancel races and bypass navigation in Chromium and Firefox. These are tested failure boundaries, not a guarantee against every future software or hardware fault.
 
 ## Sources and local processing
 

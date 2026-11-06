@@ -7,7 +7,8 @@
  const num=(v,d=0)=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
  const gib=v=>typeof v==='number'?num(v/1073741824,1)+' GiB':'not exposed';
  const time=v=>typeof v==='number'?num(v,1)+'s':'—';
- const addr=path=>{const u=new URL(location.href);u.port=location.hostname.endsWith('.ts.net')?'':'8080';u.pathname=path;u.search='';u.hash='';return u.href};
+ const skinOff=new URLSearchParams(location.search).get('skin')==='off';
+ const addr=path=>{const u=new URL(location.href);u.port=location.hostname.endsWith('.ts.net')?'':'8080';u.pathname=path;u.search=skinOff?'?skin=off':'';u.hash='';return u.href};
  const screen=document.body.dataset.screen||location.pathname.split('/')[1]||'home';
  const embedded=window.self!==window.top;
  window.FuryUI={icon,esc,num,gib,time,addr};
@@ -20,13 +21,15 @@
   const logo=header.querySelector('.hp-home');logo.innerHTML='<img class="hp-logo" src="/showcase-assets/hp-logo-keyline.png" width="48" height="48" alt="HP"><span class="mc-home-text"><b>FURY</b><small>Mission Control</small></span>';
   const links=[['overview','Mission Control','/demos','all-demos'],['models','Model Hub','/models',''],['performance','Performance','/performance',''],['economics','Cloud vs Local','/economics',''],['secure','Local and secure','/secure',''],['setup','Station setup','/stations',''],['about','About','/about','']];
   nav.innerHTML=links.map(([key,label,path,cls])=>'<a class="'+cls+'" href="'+addr(path)+'" '+((location.pathname===path||key==='overview'&&['/','/demos'].includes(location.pathname))?'aria-current="page"':'')+' title="'+label+'">'+icon(key)+'<span class="mc-nav-label">'+label+'</span></a>').join('');
-  const bottom=document.createElement('div');bottom.className='mc-nav-bottom';if(full)bottom.append(full);if(theme)bottom.append(theme);nav.append(bottom);
+  const bottom=document.createElement('div');bottom.className='mc-nav-bottom';
+  const recovery=document.createElement('a'),recoveryURL=new URL(addr('/demos'));recoveryURL.search=skinOff?'':'?skin=off';recovery.href=recoveryURL.href;recovery.id='mc-default-appearance';recovery.title=skinOff?'Return to the normal shell':'Open the demo with default appearance; bypass customer customization';recovery.innerHTML=icon('setup')+'<span class="mc-nav-label">'+(skinOff?'Enable customization':'Default appearance')+'</span>';bottom.append(recovery);
+  if(full)bottom.append(full);if(theme)bottom.append(theme);nav.append(bottom);
   if(['8200','8501','8765','8800'].includes(location.port))nav.querySelectorAll('a').forEach(a=>{a.target='_blank';a.rel='noopener'});
   const bar=document.createElement('div');bar.className='mc-telemetry mc-stale';bar.setAttribute('aria-label','Live machine telemetry');
   bar.innerHTML='<div class="mc-signal"><i class="mc-dot"></i><span id="mc-signal-text">CONNECTING</span></div>'+[['gpu','GPU'],['hbm','HBM / total'],['grace','Grace used'],['power','GPU power'],['tps','Output tok/s'],['active','Active jobs'],['queued','Queued jobs'],['external','External AI APIs']].map(([key,label])=>'<div class="mc-readout"><span>'+label+'</span><strong id="mc-'+key+'">—</strong></div>').join('');document.body.prepend(bar);
  }
  shell();
- const skinScript=document.createElement('script');skinScript.src='/showcase-assets/skin.js';document.head.append(skinScript);
+ if(!skinOff){const skinScript=document.createElement('script');skinScript.src='/showcase-assets/skin.js';document.head.append(skinScript)}
  function text(id,value){const el=document.getElementById(id);if(el&&el.textContent!==String(value))el.textContent=value}
  function lanes(t){return t.lanes.map(l=>'<div class="mc-lane" data-queued="'+Boolean(l.queued&&!l.active)+'" data-busy="'+Boolean(l.active||l.last_request&&Date.now()/1000-l.last_request<2.5)+'" title="'+esc((l.routing||[]).join('; '))+'"><span>'+esc(l.name)+'</span><b>'+(!l.ready?'Unavailable':l.active?'ACTIVE '+l.active:l.queued?'QUEUED '+l.queued:'Ready')+'</b></div>').join('')+(t.routing?.[0]&&Date.now()/1000-t.routing[0].at<120?'<div class="mc-routing-mini">Latest route · '+esc(t.routing[0].reason)+'</div>':'')}
  function jobs(t){

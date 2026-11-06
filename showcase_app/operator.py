@@ -9,7 +9,7 @@ from showcase_app.gateway import connect,ROOT
 from fastapi.staticfiles import StaticFiles
 from showcase_app.ui import ASSETS
 from showcase_app.costs import comparison
-from showcase_app import workloads,trailer,samples,skin
+from showcase_app import workloads,trailer,samples,skin_runtime as skin
 from showcase_app.creative_auth import private_key
 monitor=Monitor()
 @asynccontextmanager
@@ -26,8 +26,17 @@ async def lifespan(app):
   await asyncio.gather(*tasks,return_exceptions=True)
 app=FastAPI(lifespan=lifespan)
 app.include_router(workloads.router);app.include_router(trailer.router);app.include_router(samples.router)
-app.include_router(skin.router)
+if skin.service is not None:app.include_router(skin.service.router)
 app.mount("/showcase-assets",StaticFiles(directory=ASSETS),name="showcase-assets")
+
+@app.post('/api/appearance/reset')
+async def default_appearance(request:Request):
+ # Recovery deliberately has no dependency on the optional skin service.
+ if not station_origin_allowed(request.headers.get('origin'),request.url.hostname):raise HTTPException(403,'Use a local station')
+ try:(ROOT/'state/skin/active.json').unlink(missing_ok=True)
+ except OSError:raise HTTPException(503,'Appearance storage unavailable; open /demos?skin=off') from None
+ return {'active':None}
+
 def sync_agent():
  for path in (ROOT/'build/sources/fury_agent_factory/runs').glob('*.sqlite'):
   try:

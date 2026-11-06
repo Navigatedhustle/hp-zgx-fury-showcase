@@ -106,7 +106,7 @@ async def main(args):
    assert await page.evaluate('window.skinTransitionCalls')==0;report['checks']['reduced_motion_instant_swap']=True
    await page.emulate_media(reduced_motion='no-preference')
    await page.evaluate('document.startViewTransition=undefined')
-   await page.evaluate("async value=>{const r=await fetch('/skin/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:value.active.id,primary:'#7c44cc'})});window.FurySkin.update(await r.json())}",base)
+   await page.evaluate("async value=>{const r=await fetch('/skin/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:value.active.id,primary:'#7c44cc'})});const v=await r.json();v.revision+='-animation-check';window.FurySkin.update(v,{animate:true})}",base)
    await page.wait_for_function("()=>document.documentElement.classList.contains('skin-fade')")
    await page.wait_for_function("()=>!document.documentElement.classList.contains('skin-fade')",timeout=1000);report['checks']['css_transition_fallback']=True
    await page.evaluate("async value=>{const r=await fetch('/skin/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:value.active.id,primary:value.active.theme.primary,accent:value.active.theme.accent,pack:value.active.pack})});window.FurySkin.update(await r.json())}",base)
