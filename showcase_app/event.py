@@ -106,6 +106,9 @@ class Store:
         session = {'id': secrets.token_hex(8), 'name': name.strip(), 'started': time.time()}
         db.execute('INSERT INTO sessions VALUES (:id,:name,:started)', session)
         db.execute('INSERT OR REPLACE INTO settings VALUES (1,?)', (session['id'],))
+        if self.path == DB:
+            from showcase_app.skin import reset
+            reset()
         return session
 
     def current(self):
@@ -215,7 +218,7 @@ class Monitor:
             live = await collect()
             self.latest_live = live
             self.latest = await asyncio.to_thread(self.snapshot, live)
-            self.stream = json.dumps({'telemetry':live.get('telemetry'),'event':self.latest},separators=(',',':'))
+            self.stream = json.dumps({'telemetry':live.get('telemetry'),'event':self.latest,'skin':live.get('skin')},separators=(',',':'))
         async with self.changed:self.changed.notify_all()
 
     async def run(self, collect):

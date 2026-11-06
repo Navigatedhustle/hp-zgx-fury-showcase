@@ -220,6 +220,14 @@ def gpu_status():
  except (OSError,subprocess.TimeoutExpired):return {'verified':False,'summary':'nvidia-smi unavailable','processes':[]}
 
 def status():
+ try:
+  customer=json.loads((STATE/'skin/active.json').read_text())
+  idle=json.loads((ROOT/'config/skin.json').read_text())['idle_hours']*3600
+  skin_name=customer['name'] if time.time()-customer.get('touched',0)<idle else 'default · HP ZGX Fury'
+ except (OSError,ValueError,KeyError):skin_name='default · HP ZGX Fury'
+ print('Customer skin:',skin_name)
+ try:print('Presenter PIN:',(STATE/'skin-presenter.pin').read_text().strip())
+ except OSError:print('Presenter PIN: generated on first operator launch')
  print(f'{"COMPONENT":12} {"PORT":6} {"PID":8} {"PROCESS / READINESS":24} MODEL')
  for name,spec in COMPONENTS.items():
   row=discover(name);healthy=ready(name) if row else False

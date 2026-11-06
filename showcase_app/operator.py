@@ -9,22 +9,24 @@ from showcase_app.gateway import connect,ROOT
 from fastapi.staticfiles import StaticFiles
 from showcase_app.ui import ASSETS
 from showcase_app.costs import comparison
-from showcase_app import workloads,trailer,samples
+from showcase_app import workloads,trailer,samples,skin
 from showcase_app.creative_auth import private_key
 monitor=Monitor()
 @asynccontextmanager
 async def lifespan(app):
- trailer.visitors.start();private_key()
+ trailer.visitors.start();private_key();skin.presenter_pin()
  task=asyncio.create_task(monitor.run(collect_live))
  privacy=asyncio.create_task(trailer.sweep())
  try:yield
  finally:
+  await skin.shutdown()
   for sid in list(trailer.visitors.sessions):await trailer.erase(sid)
   tasks=[task,privacy,*[j['_task'] for j in workloads.JOBS.values() if not j['_task'].done()]]
   for pending in tasks:pending.cancel()
   await asyncio.gather(*tasks,return_exceptions=True)
 app=FastAPI(lifespan=lifespan)
 app.include_router(workloads.router);app.include_router(trailer.router);app.include_router(samples.router)
+app.include_router(skin.router)
 app.mount("/showcase-assets",StaticFiles(directory=ASSETS),name="showcase-assets")
 def sync_agent():
  for path in (ROOT/'build/sources/fury_agent_factory/runs').glob('*.sqlite'):
@@ -63,6 +65,8 @@ async def collect_live():
  from showcase_app.model_hub import models
  measured['models']=models(live);measured['workflow_jobs']=workloads.summaries()
  measured['factory_jobs']=services.get('factory_jobs',{}).get('data',{}).get('jobs',[])
+ live['skin']=skin.snapshot()
+ measured['public_web_lookups']=skin.public_count()
  return live
 @app.get('/')
 async def home():return FileResponse(ROOT/'showcase_app/launcher.html')

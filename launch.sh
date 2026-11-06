@@ -12,6 +12,7 @@ case "$command" in
  stop|status|restart) shift || true; exec ./showcase "$command" "$@" ;;
  diagnostics) exec python3 ops/diagnostics.py ;;
  recover) shift; exec .venv/bin/python ops/recover.py "$@" ;;
+ skin) shift; exec .venv/bin/python ops/skin.py "$@" ;;
  desktop) exec python3 ops/install-desktop.py ;;
  start)
   python3 ops/preflight.py --ports
@@ -30,5 +31,5 @@ PY
   if [[ "${FURY_NO_BROWSER:-0}" != 1 && ( -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ) ]] && command -v xdg-open >/dev/null; then
    xdg-open http://localhost:8080/ >/dev/null 2>&1 || true
   fi ;;
- *) echo 'Usage: ./launch.sh [start|setup|stop|status|diagnostics|recover COMPONENT|restart COMPONENT|desktop]' >&2; exit 2 ;;
+ *) echo 'Usage: ./launch.sh [start|setup|stop|status|diagnostics|recover COMPONENT|restart COMPONENT|desktop|skin prep NAMES...|skin list|skin clear]' >&2; exit 2 ;;
 esac

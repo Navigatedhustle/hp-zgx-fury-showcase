@@ -76,3 +76,7 @@ dist/
 
 # Optional private runtime photography is never a redistributable source asset.
 /build/sources/fury_agent_factory/travel_portal/art-data.json
+
+# Customer branding and presenter credentials are runtime-only.
+/state/skin/
+/state/skin-presenter.pin
