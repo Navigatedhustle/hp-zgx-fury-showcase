@@ -1,5 +1,13 @@
 # V3 presenter script
 
+## The customer skin moment — 20 seconds
+
+“Who is in the room today? I’ll choose the official mark, check the colors and prepare every station. This is still HP ZGX Fury, built for your conversation. The models, security boundaries and generated applications stay the same. Your brand stays on screen and out of downloads.”
+
+Assign the Presenter role or unlock with the PIN from `./launch.sh status`, then use the palette button. Confirm identity/logo, preview, and Apply. Pre-cache before an event or upload offline. [Full steps and privacy](CUSTOMER_SKIN.md).
+
+Show the separate kWh chart on `/economics`. Cloud values require sourced, same-workload estimates; the display reports more **or less** electricity rather than assuming cloud consumes more. A higher API bill is not evidence of higher energy consumption.
+
 Start at http://localhost:8080. Show the eight workload cards and the live GPU/HBM/Grace/power/token counters. “These are local measurements. The external AI counter covers this gateway, not every packet on the machine.”
 
 | One-minute demo | Action and evidence |

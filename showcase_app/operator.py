@@ -131,7 +131,7 @@ async def model_hub():
  from showcase_app.model_hub import models
  return {'models':models(monitor.latest_live or {}),'as_of':(monitor.latest_live or {}).get('timestamp')}
 
-PROOF_FILES={'ops/runtime.py','config/gb300.json','config/model-pins.json','config/creative-models.json','showcase_app/gateway.py','build/sources/fury_agent_factory/devteam_sandbox.py','showcase_app/visitor_store.py','AGENTS.md','docs/ASSET-MANIFEST.md'}
+PROOF_FILES={'showcase_app/skin_research.py','ops/runtime.py','config/gb300.json','config/model-pins.json','config/creative-models.json','showcase_app/gateway.py','build/sources/fury_agent_factory/devteam_sandbox.py','showcase_app/visitor_store.py','AGENTS.md','docs/ASSET-MANIFEST.md'}
 @app.get('/api/source/{name:path}')
 async def source_proof(name:str):
  if name not in PROOF_FILES:raise HTTPException(404)

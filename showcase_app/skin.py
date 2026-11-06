@@ -1,5 +1,6 @@
 """Presenter-only customer wrapper. All identity-bearing files stay in state/skin/."""
 import asyncio
+import fcntl
 import hashlib
 import hmac
 import json
@@ -57,7 +58,10 @@ def public_count():return read_json(STATE/'web-counter.json',{}).get('requests',
 
 
 def count_request():
- with COUNTER_LOCK:write_json(STATE/'web-counter.json',{'requests':public_count()+1})
+ with COUNTER_LOCK:
+  STATE.mkdir(parents=True,exist_ok=True,mode=0o700)
+  with (STATE/'web-counter.lock').open('a') as lock:
+   fcntl.flock(lock,fcntl.LOCK_EX);write_json(STATE/'web-counter.json',{'requests':public_count()+1})
 
 
 def active():
@@ -73,12 +77,14 @@ def reset():
 
 def snapshot():
  value=active()
- return {'active':value,'public_web_lookups':public_count(),'revision':hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()[:16]}
+ identity={k:v for k,v in value.items() if k not in ('touched','used')} if value else None
+ return {'active':value,'sample_pack':packs().get(value['pack']) if value else None,'booth_palette':settings()['presentations_booth_palette'],
+         'public_web_lookups':public_count(),'revision':hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest()[:16]}
 
 
 def recent():
  rows=[read_json(p) for p in (STATE/'cache').glob('*/skin.json')]
- return sorted((v for v in rows if v),key=lambda v:v.get('used',v.get('retrieved',0)),reverse=True)[:8]
+ return sorted((v for v in rows if v and v.get('confirmed')),key=lambda v:v.get('used',v.get('retrieved',0)),reverse=True)[:8]
 
 
 def packs():
@@ -107,7 +113,7 @@ def apply_skin(slug,theme=None,pack=None):
  if pack is not None:
   if pack not in packs():raise ValueError('Unknown sample pack')
   value['pack']=pack
- value['touched']=value['used']=time.time()
+ value['touched']=value['used']=time.time();value['confirmed']=True
  dark=value['theme']['variables'].get('--mc-panel','#101c2e')
  value['plate']=any(contrast(c,dark)<3 for c,w in value['colors'] if w>0) if value['colors'] else value['plate']
  write_json(STATE/'cache'/slug/'skin.json',value);write_json(STATE/'active.json',value)
@@ -131,10 +137,10 @@ async def rank(job,entities,logos):
  try:
   chosen=await research.model_choose(entities,logos,lambda r:route(job,r))
   return chosen
- except (Exception,):
+ except Exception:
   # No invented model claim on a failed local call. The presenter still chooses.
   job['routing']['note']='Local ranking unavailable; source-order candidates require presenter confirmation.'
-  return {'entities':list(range(min(4,len(entities)))),'logos':list(range(min(6,len(logos))))}
+  return {'entities':list(range(min(4,len(entities)))),'logos':[i for i,c in enumerate(logos) if c.get('priority',4)<4][:6]}
 
 
 async def collect_candidates(job,entity=None,initial=None):
@@ -145,12 +151,12 @@ async def collect_candidates(job,entity=None,initial=None):
   step(job,'Found official site')
   try:
    site,hint=await research.site_logo_candidates(website,fetcher);logos+=site
-  except research.LookupError:pass
+  except research.LookupError:
+   if not logos:raise
  # Explicit site starts first. Otherwise Wikidata always has source priority.
  if initial:logos.sort(key=lambda c:c['priority'] if c['source']!='Wikidata' else 5)
  choice=await rank(job,[],logos)
  ordered=[logos[i] for i in dict.fromkeys(choice['logos'])]
- if not ordered:ordered=logos[:6]
  result=[];step(job,'Extracting colors')
  for candidate in ordered:
   if fetcher.cancelled:return
@@ -165,6 +171,14 @@ async def collect_candidates(job,entity=None,initial=None):
  job['candidates']=result;job['status']='candidates' if result else 'manual'
  if not result:job['message']='No suitable public logo found. Upload a PNG or SVG to continue.'
  step(job,'Candidates ready' if result else 'Manual logo upload ready')
+
+
+async def continue_lookup(job,entity):
+ try:await collect_candidates(job,entity)
+ except asyncio.CancelledError:job['status']='cancelled';raise
+ except research.LookupError as exc:job.update(status='manual',message=str(exc))
+ except Exception:job.update(status='manual',message='Research unavailable. Upload a PNG or SVG to continue.')
+ finally:job['elapsed']=round(time.monotonic()-job['_started'],3)
 
 
 async def run_lookup(job):
@@ -196,6 +210,7 @@ async def run_lookup(job):
 def new_lookup(name,website=None):
  if not isinstance(name,str) or not 1<=len(name.strip())<=80 or any(ord(c)<32 for c in name):raise ValueError('Use a customer name between 1 and 80 characters')
  if website:
+  if not isinstance(website,str) or len(website)>2048:raise ValueError('Use an official HTTPS website')
   website=website.strip()
   if '://' not in website:website='https://'+website
   research.validate_url(website)
@@ -248,8 +263,8 @@ async def changed():
 
 @router.get('/state')
 async def state(request:Request):
- value=snapshot();value['presenter']=authorized(request)
- if value['presenter']:value.update(recent=recent(),packs=packs())
+ value=snapshot();value.update(presenter=authorized(request),packs=packs())
+ if value['presenter']:value.update(recent=recent())
  return JSONResponse(value,headers={'Cache-Control':'no-store'})
 
 
@@ -298,7 +313,7 @@ async def entity_choice(jid:str,request:Request):
  if not job or job['status']!='entities':raise HTTPException(409,'Choose an entity from the current lookup')
  entity=next((e for e in job['entities'] if e['qid']==data.get('qid')),None)
  if entity is None:raise HTTPException(422,'Unknown entity choice')
- job['status']='researching';job['_task']=asyncio.create_task(collect_candidates(job,entity));return job_public(job)
+ job['status']='researching';job['_task']=asyncio.create_task(continue_lookup(job,entity));return job_public(job)
 
 
 @router.post('/upload')
@@ -351,6 +366,8 @@ async def reset_route(request:Request):
 @router.post('/touch')
 async def touch(request:Request):
  # Real browser interaction extends retention; polling and SSE never do.
+ origin=request.headers.get('origin')
+ if origin and urlsplit(origin).hostname!=request.url.hostname:raise HTTPException(403,'Use a local station')
  value=active()
  if value and time.time()-value.get('touched',0)>60:value['touched']=time.time();write_json(STATE/'active.json',value)
  return {'active':bool(value)}
@@ -359,6 +376,17 @@ async def touch(request:Request):
 @router.get('/active.css')
 async def active_css():
  value=active();return Response(css(value['theme']) if value else ':root{}',media_type='text/css',headers={'Cache-Control':'no-store'})
+
+
+@router.get('/booth.css')
+async def booth_css():
+ # Opt-in, on-screen CSS only: no deck records, prompts or exports are modified.
+ value=active();sheet=''
+ if value and settings()['presentations_booth_palette']:
+  variables=value['theme']['variables']
+  bg=variables.get('--mc-bg','#060c17');panel=variables.get('--mc-panel','#101c2e');accent=variables.get('--mc-blue','#4c9cff')
+  sheet=css(value['theme'])+'.bf{background:'+bg+'!important;color:#edf5ff!important}.bf h1,.bf-tag,.bf-card span{color:'+accent+'!important}.bf-card{background:'+panel+'!important}.bf-sub,.bf footer{color:#9eb0c7!important}'
+ return Response(sheet,media_type='text/css',headers={'Cache-Control':'no-store'})
 
 
 @router.get('/logo/{slug}/{filename}')

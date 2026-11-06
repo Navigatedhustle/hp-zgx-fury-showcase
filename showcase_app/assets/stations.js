@@ -1,5 +1,5 @@
 (() => {
- const key='fury-station-v2',routes={economics:'/operator',why:'/why-hp',demos:'/demos'};
+ const key='fury-station-v2',routes={economics:'/operator',why:'/why-hp',demos:'/demos',presenter:'/presenter'};
  const page=document.body.dataset.stationPage;
  if(page==='setup'){
   let saved='demos';try{saved=localStorage.getItem(key)||saved}catch{}

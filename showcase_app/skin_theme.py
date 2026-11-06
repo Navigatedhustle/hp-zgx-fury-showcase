@@ -31,14 +31,18 @@ def oklab(color):
             .0259040371*l + .7827717662*m - .808675766*s)
 
 
-def hex_lab(lab):
+def linear_lab(lab):
     l, a, b = lab
     x = (l + .3963377774*a + .2158037573*b)**3
     y = (l - .1055613458*a - .0638541728*b)**3
     z = (l - .0894841775*a - 1.291485548*b)**3
-    values = (4.0767416621*x - 3.3077115913*y + .2309699292*z,
+    return (4.0767416621*x - 3.3077115913*y + .2309699292*z,
               -1.2684380046*x + 2.6097574011*y - .3413193965*z,
               -.0041960863*x - .7034186147*y + 1.707614701*z)
+
+
+def hex_lab(lab):
+    values=linear_lab(lab)
     return '#' + ''.join(f'{round(min(1,max(0,srgb(v)))*255):02x}' for v in values)
 
 
@@ -48,7 +52,15 @@ def lch(color):
 
 
 def from_lch(l, c, h):
-    return hex_lab((l, c*math.cos(math.radians(h)), c*math.sin(math.radians(h))))
+    def lab(chroma):return (l,chroma*math.cos(math.radians(h)),chroma*math.sin(math.radians(h)))
+    if not all(-1e-7<=v<=1.0000001 for v in linear_lab(lab(c))):
+        low,high=0,c
+        for _ in range(24):
+            mid=(low+high)/2
+            if all(0<=v<=1 for v in linear_lab(lab(mid))):low=mid
+            else:high=mid
+        c=low
+    return hex_lab(lab(c))
 
 
 def contrast(a, b):
@@ -63,7 +75,10 @@ def accessible(color, panel, threshold):
     # Preserve hue; try lightness before reducing chroma. Quantized output is checked.
     for chroma in (c,c*.8,c*.6,c*.3,0):
         for i in range(101):
-            candidate = from_lch(l+(1-l)*i/100,chroma,h)
+            lightness=l+(1-l)*i/100
+            lab=(lightness,chroma*math.cos(math.radians(h)),chroma*math.sin(math.radians(h)))
+            if not all(-1e-7<=v<=1.0000001 for v in linear_lab(lab)):continue
+            candidate = hex_lab(lab)
             if contrast(candidate,panel) >= threshold:return candidate
     return '#ffffff'
 
@@ -86,7 +101,7 @@ def raster_colors(image):
 
 
 def svg_colors(root):
-    """Paint weights use geometric area (path coordinate bounds approximate area)."""
+    """Paint weights use geometric area; paths integrate curves with AreaPen."""
     weights = Counter()
     def number(v,default=0):
         try:return float(re.match(r'[-+.\deE]+',str(v))[0])
@@ -97,9 +112,15 @@ def svg_colors(root):
         if tag in ('defs','clipPath','mask','title','desc'):return
         if tag=='rect':area = number(attrs.get('width'))*number(attrs.get('height'))
         elif tag in ('circle','ellipse'):area = math.pi*number(attrs.get('r',attrs.get('rx')))*number(attrs.get('r',attrs.get('ry')))
-        elif tag in ('path','polygon','polyline'):
+        elif tag=='path':
+            try:
+                from fontTools.pens.areaPen import AreaPen
+                from fontTools.svgLib.path import parse_path
+                pen=AreaPen(None);parse_path(attrs.get('d',''),pen);area=abs(pen.value)
+            except (ValueError,TypeError,NotImplementedError):area=1
+        elif tag in ('polygon','polyline'):
             nums = [float(v) for v in re.findall(r'[-+]?(?:\d*\.)?\d+(?:[eE][-+]?\d+)?',attrs.get('d',attrs.get('points','')))]
-            xs,ys = nums[::2],nums[1::2];area = (max(xs)-min(xs))*(max(ys)-min(ys)) if xs and ys else 1
+            points=list(zip(nums[::2],nums[1::2]));area=abs(sum(x*y2-x2*y for (x,y),(x2,y2) in zip(points,points[1:]+points[:1])))/2 if points else 1
         else:area = 1
         if tag in ('rect','circle','ellipse','path','polygon','polyline','text','line'):
             for key in ('fill','stroke'):
@@ -136,7 +157,7 @@ def palette(colors, hint=None, primary=None, accent=None):
     bg,panel,raised=[from_lch(l,.015 if l==.13 else .022,surface_h) for l in (.13,.17,.19)]
     text=accessible(primary,panel,4.5);edge=accessible(primary,panel,3);act=accessible(accent,panel,4.5)
     variables={'--mc-bg':bg,'--mc-panel':panel,'--mc-raise':raised,'--mc-blue':text,'--mc-cyan':act,'--mc-line':edge,
-               '--bg':bg,'--panel':panel,'--surface':panel,'--surface-raised':raised,'--action':text,'--accent':act,'--border':edge}
+               '--mc-text':'#edf5ff','--mc-muted':'#9eb0c7','--bg':bg,'--page':bg,'--panel':panel,'--surface':panel,'--surface-raised':raised,'--action':text,'--accent':act,'--border':edge,'--text':'#edf5ff','--subtle':'#9eb0c7','--on-action':bg,'--focus':text}
     if monochrome:
         variables={};text=DEFAULT_PRIMARY;act='#69d9ee';panel='#101c2e';edge=DEFAULT_PRIMARY
     return {'primary':primary,'accent':accent,'swatches':[c for c,_ in sorted(colors,key=lambda x:x[1],reverse=True)[:6]],
@@ -146,4 +167,4 @@ def palette(colors, hint=None, primary=None, accent=None):
 
 
 def css(theme):
-    return ':root:root {'+';'.join(k+':'+v for k,v in theme.get('variables',{}).items() if re.fullmatch(r'--[a-z-]+',k) and re.fullmatch(r'#[0-9a-fA-F]{6}',v))+'}'
+    return ':root:root {'+';'.join(k+':'+v for k,v in theme.get('variables',{}).items() if k not in SEMANTIC and re.fullmatch(r'--[a-z-]+',k) and re.fullmatch(r'#[0-9a-fA-F]{6}',v))+'}'

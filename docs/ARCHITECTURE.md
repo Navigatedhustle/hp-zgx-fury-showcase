@@ -1,5 +1,7 @@
 # Architecture
 
+Customer Skin runs in the existing operator process (`skin.py`, `skin_research.py`, pure `skin_theme.py`). Presenter-gated actions write customer identity only under ignored `state/skin/`. Deterministic HTTPS tools validate DNS and pin sockets; extracted metadata uses the existing DeepSeek-if-free/Qwen-otherwise lead gateway. Public request counts are separate from external inference counts. The existing cached telemetry SSE carries skin state without persisting identity in event samples or usage ledgers. Component-origin proxies reuse operator state. Shared CSS/JSON tokens drive the shell; Factory previews and pipelines remain isolated. Event reset and configurable genuine-interaction idle expiry clear active branding. [Customer Skin](CUSTOMER_SKIN.md).
+
 `launch.sh` performs setup/preflight and delegates service ownership to the existing `showcase` → `ops/control.py` controller. No second supervisor is introduced. It records exact Linux process identities under this installation's `state/`, starts detached sessions in dependency order, waits for application readiness/model identity, rejects unknown listeners, rolls back failed newly started components and verifies shutdown. It does not adopt another installation's registry. `config/gb300.json` replaces the private machine-specific runtime plan; GPU selection defaults to index 0 (`FURY_GPU` can select a local index/UUID).
 
 ```mermaid

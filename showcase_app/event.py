@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / 'state/event-session.sqlite'
 PRICING = ROOT / 'config/event-pricing.json'
 SAMPLE_SECONDS = 2
-TEXT_DEMOS = ('atlas','slides','agent','vision','translate','trailer')
+TEXT_DEMOS = ('atlas','slides','agent','vision','translate','trailer','skin')
 MAX_POWER_GAP = 20
 
 

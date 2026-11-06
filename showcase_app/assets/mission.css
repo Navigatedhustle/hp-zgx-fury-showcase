@@ -58,3 +58,4 @@ body:is(.mission-layout,.mission-embedded)[data-workflow=atlas]>footer button,bo
 @media(prefers-reduced-motion:reduce){.frontier-track i{transition:none}}
 .frontier-row{padding:6px 0}.frontier-label strong{line-height:1.25}.frontier-label small{line-height:1.25;margin-top:3px}.frontier-caveat{line-height:1.5!important}
 .frontier-asof{margin-left:auto;font-family:Plex,monospace}
+.frontier-energy{border-top:1px solid var(--mc-line);margin-top:26px;padding-top:24px}.frontier-energy-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0 22px}.frontier-energy-inputs label{font-size:11px}.frontier-energy-inputs input{margin-top:7px}.frontier-energy .frontier-value{font-size:12px}@media(max-width:700px){.frontier-energy-inputs{grid-template-columns:1fr}}

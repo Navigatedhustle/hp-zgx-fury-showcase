@@ -1,5 +1,9 @@
 # Fury electricity and frontier API comparison
 
+The additional **One Fury vs cloud electricity** chart uses a separate kWh axis. Whole-Fury electricity is power × runtime; each cloud row requires an explicit, sourced same-workload kWh estimate. Missing values remain **Unknown**, never zero. Entering 240 kWh against 48 kWh produces a clearly conditional 5× / 192 kWh-more scenario; entering a lower value correctly reports less. These numbers are an arithmetic illustration, not measured frontier-model energy.
+
+No model-specific electricity is inferred from prices, model size or a claim that cloud always uses more. Google's [primary-source May 2025 Gemini Apps study](https://cloud.google.com/blog/products/infrastructure/measuring-the-environmental-impact-of-ai-inference) reports 0.24 Wh for a median text prompt with serving overhead. This historical observation is not an estimate for today's frontier API models or for the mixed image/video workload. Training and client/network electricity are excluded on both sides. Use compatible serving-system boundaries, completed workload counts and wall-meter measurements where available.
+
 The Cloud vs Local page (`/economics`) now leads with an interactive horizontal bar chart. All bars share a linear USD axis starting at zero, with exact values visible alongside them. Power, hours, tariff and monthly workload are editable; changing them updates the chart and preserves the existing detailed calculator and measured event-energy readout.
 
 The local bar is **estimated whole-Fury electricity**, using the presenter's average system power, runtime and tariff. The initial 1,200 W / 40 hours / $0.25 per kWh are explicitly illustrative assumptions, not wall-meter measurements or a local tariff claim. Runtime must cover the entered workload. Hardware, support, cooling outside the supplied power scope and client-device costs are excluded. Electricity is not total ownership cost.

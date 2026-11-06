@@ -48,6 +48,10 @@ Telemetry comes from native GPU/CPU/memory counters and vLLM output-token deltas
 
 Conference stations remain at `/stations`; assignments belong to each browser. Use the actual CSS viewport at 100% zoom, principally 1366×768, plus 1280×720, 1440×900, 1920×1080 and shorter laptop cases. Workspaces use contained scrolling. Fullscreen is optional.
 
+**Customer Skin** adds a Presenter station role and six digit PIN access. Choose **Customize for customer** to research public identity/logo candidates through the local gateway, preview accessible colors and apply across station shells. HP ZGX Fury stays visible; branding stays in ignored `state/skin/`, outside generated apps and downloads. Offline uploads, eight recent confirmed skins and `./launch.sh skin prep|list|clear` support preparation. [Presenter steps and privacy](docs/CUSTOMER_SKIN.md).
+
+Cloud vs Local separates **USD costs** from **kWh electricity**. Enter sourced, same-workload cloud energy estimates to see how many times more or less electricity they use than one Fury. Missing model-specific energy stays unknown; API prices do not establish energy use.
+
 [Quickstart](QUICKSTART.md) · [Presenter script](docs/PRESENTER.md) · [V3 launch guide](docs/V3_LAUNCH_GUIDE.md) · [Launch PDF](docs/V3_Launch_Guide_v3.0.0.pdf) · [Models and licenses](docs/ASSET-MANIFEST.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Remote access](docs/REMOTE-ACCESS.md) · [MIT source license](LICENSE)
 
 ## Upgrade and rollback
