@@ -20,7 +20,7 @@ def test_supplied_artwork_visibility_and_exact_style_restoration():
     await page.set_content('<style>.hero{position:relative;width:320px;height:180px}.hero img{width:100%;height:100%}.hero-fallback{position:absolute;inset:0;background:#123}</style><div class="hero"><img style="object-fit: cover" src="'+uri+'"><div class="hero-fallback"></div></div>')
     await page.evaluate('(uri)=>window.furyArtwork={hero:uri}',uri)
     # Visible card artwork must not mask an occluded primary hero.
-    await page.evaluate('(uri)=>{const card=new Image();card.src=uri;card.style.cssText="width:320px;height:180px";document.body.append(card)}',uri)
+    await page.evaluate('(uri)=>{const card=new Image();card.src=uri;card.className="hotel-hero";card.style.cssText="width:320px;height:180px";document.body.append(card)}',uri)
     original=await page.locator('.hero img').get_attribute('style')
     with pytest.raises(ValueError,match='no visible artwork'):await check_artwork_visibility(page)
     assert await page.locator('.hero img').get_attribute('style')==original

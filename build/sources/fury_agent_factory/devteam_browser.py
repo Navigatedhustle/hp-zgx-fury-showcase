@@ -95,11 +95,15 @@ async def check_artwork_visibility(embedded):
    const cs=getComputedStyle(el),r=el.getBoundingClientRect();
    const image=el.tagName==='IMG' && el.currentSrc===uri && el.complete && el.naturalWidth>0;
    const background=cs.backgroundImage.includes(uri);
-   return (image||background)&&r.width>=160&&r.height>=80 ? [{index,image,primary:Boolean(el.closest('header,.hero,#hero,[class*=hero]')),selector:el.id?'#'+el.id:el.tagName.toLowerCase()+'.'+[...el.classList].join('.')}] : [];
+   const hero=el.closest('.hero,#hero,header')||el.closest('[class*=hero]');
+   return (image||background)&&r.width>=160&&r.height>=80 ? [{index,image,primaryTop:hero?hero.getBoundingClientRect().top+scrollY:null,selector:el.id?'#'+el.id:el.tagName.toLowerCase()+'.'+[...el.classList].join('.')}] : [];
   }).slice(0,8);
  }""")
  if candidates is None:return
- if candidates and any(item['primary'] for item in candidates):candidates=[item for item in candidates if item['primary']]
+ primary=[item for item in candidates or [] if item['primaryTop'] is not None]
+ if primary:
+  top=min(item['primaryTop'] for item in primary)
+  candidates=[item for item in primary if abs(item['primaryTop']-top)<1]
  if not candidates:raise ValueError('Supplied hero artwork has no loaded image or CSS image area at least 160 by 80 pixels; use the supplied artwork visibly, preserving content.')
  diagnostics=[]
  for candidate in candidates:
