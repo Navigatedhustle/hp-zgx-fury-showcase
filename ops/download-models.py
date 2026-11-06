@@ -13,6 +13,19 @@ def main():
  from huggingface_hub import hf_hub_download
  p=argparse.ArgumentParser();p.add_argument('--verify-only',action='store_true');args=p.parse_args()
  records=json.loads((ROOT/'config/model-files.json').read_text())
+ creative_path=ROOT/'config/creative-models.json'
+ if creative_path.is_file():
+  creative=json.loads(creative_path.read_text())
+  if creative.get('candidate_profile') in ('base','longlive'):
+   candidates=[creative]
+   if creative['candidate_profile']=='longlive':candidates+=creative['reviewed_adapters']
+   for candidate in candidates:
+    files=[]
+    for item in candidate['files']:
+     sha=item.get('sha256');blob=item.get('git_blob_sha1')
+     if not sha and not blob:raise RuntimeError('Creative asset lacks a pinned digest')
+     files.append({'path':item['path'],'size':item['bytes'],'algorithm':'sha256' if sha else 'sha1','hash':sha or blob})
+    records.append({'repo':candidate['repo'],'revision':candidate['revision'],'directory':candidate['repo'].split('/')[-1],'files':files})
  for model in records:
   folder=ROOT/'models'/model['directory'];folder.mkdir(parents=True,exist_ok=True)
   total=sum(f['size'] for f in model['files']);print(f"{model['repo']} @ {model['revision']} — {total/1024**3:.2f} GiB",flush=True)

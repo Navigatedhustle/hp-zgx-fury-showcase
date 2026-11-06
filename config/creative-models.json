@@ -134,8 +134,8 @@
     }
   ],
   "bytes": 34201436033,
-  "qualification_status": "in progress after owner-approved simplification",
-  "selected_profile": null,
+  "qualification_status": "passed",
+  "selected_profile": "longlive",
   "reviewed_adapters": [
     {
       "repo": "Efficient-Large-Model/LongLive-Plug-Wan2.2-TI2V-5B-few-step",
@@ -222,5 +222,21 @@
       ]
     }
   ],
-  "candidate_profile": "longlive"
+  "candidate_profile": "longlive",
+  "qualified_settings": {
+    "steps": 4,
+    "guidance": 1.0,
+    "frames": 121,
+    "fps": 24,
+    "resolutions": [
+      {
+        "width": 1280,
+        "height": 704
+      },
+      {
+        "width": 832,
+        "height": 480
+      }
+    ]
+  }
 }
