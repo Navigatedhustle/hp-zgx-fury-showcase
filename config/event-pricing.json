@@ -1,5 +1,5 @@
 {
-  "checked": "2026-11-04",
+  "checked": "2026-11-06",
   "currency": "USD",
   "scope": "Standard text API pricing scenario per million observed tokens; no cache discounts, paid API calls, tools, taxes, images or audio.",
   "models": [
@@ -14,6 +14,15 @@
       "long_output": 75,
       "source": "https://developers.openai.com/api/docs/models/gpt-6-astra",
       "note": "Standard tier. Above 272K input tokens, the whole request uses $20 input / $75 output."
+    },
+    {
+      "id": "claude-fable-5-1",
+      "name": "Claude Fable 5.1",
+      "provider": "Anthropic",
+      "input": 10,
+      "output": 50,
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "note": "Standard global routing; no cache or batch discount. Representative demanding-reasoning model, not a usage ranking."
     },
     {
       "id": "claude-opus-5-5",

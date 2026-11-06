@@ -13,6 +13,10 @@ Start at http://localhost:8080. Show the eight workload cards and the live GPU/H
 | Video Studio | Choose text or an Image Studio reference, then generate five seconds. Show real steps, frames, model/adapters and elapsed time. This is a fixed proven preset. |
 | Action Trailer | Read consent before camera access. Choose an original PG genre, capture once and show screenplay/keyframes/clips as they finish. Generation exceeds a minute. Tap final fullscreen with sound, then Done to visibly delete photo and video. |
 
+## Cloud vs Local
+
+Open `/economics` and show the Fury power versus cloud API bars. Change runtime or tariff, then edit the monthly workload. Explain that the initial 1,200 W, 40 hours and $0.25/kWh are illustrative inputs; the local bar excludes hardware/support. Cloud provider electricity is bundled into API charges. The graph is a cost scenario, not equal-quality or throughput evidence. Expand the dated official rates for details.
+
 ## Fury Rush
 
 Press **Launch Fury Rush** once. “Six workflows are submitting through their real controls. One Factory build remains the global limit; visible queues preserve the workstation's admission limits.” Show DeepSeek/Qwen/FLUX lanes and measured throughput. Open completed workspaces without abandoning Factory. Wait for every tile to reach complete or failed; a failed tile is a real failure, not a canned replacement. The longest workload is the live Factory build.
