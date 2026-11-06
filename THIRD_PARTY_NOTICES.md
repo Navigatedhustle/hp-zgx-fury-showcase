@@ -1,5 +1,13 @@
 # Source ownership and third-party notices
 
+## V3 qualification runtime additions
+
+Wan2.2-TI2V-5B uses its publisher's Apache-2.0 Diffusers serialization; pinned revisions and reviewed model-card links are in `docs/ASSET-MANIFEST.md` and `config/creative-models.json`. Downloaded weights are not redistributed in Git or source archives.
+
+ImageIO-FFmpeg 0.8.1's Python wrapper is BSD-2-Clause. Its separately executed ARM64 FFmpeg binary reports GPL-3.0-or-later; commercial use is permitted without an annual-revenue threshold. The wheel and binary are installed into local environments, not bundled in Git or release ZIPs. Exact download/binary hashes and version are in `config/creative-tools.json`; upstream source and terms: https://github.com/imageio/imageio-ffmpeg and https://ffmpeg.org/legal.html.
+
+Wan text normalization additionally uses ftfy 6.3.1 (Apache-2.0) and wcwidth 0.2.13 (MIT), pinned in the model environment lock. The creative worker calls the host's existing libnuma interface for its own CPU allocation policy; no host policy or library is redistributed or changed.
+
 The source distribution follows the existing Atlas MIT license. The preserved ownership record states that first-party ownership across the discovered projects was confirmed by the owner on 2026-10-10; the owner explicitly authorized public distribution on 2026-10-30. This license covers project-authored integration, examples, prompts and generated demonstration code. It does not license third-party names, marks, weights or dependencies beyond their own terms.
 
 HP, NVIDIA, GB300, DeepSeek, Qwen and other names identify their respective products/owners. This community demonstration does not imply support, endorsement or a trademark license. Product photos and vendor logos with no recorded redistribution permission were excluded and replaced by neutral original diagrams. Historical source comments may mention brand styling; included neutral assets govern this public build.

@@ -1,0 +1,13 @@
+{
+  "package": "imageio-ffmpeg",
+  "version": "0.8.1",
+  "wrapper_license": "BSD-2-Clause",
+  "url": "https://files.pythonhosted.org/packages/53/02/e139e53a71f33f728cb2ce6c1124edc29e4c008427923f01a4d37f9a1867/imageio_ffmpeg-0.8.1-py3-none-manylinux_2_28_aarch64.whl",
+  "sha256": "fad3176f859b25869e60a8ed79957d4e3ed74a97a95e5f0cdcb91455f6c6d00e",
+  "filename": "imageio_ffmpeg-0.8.1-py3-none-manylinux_2_28_aarch64.whl",
+  "redistributed_in_git_or_zip": false,
+  "ffmpeg_version": "ffmpeg version n9.0.2-17-g2a571b6068-20260930 Copyright (c) 2000-2026 the FFmpeg developers",
+  "ffmpeg_binary_sha256": "0b0b5ac30495b4e07ce1321b8d58200f901f57782884a8b6b264c7528c2c9e77",
+  "ffmpeg_license": "GPL-3.0-or-later",
+  "license_scope": "Python wrapper BSD-2-Clause; separately executed FFmpeg binary GPL-3.0-or-later, commercial use permitted, binary not redistributed in Git/ZIP."
+}
