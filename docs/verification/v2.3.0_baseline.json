@@ -1,0 +1,720 @@
+{
+  "version": "v2.3.0+authorized-visual-repair",
+  "commit": "23468e27a0525b22f8b3a48df0819693985e0cb7",
+  "method": "Real Chromium Live automatic short builds and the existing four-workload acceptance. Cold-init memory was measured before the authorized visual-only source fix, with all services started from stopped state using existing disk caches. Only the idle Factory service was recovered for the corrected benchmark; resident models and config are unchanged. HBM peaks are sampled once per second, not a continuous hardware trace.",
+  "config_sha256": "2bb4c87c43c934277e75710e3caedaa43f6a34a50c689b76241765c1afdc5c62",
+  "cold_init": {
+    "at_utc": "2026-11-05T23:03:24.629139+00:00",
+    "gpu_name": "NVIDIA GB300",
+    "hbm_total_mib": 256703,
+    "hbm_used_mib": 219290,
+    "hbm_free_mib": 36199,
+    "grace_total_bytes": 798493376512,
+    "grace_available_bytes": 487630569472,
+    "grace_free_bytes": 68564221952,
+    "service_startup_timings": {
+      "text": {
+        "seconds": 130.871,
+        "observed_at": 1793919495.249849
+      },
+      "lead": {
+        "seconds": 180.935,
+        "observed_at": 1793919676.2218912
+      },
+      "gateway": {
+        "seconds": 5.363,
+        "observed_at": 1793919681.6214232
+      },
+      "asr": {
+        "seconds": 5.305,
+        "observed_at": 1793919686.9628186
+      },
+      "tts": {
+        "seconds": 40.434,
+        "observed_at": 1793919727.4327796
+      },
+      "atlas": {
+        "seconds": 5.311,
+        "observed_at": 1793919732.7810678
+      },
+      "slides": {
+        "seconds": 5.397,
+        "observed_at": 1793919738.2142086
+      },
+      "agent": {
+        "seconds": 5.369,
+        "observed_at": 1793919743.6198869
+      },
+      "image": {
+        "seconds": 45.453,
+        "observed_at": 1793919789.1108675
+      },
+      "operator": {
+        "seconds": 5.33,
+        "observed_at": 1793919794.480031
+      }
+    }
+  },
+  "factory_builds": [
+    {
+      "passed": true,
+      "error": null,
+      "wall_seconds": 354.64043641090393,
+      "factory_elapsed_seconds": 349.9123079776764,
+      "terminal_state": "finished",
+      "merged_backend_tests_passed": true,
+      "call_count": 16,
+      "stages": [
+        {
+          "title": "Architecture",
+          "status": "merged",
+          "wall_seconds": 10.618085145950317
+        },
+        {
+          "title": "Frontend",
+          "status": "merged",
+          "wall_seconds": 57.04053330421448
+        },
+        {
+          "title": "Contract review",
+          "status": "merged",
+          "wall_seconds": 57.04007840156555
+        },
+        {
+          "title": "Backend",
+          "status": "merged",
+          "wall_seconds": 15.533037900924683
+        },
+        {
+          "title": "Accessibility and content",
+          "status": "merged",
+          "wall_seconds": 15.532579183578491
+        },
+        {
+          "title": "Independent QA",
+          "status": "merged",
+          "wall_seconds": 22.63569164276123
+        },
+        {
+          "title": "Input hardening",
+          "status": "merged",
+          "wall_seconds": 22.634735584259033
+        },
+        {
+          "title": "Frontend wiring",
+          "status": "merged",
+          "wall_seconds": 45.30079913139343
+        },
+        {
+          "title": "Validation QA",
+          "status": "merged",
+          "wall_seconds": 45.29990744590759
+        },
+        {
+          "title": "Frontend refinement",
+          "status": "merged",
+          "wall_seconds": 48.165447473526
+        },
+        {
+          "title": "Integration review",
+          "status": "merged",
+          "wall_seconds": 48.1641583442688
+        },
+        {
+          "title": "Responsive polish",
+          "status": "merged",
+          "wall_seconds": 27.746605157852173
+        },
+        {
+          "title": "Integration repair",
+          "status": "merged",
+          "wall_seconds": 24.171552896499634
+        },
+        {
+          "title": "Frontend contract review",
+          "status": "merged",
+          "wall_seconds": 24.71484637260437
+        },
+        {
+          "title": "Visual acceptance",
+          "status": "merged",
+          "wall_seconds": 19.259914875030518
+        },
+        {
+          "title": "Release notes",
+          "status": "merged",
+          "wall_seconds": 10.560535192489624
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "error": null,
+      "wall_seconds": 419.80245542526245,
+      "factory_elapsed_seconds": 415.3265743255615,
+      "terminal_state": "finished",
+      "merged_backend_tests_passed": true,
+      "call_count": 18,
+      "stages": [
+        {
+          "title": "Architecture",
+          "status": "merged",
+          "wall_seconds": 14.064991235733032
+        },
+        {
+          "title": "Frontend",
+          "status": "merged",
+          "wall_seconds": 70.48098754882812
+        },
+        {
+          "title": "Contract review",
+          "status": "merged",
+          "wall_seconds": 70.48071193695068
+        },
+        {
+          "title": "Backend",
+          "status": "merged",
+          "wall_seconds": 35.9989550113678
+        },
+        {
+          "title": "Accessibility and content",
+          "status": "merged",
+          "wall_seconds": 35.998483657836914
+        },
+        {
+          "title": "Independent QA",
+          "status": "merged",
+          "wall_seconds": 35.13882875442505
+        },
+        {
+          "title": "Input hardening",
+          "status": "merged",
+          "wall_seconds": 35.13787794113159
+        },
+        {
+          "title": "Frontend wiring",
+          "status": "merged",
+          "wall_seconds": 45.08987355232239
+        },
+        {
+          "title": "Validation QA",
+          "status": "merged",
+          "wall_seconds": 45.088815450668335
+        },
+        {
+          "title": "Frontend refinement",
+          "status": "merged",
+          "wall_seconds": 51.36250877380371
+        },
+        {
+          "title": "Integration review",
+          "status": "merged",
+          "wall_seconds": 51.35966658592224
+        },
+        {
+          "title": "Responsive polish",
+          "status": "merged",
+          "wall_seconds": 27.583659172058105
+        },
+        {
+          "title": "Integration repair",
+          "status": "merged",
+          "wall_seconds": 25.51532220840454
+        },
+        {
+          "title": "Frontend contract review",
+          "status": "merged",
+          "wall_seconds": 26.9159517288208
+        },
+        {
+          "title": "Visual acceptance",
+          "status": "merged",
+          "wall_seconds": 28.42801833152771
+        },
+        {
+          "title": "Release notes",
+          "status": "merged",
+          "wall_seconds": 10.161339521408081
+        }
+      ]
+    }
+  ],
+  "four_way": {
+    "passed": true,
+    "wall_seconds": 343.98026609420776,
+    "workloads": {
+      "atlas-1": {
+        "passed": true,
+        "wall_seconds": 2.2383131980895996,
+        "error": null
+      },
+      "slides-1": {
+        "passed": true,
+        "wall_seconds": 8.596410274505615,
+        "error": null
+      },
+      "agent-1": {
+        "passed": true,
+        "error": null,
+        "wall_seconds": 342.6684489250183,
+        "factory_elapsed_seconds": 337.73682475090027,
+        "terminal_state": "finished",
+        "merged_backend_tests_passed": true,
+        "call_count": 16,
+        "stages": [
+          {
+            "title": "Architecture",
+            "status": "merged",
+            "wall_seconds": 15.847951173782349
+          },
+          {
+            "title": "Frontend",
+            "status": "merged",
+            "wall_seconds": 66.9114899635315
+          },
+          {
+            "title": "Contract review",
+            "status": "merged",
+            "wall_seconds": 66.91122364997864
+          },
+          {
+            "title": "Backend",
+            "status": "merged",
+            "wall_seconds": 14.60673451423645
+          },
+          {
+            "title": "Accessibility and content",
+            "status": "merged",
+            "wall_seconds": 14.606209754943848
+          },
+          {
+            "title": "Independent QA",
+            "status": "merged",
+            "wall_seconds": 22.725974082946777
+          },
+          {
+            "title": "Input hardening",
+            "status": "merged",
+            "wall_seconds": 22.725146293640137
+          },
+          {
+            "title": "Frontend wiring",
+            "status": "merged",
+            "wall_seconds": 25.35421657562256
+          },
+          {
+            "title": "Validation QA",
+            "status": "merged",
+            "wall_seconds": 25.35336923599243
+          },
+          {
+            "title": "Frontend refinement",
+            "status": "merged",
+            "wall_seconds": 47.831114053726196
+          },
+          {
+            "title": "Integration review",
+            "status": "merged",
+            "wall_seconds": 47.8302264213562
+          },
+          {
+            "title": "Responsive polish",
+            "status": "merged",
+            "wall_seconds": 23.575875759124756
+          },
+          {
+            "title": "Integration repair",
+            "status": "merged",
+            "wall_seconds": 23.128429651260376
+          },
+          {
+            "title": "Frontend contract review",
+            "status": "merged",
+            "wall_seconds": 26.523600578308105
+          },
+          {
+            "title": "Visual acceptance",
+            "status": "merged",
+            "wall_seconds": 20.138354778289795
+          },
+          {
+            "title": "Release notes",
+            "status": "merged",
+            "wall_seconds": 7.821590423583984
+          }
+        ]
+      },
+      "image-1": {
+        "passed": true,
+        "wall_seconds": 8.210248470306396,
+        "error": null
+      }
+    },
+    "backend_overlap_seconds": [
+      0.3049144744873047,
+      0.2213904857635498
+    ],
+    "peak_hbm_used_mib": 228790,
+    "minimum_hbm_free_mib": 26699,
+    "sampling_interval_seconds": 1,
+    "sample_count": 324
+  },
+  "passed": true,
+  "base_release_tag": "v2.3.0",
+  "baseline_kind": "Owner-authorized corrected source commit; immutable v2.3.0 itself did not pass the original baseline.",
+  "original_release_failures": [
+    {
+      "attempt": 1,
+      "started_at_utc": "2026-11-05T23:03:25.177396+00:00",
+      "passed": false,
+      "wall_seconds": 313.69109177589417,
+      "factory_elapsed_seconds": 313.4970796108246,
+      "terminal_state": "failed",
+      "merged_backend_tests_passed": true,
+      "call_count": 17,
+      "stages": [
+        {
+          "title": "Architecture",
+          "status": "merged",
+          "wall_seconds": 10.414239168167114
+        },
+        {
+          "title": "Frontend",
+          "status": "merged",
+          "wall_seconds": 44.38418221473694
+        },
+        {
+          "title": "Contract review",
+          "status": "merged",
+          "wall_seconds": 44.38902759552002
+        },
+        {
+          "title": "Backend",
+          "status": "merged",
+          "wall_seconds": 30.345802545547485
+        },
+        {
+          "title": "Accessibility and content",
+          "status": "merged",
+          "wall_seconds": 30.345446348190308
+        },
+        {
+          "title": "Independent QA",
+          "status": "merged",
+          "wall_seconds": 22.597627639770508
+        },
+        {
+          "title": "Input hardening",
+          "status": "merged",
+          "wall_seconds": 22.596800327301025
+        },
+        {
+          "title": "Frontend wiring",
+          "status": "merged",
+          "wall_seconds": 36.32913255691528
+        },
+        {
+          "title": "Validation QA",
+          "status": "merged",
+          "wall_seconds": 36.32811999320984
+        },
+        {
+          "title": "Frontend refinement",
+          "status": "merged",
+          "wall_seconds": 47.60517644882202
+        },
+        {
+          "title": "Integration review",
+          "status": "merged",
+          "wall_seconds": 47.60412311553955
+        },
+        {
+          "title": "Responsive polish",
+          "status": "merged",
+          "wall_seconds": 29.70561909675598
+        },
+        {
+          "title": "Integration repair",
+          "status": "merged",
+          "wall_seconds": 22.63879156112671
+        },
+        {
+          "title": "Frontend contract review",
+          "status": "merged",
+          "wall_seconds": 27.587629079818726
+        },
+        {
+          "title": "Visual acceptance",
+          "status": "failed",
+          "wall_seconds": 10.266028881072998
+        },
+        {
+          "title": "Release notes",
+          "status": "blocked",
+          "wall_seconds": null
+        }
+      ],
+      "failed_stage": "Visual acceptance",
+      "failure_reason": "The generated exact edit matched zero source fragments; the existing bounded repair could not resolve it.",
+      "peak_hbm_used_mib": 222065,
+      "minimum_hbm_free_mib": 33424
+    },
+    {
+      "attempt": 2,
+      "started_at_utc": "2026-11-06T00:59:01.067740+00:00",
+      "passed": false,
+      "wall_seconds": 306.69469261169434,
+      "factory_elapsed_seconds": 306.0987377166748,
+      "terminal_state": "failed",
+      "merged_backend_tests_passed": true,
+      "call_count": 16,
+      "stages": [
+        {
+          "title": "Architecture",
+          "status": "merged",
+          "wall_seconds": 12.662520408630371
+        },
+        {
+          "title": "Frontend",
+          "status": "merged",
+          "wall_seconds": 63.405234813690186
+        },
+        {
+          "title": "Contract review",
+          "status": "merged",
+          "wall_seconds": 63.409804582595825
+        },
+        {
+          "title": "Backend",
+          "status": "merged",
+          "wall_seconds": 14.935717821121216
+        },
+        {
+          "title": "Accessibility and content",
+          "status": "merged",
+          "wall_seconds": 14.93526291847229
+        },
+        {
+          "title": "Independent QA",
+          "status": "merged",
+          "wall_seconds": 23.999178171157837
+        },
+        {
+          "title": "Input hardening",
+          "status": "merged",
+          "wall_seconds": 23.99819564819336
+        },
+        {
+          "title": "Frontend wiring",
+          "status": "merged",
+          "wall_seconds": 27.57594394683838
+        },
+        {
+          "title": "Validation QA",
+          "status": "merged",
+          "wall_seconds": 27.574954748153687
+        },
+        {
+          "title": "Frontend refinement",
+          "status": "merged",
+          "wall_seconds": 46.577149391174316
+        },
+        {
+          "title": "Integration review",
+          "status": "merged",
+          "wall_seconds": 46.576087951660156
+        },
+        {
+          "title": "Responsive polish",
+          "status": "merged",
+          "wall_seconds": 27.933989763259888
+        },
+        {
+          "title": "Integration repair",
+          "status": "merged",
+          "wall_seconds": 22.607818126678467
+        },
+        {
+          "title": "Frontend contract review",
+          "status": "merged",
+          "wall_seconds": 26.61651372909546
+        },
+        {
+          "title": "Visual acceptance",
+          "status": "failed",
+          "wall_seconds": 8.09623384475708
+        },
+        {
+          "title": "Release notes",
+          "status": "blocked",
+          "wall_seconds": null
+        }
+      ],
+      "failed_stage": "Visual acceptance",
+      "failure_reason": "The generated exact edit matched zero source fragments; the existing bounded repair could not resolve it.",
+      "peak_hbm_used_mib": 222078,
+      "minimum_hbm_free_mib": 33411
+    },
+    {
+      "attempt": 3,
+      "started_at_utc": "2026-11-06T01:05:10.302747+00:00",
+      "passed": false,
+      "wall_seconds": 333.8115327358246,
+      "factory_elapsed_seconds": 333.6051661968231,
+      "terminal_state": "failed",
+      "merged_backend_tests_passed": true,
+      "call_count": 16,
+      "stages": [
+        {
+          "title": "Architecture",
+          "status": "merged",
+          "wall_seconds": 13.14198350906372
+        },
+        {
+          "title": "Frontend",
+          "status": "merged",
+          "wall_seconds": 66.9282021522522
+        },
+        {
+          "title": "Contract review",
+          "status": "merged",
+          "wall_seconds": 66.9271137714386
+        },
+        {
+          "title": "Backend",
+          "status": "merged",
+          "wall_seconds": 13.981422185897827
+        },
+        {
+          "title": "Accessibility and content",
+          "status": "merged",
+          "wall_seconds": 13.981007814407349
+        },
+        {
+          "title": "Independent QA",
+          "status": "merged",
+          "wall_seconds": 26.413337230682373
+        },
+        {
+          "title": "Input hardening",
+          "status": "merged",
+          "wall_seconds": 26.412572622299194
+        },
+        {
+          "title": "Frontend wiring",
+          "status": "merged",
+          "wall_seconds": 52.488383531570435
+        },
+        {
+          "title": "Validation QA",
+          "status": "merged",
+          "wall_seconds": 52.48752450942993
+        },
+        {
+          "title": "Frontend refinement",
+          "status": "merged",
+          "wall_seconds": 46.0515615940094
+        },
+        {
+          "title": "Integration review",
+          "status": "merged",
+          "wall_seconds": 46.054749727249146
+        },
+        {
+          "title": "Responsive polish",
+          "status": "merged",
+          "wall_seconds": 23.748870849609375
+        },
+        {
+          "title": "Integration repair",
+          "status": "merged",
+          "wall_seconds": 22.265723943710327
+        },
+        {
+          "title": "Frontend contract review",
+          "status": "merged",
+          "wall_seconds": 26.35043478012085
+        },
+        {
+          "title": "Visual acceptance",
+          "status": "failed",
+          "wall_seconds": 10.33682918548584
+        },
+        {
+          "title": "Release notes",
+          "status": "blocked",
+          "wall_seconds": null
+        }
+      ],
+      "failed_stage": "Visual acceptance",
+      "failure_reason": "The generated exact edit matched zero source fragments; the existing bounded repair could not resolve it.",
+      "peak_hbm_used_mib": 222608,
+      "minimum_hbm_free_mib": 32881
+    }
+  ],
+  "before_corrected_builds": {
+    "at_utc": "2026-11-06T02:34:43.027558+00:00",
+    "gpu_name": "NVIDIA GB300",
+    "hbm_total_mib": 256703,
+    "hbm_used_mib": 225492,
+    "hbm_free_mib": 29997,
+    "grace_total_bytes": 798493376512,
+    "grace_available_bytes": 481229996032,
+    "grace_free_bytes": 61514973184
+  },
+  "comparison_metric": "factory_elapsed_seconds; UI wall clock and per-stage wall times also recorded. Parallel stage times are not additive.",
+  "factory_memory": {
+    "peak_hbm_used_mib": 226024,
+    "minimum_hbm_free_mib": 29465,
+    "sampling_interval_seconds": 1,
+    "sample_count": 726
+  },
+  "factory_baseline_mean_seconds": 382.61944115161896,
+  "after_baseline": {
+    "at_utc": "2026-11-06T02:53:23.024165+00:00",
+    "gpu_name": "NVIDIA GB300",
+    "hbm_total_mib": 256703,
+    "hbm_used_mib": 228790,
+    "hbm_free_mib": 26699,
+    "grace_total_bytes": 798493376512,
+    "grace_available_bytes": 475920531456,
+    "grace_free_bytes": 56109367296
+  },
+  "factory_slowdown_limit_seconds": 420.8813852667809,
+  "frozen_source_sha256": {
+    "config/gb300.json": "2bb4c87c43c934277e75710e3caedaa43f6a34a50c689b76241765c1afdc5c62",
+    "showcase_app/gateway.py": "c7311a33768686e0ea06aa130fe0095548a55d700814793bd147e1b2508c5dc5",
+    "build/sources/fury_agent_factory/devteam.py": "544ee3dd19d762a668432b785f6a4ffef858105202d80ef9f3f42cf6694457c9",
+    "build/sources/fury_agent_factory/devteam_sandbox.py": "408183a353efd4e025fd54d62d96485fcc9ca37958b80b80638bafbe6da26d01",
+    "build/sources/fury_agent_factory/devteam_browser.py": "67d3e0a0c268ed3b0a721850d5042c529bfb96b991c2effb8c9ed485a9fa1724",
+    "build/sources/fury_agent_factory/visual_source_edits.py": "4f14a253e5cb824b44120d05d8f88f429d42bc61ca9e6828216fb6f5c499b7ec"
+  },
+  "source_tests": {
+    "factory": 180,
+    "core": 34,
+    "additional_focused_flow_and_repair": 36,
+    "passed": true,
+    "scope": "Source tests are distinct from the real Live-build, concurrency and local-inference snapshot acceptance."
+  },
+  "visual_repair_replays": {
+    "passed": true,
+    "cases": 3,
+    "first_proposal_seconds": [
+      13.76621389389038,
+      16.437822580337524,
+      12.203458547592163
+    ],
+    "scope": "Actual local inference and original generated backend, empty/populated desktop/mobile checks plus sandbox tests; raw artifacts remain private."
+  },
+  "pending_v3_visual_checks": [
+    "A generated hero image was loaded but covered by its fallback layer. Add supplied-artwork visibility checks and repair future generated previews before V3 visual acceptance; do not edit immutable generated previews."
+  ],
+  "release": {
+    "url": "https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v2.3.0",
+    "tag_unchanged": true,
+    "zip_sha256": "3dd227d65665d2226ef51192eb6aacee652a0cfe53ed474f8fcf867240282798",
+    "zip_and_pdf_match_published_assets": true,
+    "source_sha256sums_attached_and_download_verified": true,
+    "scope": "Original immutable v2.3.0 archive; corrected baseline source is the separate commit recorded above."
+  }
+}
