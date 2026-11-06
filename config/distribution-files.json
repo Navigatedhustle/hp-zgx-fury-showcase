@@ -492,6 +492,7 @@
   "docs/screenshots/why.png",
   "docs/verification/factory-v2.1.0.json",
   "docs/verification/v2.3.0_baseline.json",
+  "docs/verification/v3_memory_plan.json",
   "examples/inputs.json",
   "examples/reference-travel/README.md",
   "examples/reference-travel/app/app.js",
