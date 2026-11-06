@@ -1,8 +1,7 @@
-"""Presenter-only customer wrapper. All identity-bearing files stay in state/skin/."""
+"""Customer wrapper available to every station. Identity files stay in state/skin/."""
 import asyncio
 import fcntl
 import hashlib
-import hmac
 import json
 import os
 import re
@@ -19,10 +18,8 @@ from showcase_app.skin_theme import palette, css, contrast
 
 ROOT=Path(__file__).resolve().parents[1]
 STATE=ROOT/'state/skin'
-PIN=ROOT/'state/skin-presenter.pin'
 router=APIRouter(prefix='/skin')
 JOBS={}
-TOKENS={}
 COUNTER_LOCK=threading.Lock()
 INDUSTRIES={
  # Public concept labels checked against Wikidata; unknown P452 values fall back.
@@ -47,15 +44,8 @@ def read_json(path,default=None):
  except (OSError,ValueError):return default
 
 
-def presenter_pin():
+def initialize():
  STATE.mkdir(parents=True,exist_ok=True,mode=0o700);STATE.chmod(0o700)
- PIN.parent.mkdir(parents=True,exist_ok=True)
- if not PIN.exists():
-  try:fd=os.open(PIN,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600)
-  except FileExistsError:pass
-  else:
-   with os.fdopen(fd,'w') as f:f.write(f'{secrets.randbelow(1000000):06d}')
- return PIN.read_text().strip()
 
 
 def public_count():return read_json(STATE/'web-counter.json',{}).get('requests',0)
@@ -237,15 +227,10 @@ def new_lookup(name,website=None):
  JOBS[jid]=job;job['_task']=asyncio.create_task(run_lookup(job));return job
 
 
-def authorized(request):
- token=request.cookies.get('fury_skin','');expiry=TOKENS.get(token,0)
- return expiry>time.time()
-
-
 def require(request):
+ # Shared employee setup has no PIN, role or cookie prerequisite.
  origin=request.headers.get('origin')
  if origin and urlsplit(origin).hostname!=request.url.hostname:raise HTTPException(403,'Use the local presenter station')
- if not authorized(request):raise HTTPException(403,'Assign this station as Presenter or enter the presenter PIN')
 
 
 async def body(request):
@@ -276,25 +261,15 @@ async def changed():
 
 @router.get('/state')
 async def state(request:Request):
- value=snapshot();value.update(presenter=authorized(request),packs=packs())
- if value['presenter']:value.update(recent=recent())
+ value=snapshot();value.update(presenter=True,pin_required=False,packs=packs(),recent=recent())
  return JSONResponse(value,headers={'Cache-Control':'no-store'})
 
 
 @router.post('/unlock')
 async def unlock(request:Request):
- origin=request.headers.get('origin')
- if origin and urlsplit(origin).hostname!=request.url.hostname:raise HTTPException(403,'Use the local presenter station')
- data=await json_body(request)
- # Station assignment is an explicit local presenter action, like /stations.
- # PIN is required when the browser has another station assignment.
- if data.get('role')!='presenter' and not hmac.compare_digest(str(data.get('pin','')),presenter_pin()):raise HTTPException(403,'Presenter PIN did not match')
- now=time.time()
- for key,expiry in list(TOKENS.items()):
-  if expiry<now:TOKENS.pop(key,None)
- if len(TOKENS)>64:raise HTTPException(429,'Presenter sessions full')
- token=secrets.token_urlsafe(32);TOKENS[token]=now+8*3600
- response=JSONResponse({'presenter':True});response.set_cookie('fury_skin',token,httponly=True,samesite='strict',max_age=8*3600,secure=request.url.scheme=='https');return response
+ # Compatibility for already-open station pages; no credential is needed.
+ require(request)
+ return {'presenter':True,'pin_required':False}
 
 
 @router.post('/research')

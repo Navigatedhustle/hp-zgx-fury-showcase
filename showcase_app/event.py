@@ -1,6 +1,5 @@
 """Shared, inference-free event telemetry. Runtime state is never publication input."""
 import asyncio
-import hmac
 import json
 import math
 import os
@@ -10,6 +9,7 @@ import time
 from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / 'state/event-session.sqlite'
@@ -19,28 +19,9 @@ TEXT_DEMOS = ('atlas','slides','agent','vision','translate','trailer','skin')
 MAX_POWER_GAP = 20
 
 
-def presenter_key_path():
-    # Credentials stay outside the repository, including outside ignored runtime dirs.
-    return Path(os.environ.get('FURY_PRESENTER_KEY_FILE', str(Path.home() / '.config/fury-showcase/presenter.key')))
-
-
-def presenter_key(create=False):
-    path = presenter_key_path()
-    if create and not path.exists():
-        path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-        try:
-            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        except FileExistsError:
-            pass
-        else:
-            with os.fdopen(fd, 'w') as stream:
-                stream.write(secrets.token_urlsafe(24))
-    return path.read_text().strip() if path.is_file() else None
-
-
-def authorized(value):
-    key = presenter_key()
-    return bool(key and value and hmac.compare_digest(key, value))
+def station_origin_allowed(origin, hostname):
+    """Allow station controls without a secret, while rejecting other websites."""
+    return not origin or urlsplit(origin).hostname == hostname
 
 
 def number(value):

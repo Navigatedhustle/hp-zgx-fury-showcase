@@ -4,7 +4,7 @@
 
 “Who is in the room today? I’ll choose the official mark, check the colors and prepare every station. This is still HP ZGX Fury, built for your conversation. The models, security boundaries and generated applications stay the same. Your brand stays on screen and out of downloads.”
 
-Assign the Presenter role or unlock with the PIN from `./launch.sh status`, then use the palette button. Confirm identity/logo, preview, and Apply. Pre-cache before an event or upload offline. [Full steps and privacy](CUSTOMER_SKIN.md).
+Open the demo and use the palette button directly. Presenter controls and settings do not require a PIN or station assignment. Confirm identity/logo, preview, and Apply. Pre-cache before an event or upload offline. [Full steps and privacy](CUSTOMER_SKIN.md).
 
 Show the separate kWh chart on `/economics`. Cloud values require sourced, same-workload estimates; the display reports more **or less** electricity rather than assuming cloud consumes more. A higher API bill is not evidence of higher energy consumption.
 
@@ -55,13 +55,13 @@ Factory opens in short travel mode from the conference chooser. Live creates new
 
 Economics counts actual terminal live calls with reported usage, including known usage of failed calls. Final output totals can jump as responses finish; there is no invented live token rate. Recorded playback is excluded. API estimates reprice observed text tokens, and GPU energy includes measured session idle power. GPU electricity is not the complete Fury power bill or ROI. Expand Assumptions for dated sources and browser-local tariff/currency settings.
 
-An authorized presenter can reset only the event window through the host shell:
+Reset the event window through the host shell:
 
 ```bash
 .venv/bin/python ops/event-session.py reset --name "My conference"
 ```
 
-For a browser reset, retrieve a private presenter code in your SSH terminal using `.venv/bin/python ops/event-session.py presenter-code`. Enter it only in the protected reset form. Keep it out of shared documentation. Reset affects every Economics display's counter window, not station assignments, jobs, or artifacts. Clearing a station assignment is a separate local action on `/stations`.
+For a browser reset, open **Assumptions & presenter controls** on `/operator`, enter an event name and confirm **Reset event session**. No PIN or presenter code is required. Reset changes the shared counter window and restores the default skin, preserving station assignments, jobs and artifacts. Clearing a station assignment is a separate local action on `/stations`.
 
 ## Working demo flows
 

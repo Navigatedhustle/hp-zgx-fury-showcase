@@ -18,7 +18,7 @@ ROOT=Path(__file__).resolve().parents[2]
 
 @pytest.fixture
 def state(tmp_path,monkeypatch):
- monkeypatch.setattr(skin,'STATE',tmp_path/'skin');monkeypatch.setattr(skin,'PIN',tmp_path/'presenter.pin');monkeypatch.setattr(skin,'JOBS',{});monkeypatch.setattr(skin,'TOKENS',{})
+ monkeypatch.setattr(skin,'STATE',tmp_path/'skin');monkeypatch.setattr(skin,'JOBS',{})
  return tmp_path/'skin'
 
 
@@ -146,8 +146,8 @@ def test_ambiguous_lookup_public_count_and_no_external_ai(state,monkeypatch):
  assert all(research.urlsplit(v[0]).hostname in ('127.0.0.1','localhost','::1') for v in BACKENDS.values())
 
 
-def test_pin_is_private_six_digits(state):
- assert len(skin.presenter_pin())==6;assert skin.presenter_pin().isdigit();assert skin.PIN.stat().st_mode&0o777==0o600
+def test_initialization_keeps_branding_private_without_creating_credentials(state):
+ skin.initialize();assert state.stat().st_mode&0o777==0o700;assert not list(state.glob('*.pin'))
 
 
 def test_all_curated_packs_have_six_fictional_samples():
@@ -190,16 +190,16 @@ def test_svg_area_stroke_scale_opacity_and_gradient_paints():
  assert colors['#142958']==200;assert colors['#f3af42']==50
 
 
-def test_presenter_api_pin_limits_css_matches_json_and_names_stay_private(state,monkeypatch):
+def test_presenter_api_needs_no_pin_role_or_cookie_and_keeps_names_private(state,monkeypatch):
  from fastapi import FastAPI
  from fastapi.testclient import TestClient
  app=FastAPI();app.include_router(skin.router)
  async def changed():pass
  monkeypatch.setattr(skin,'changed',changed)
  with TestClient(app) as c:
-  assert c.post('/skin/research',json={'name':'Northwind'}).status_code==403
-  assert c.post('/skin/unlock',json={'pin':'invalid'}).status_code==403
-  assert c.post('/skin/unlock',json={'pin':skin.presenter_pin()}).status_code==200
+  access=c.get('/skin/state').json();assert access['presenter'];assert access['pin_required'] is False
+  compatibility=c.post('/skin/unlock');assert compatibility.status_code==200;assert 'set-cookie' not in compatibility.headers
+  assert not c.cookies
   assert c.post('/skin/research',json={'name':'X'*81}).status_code==422
   value=c.post('/skin/upload',content=(FIXTURES/'northwind.svg').read_bytes(),headers={'Content-Type':'image/svg+xml','x-skin-name':'Northwind%20Beverages'}).json()
   proposed=c.post('/skin/preview',json={'id':value['id'],'primary':'#1234ff'});assert proposed.status_code==200

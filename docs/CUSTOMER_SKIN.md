@@ -4,7 +4,7 @@ The V3 shell always identifies **HP ZGX Fury, prepared for CUSTOMER**. Customer 
 
 ## Presenter steps
 
-1. Assign this browser the **Presenter** role in Station setup, or choose **Presenter access** and enter the six digit PIN printed by `./launch.sh status`. First operator launch generates the PIN in ignored `state/skin-presenter.pin`. Never publish that terminal output.
+1. Open Mission Control on any station. Presenter controls and settings are available immediately: no PIN, presenter code, account, role assignment or unlock step is required. The Presenter station role remains an optional browser layout choice.
 2. Choose the palette-icon **Customize for customer** button or **Who is in the room today?** card. Enter the customer name (80 characters maximum), optionally its official website, then press Enter.
 3. Watch real research steps, elapsed time and local model routing. DeepSeek is selected only if its existing slot is free; otherwise the gateway chooses Qwen. Cancel stops the lookup. A ranking failure is disclosed and leaves source-order selection to the presenter.
 4. Resolve ambiguity using up to four entity cards with descriptions and official domains. Inspect up to six logo candidates on light and dark tiles. Choose **Use this logo**, **None of these — upload**, or **Try a different name**.

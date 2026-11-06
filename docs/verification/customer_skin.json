@@ -46,14 +46,14 @@
   "external_ai_api_calls": 0,
   "tests": {
     "factory_regressions": 189,
-    "core_and_skin": 93,
+    "core_and_skin": 98,
     "skin_cases": 49,
     "chart_arithmetic": 7,
     "network_in_unit_tests": false,
     "browser_layouts": 90,
     "browser_layouts_passed": true,
     "ui_checks": {
-      "pin_and_hidden_controls": true,
+      "no_pin_or_station_assignment_required": true,
       "offline_upload": true,
       "split_preview": true,
       "manual_color_picker": true,
@@ -68,7 +68,7 @@
       "reduced_motion_instant_swap": true,
       "css_transition_fallback": true
     },
-    "max_station_sync_seconds": 0.2193852140335366,
+    "max_station_sync_seconds": 0.31846449500881135,
     "theme_preference_cases": 4,
     "lifecycle": {
       "actual_host_event_reset": true,
@@ -87,5 +87,55 @@
     "Idle expiry was exercised with backdated fictional state, not an eight-hour observation.",
     "The optional booth palette changes on-screen preview CSS only; downloaded decks retain their original styling.",
     "Cloud electricity requires explicit same-workload estimates; no verified blanket claim that frontier inference consumes more electricity."
-  ]
+  ],
+  "presenter_access": {
+    "pin_required": false,
+    "role_assignment_required": false,
+    "account_required": false,
+    "cookies_required": false,
+    "fresh_browser_checks": [
+      {
+        "browser": "chromium",
+        "path": "/demos",
+        "no_pin_or_role_required": true
+      },
+      {
+        "browser": "chromium",
+        "path": "/presenter",
+        "no_pin_or_role_required": true
+      },
+      {
+        "browser": "chromium",
+        "path": "/operator",
+        "no_pin_or_role_required": true
+      },
+      {
+        "browser": "chromium",
+        "settings_and_event_reset_without_code": true,
+        "unrelated_origin_rejected": true
+      },
+      {
+        "browser": "firefox",
+        "path": "/demos",
+        "no_pin_or_role_required": true
+      },
+      {
+        "browser": "firefox",
+        "path": "/presenter",
+        "no_pin_or_role_required": true
+      },
+      {
+        "browser": "firefox",
+        "path": "/operator",
+        "no_pin_or_role_required": true
+      },
+      {
+        "browser": "firefox",
+        "settings_and_event_reset_without_code": true,
+        "unrelated_origin_rejected": true
+      }
+    ],
+    "event_reset_requires_confirmation": true,
+    "followup": "Owner removed presenter PIN/role gating to simplify sharing with HP and channel employees. Existing Factory latency failure remains open; no new generation benchmark was run for this access-only change."
+  }
 }

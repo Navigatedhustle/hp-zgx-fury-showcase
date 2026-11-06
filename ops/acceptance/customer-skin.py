@@ -19,12 +19,11 @@ async def main(args):
  async with async_playwright() as p:
   browser=await p.chromium.launch(args=['--no-sandbox']);context=await browser.new_context(viewport={'width':1366,'height':768});presenter=await context.new_page();errors=[]
   presenter.on('pageerror',lambda e:errors.append(str(e)))
-  await presenter.goto('http://localhost:8080/demos');await presenter.wait_for_selector('#skin-unlock')
+  await presenter.goto('http://localhost:8080/demos');await presenter.wait_for_selector('#skin-customize:visible')
   if not args.static_only:
-   assert await presenter.locator('#skin-customize').is_hidden()
-   await presenter.click('#skin-unlock');await presenter.fill('#skin-pin',(ROOT/'state/skin-presenter.pin').read_text().strip());await presenter.click('#skin-pin-form button');await presenter.wait_for_selector('#skin-name')
-   # Use reset to establish a real cross-station change, after the Factory run.
-   await presenter.evaluate("fetch('/skin/reset',{method:'POST'})");await presenter.locator('#skin-close').click()
+   assert await presenter.locator('#skin-unlock,#skin-pin-form').count()==0
+   assert await presenter.locator('#skin-room').is_visible()
+   await presenter.evaluate("fetch('/skin/reset',{method:'POST'})")
    stations=[]
    for path in ('/economics','/why-hp','/demos','/presenter'):
     c=await browser.new_context(viewport={'width':1366,'height':768});page=await c.new_page();await page.goto('http://localhost:8080'+path);await page.wait_for_selector('#skin-prepared',state='attached');stations.append((c,page))
@@ -43,7 +42,7 @@ async def main(args):
     return time.monotonic()-began
    report['sync_seconds']=await asyncio.gather(*(synced(page) for _,page in stations));assert max(report['sync_seconds'])<2
    for c,page in stations:await c.close()
-   report['checks'].update(pin_and_hidden_controls=True,offline_upload=True,split_preview=True,manual_color_picker=True,industry_pack=True,cross_station_sync=True)
+   report['checks'].update(no_pin_or_station_assignment_required=True,offline_upload=True,split_preview=True,manual_color_picker=True,industry_pack=True,cross_station_sync=True)
    await presenter.wait_for_timeout(550)
    if args.screenshots:await presenter.screenshot(path=str(args.screenshots/'northwind-shell.png'))
    # Root JSON and served CSS must contain precisely the same active properties.
@@ -101,8 +100,6 @@ async def main(args):
   if args.screenshots:await page.locator('#frontier-energy').scroll_into_view_if_needed();await page.screenshot(path=str(args.screenshots/'northwind-electricity.png'))
   report['checks']['electricity_known_unknown_more_less']=True;report['checks']['reduced_motion_context']=True
   if not args.static_only:
-   pin=(ROOT/'state/skin-presenter.pin').read_text().strip()
-   await page.evaluate("pin=>fetch('/skin/unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})})",pin)
    base=await page.evaluate("fetch('/skin/state').then(r=>r.json())")
    await page.evaluate("()=>{window.skinTransitionCalls=0;const original=document.startViewTransition?.bind(document);if(original)document.startViewTransition=(fn)=>{window.skinTransitionCalls++;return original(fn)}}")
    await page.evaluate("async value=>{const r=await fetch('/skin/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:value.active.id,primary:'#3366cc'})});const v=await r.json();window.FurySkin.update(v);if(document.documentElement.style.getPropertyValue('--mc-blue')!==v.active.theme.variables['--mc-blue'])throw Error('Reduced motion swap was delayed')}",base)

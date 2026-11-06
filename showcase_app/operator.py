@@ -3,7 +3,7 @@ from pathlib import Path
 import httpx
 from fastapi import FastAPI, Request, HTTPException
 from contextlib import asynccontextmanager
-from showcase_app.event import Monitor, authorized
+from showcase_app.event import Monitor, station_origin_allowed
 from fastapi.responses import FileResponse,HTMLResponse,StreamingResponse,JSONResponse
 from showcase_app.gateway import connect,ROOT
 from fastapi.staticfiles import StaticFiles
@@ -14,7 +14,7 @@ from showcase_app.creative_auth import private_key
 monitor=Monitor()
 @asynccontextmanager
 async def lifespan(app):
- trailer.visitors.start();private_key();skin.presenter_pin()
+ trailer.visitors.start();private_key();skin.initialize()
  task=asyncio.create_task(monitor.run(collect_live))
  privacy=asyncio.create_task(trailer.sweep())
  try:yield
@@ -176,7 +176,7 @@ async def event_telemetry():
 
 @app.post('/api/event/reset')
 async def reset_event(request:Request):
- if not authorized(request.headers.get('x-fury-presenter')):raise HTTPException(403,'Presenter code required; retrieve it through your authorized SSH terminal')
+ if not station_origin_allowed(request.headers.get('origin'),request.url.hostname):raise HTTPException(403,'Use the event controls on this station')
  body=await request.json()
  try:session=await asyncio.to_thread(monitor.store.reset,body.get('name','Conference session'))
  except (ValueError,AttributeError):raise HTTPException(422,'Use an event name between 1 and 80 characters')

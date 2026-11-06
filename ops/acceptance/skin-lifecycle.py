@@ -21,7 +21,6 @@ async def main(output):
  def configure(value):
   temp=config.with_suffix('.tmp');temp.write_text(value);temp.replace(config)
  async with httpx.AsyncClient(base_url='http://localhost:8080',trust_env=False,timeout=15) as client:
-  r=await client.post('/skin/unlock',json={'pin':(ROOT/'state/skin-presenter.pin').read_text().strip()});r.raise_for_status()
   state=(await client.get('/skin/state')).json();base=state['active'];assert base['name']=='Northwind Beverages';counter=state['public_web_lookups']
   async def restore():
    r=await client.post('/skin/apply',json={'id':base['id'],'primary':base['theme']['primary'],'accent':base['theme']['accent'],'pack':base['pack']});r.raise_for_status()
