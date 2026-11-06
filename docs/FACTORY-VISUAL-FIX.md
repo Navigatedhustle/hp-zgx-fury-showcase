@@ -1,0 +1,11 @@
+# Factory visual acceptance repair
+
+The immutable v2.3.0 release failed three fresh baseline attempts when Visual acceptance proposed HTML edits with quote styles that differed from the source. The owner explicitly authorized a narrow repair and a baseline on the corrected commit. This branch does not replace or move the v2.3.0 tag or its published archives.
+
+Visual acceptance now requests a bounded repair plan from the already loaded DeepSeek Technical Lead. Its actual model is displayed in task/call state, recorded in the model-selection event and counted by the gateway. Other Factory tickets, model settings, admission limits, sandbox, review flow and the two-attempt limit are retained.
+
+The model selects existing generic list containers and writes small CSS overrides. The coordinator compiles list roles onto the existing elements, including asynchronously rendered empty and populated children. Original HTML, rendering functions, listeners, IDs, API calls and existing stylesheet bytes are preserved. The supplied compiler is disclosed in generated source comments; it is an accessibility repair helper, not a supplied application or a substitute for failed generation. CSS remains model-authored. Plans cannot select arbitrary elements or modify backend/QA source.
+
+The independent browser criteria remain the same: actual generated backend, bookings, duplicate feedback, inventory filtering and sorting, desktop/mobile layout, and local axe WCAG checks. Visual diagnostics now report both viewports before returning, including the flex parent of overflowing elements. A repair sees the current failure after an applied candidate; rejected proposals retain the original diagnostics.
+
+Three real pre-fix snapshots passed replay through local inference, the actual generated backend, desktop/mobile empty/populated checks and sandbox tests. Each passed on its first proposal in 13.77, 16.44 and 12.20 seconds. Raw snapshots, generated artifacts and session data remain outside publication. These replays verify the repair; they are not a replacement for fresh Live-build and four-workload acceptance. Their results belong in the separately recorded corrected baseline before Gate 0 can pass.
