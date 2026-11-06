@@ -1,0 +1,9 @@
+Fictional Solstice Labs operations plan
+
+This document is synthetic demonstration material. It contains no customer or employee records.
+
+The pilot team will inspect workshop equipment, record measurements and review exceptions locally. Every inspection needs a visible owner, a dated checklist and a documented handover. No real purchasing, dispatch or customer communication is authorized.
+
+Keep product codes and quantities unchanged in translation. The term inspection unit refers to a fictional test device. A completed checklist means the visible checks were recorded, not that a compliance certification was obtained.
+
+Presenters should review translated output and terminology before using it. Language quality varies.

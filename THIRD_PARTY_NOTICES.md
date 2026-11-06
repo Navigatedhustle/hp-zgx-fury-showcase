@@ -29,3 +29,9 @@ The fictional Mediterranean hero is original AI-created supplied artwork, genera
 ## HP identity in V2
 
 The official HP Electric Blue logo with white keyline is an unchanged asset supplied by the owner for this HP demonstration. HP trademarks remain HP property; the source MIT license does not cover the mark or confer general trademark permissions. No licensed HP fonts are distributed.
+
+## V3 selected adapters, narrator and documents
+
+The selected LongLive-Plug few-step and CFG adapters are Apache-2.0 at the immutable revisions in config/creative-models.json. They are fused only into the matching Wan2.2 TI2V 5B backbone. Both model cards and their licenses were directly reviewed; no annual-revenue restriction applies.
+
+Kokoro's added am_michael voice uses the existing Apache-2.0 revision; its exact checksum and reviewed card are in docs/ASSET-MANIFEST.md. Atlas's af_heart voice is retained. pypdf is BSD-3-Clause, python-docx is MIT and ReportLab uses a BSD-style license. Installed Noto fonts retain their upstream SIL OFL terms; no additional licensed HP font is included. The original synthesized trailer soundtrack is created locally from oscillator tones, without a sampled recording. No weights, visitor media or downloaded FFmpeg/browser binaries are redistributed.

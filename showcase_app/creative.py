@@ -81,17 +81,18 @@ def copy_cpu_weights(pipeline):
                 tensor.data = tensor.data.clone()
 
 
-def export_frames(frames, path, stop):
+def export_frames(frames, path, stop, job=None):
     import numpy as np
     from imageio_ffmpeg import get_ffmpeg_exe
     height, width = frames[0].shape[:2]
     process = subprocess.Popen([get_ffmpeg_exe(), '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{width}x{height}', '-r', '24', '-i', 'pipe:0', '-an', '-c:v', 'libx264', '-threads', '4', '-preset', 'fast', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', str(path)], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     try:
-        for frame in frames:
+        for index,frame in enumerate(frames):
             if stop.is_set():
                 raise InterruptedError('Creative job cancelled')
             pixels = frame if frame.dtype == np.uint8 else np.clip(frame * 255, 0, 255).astype(np.uint8)
             process.stdin.write(np.ascontiguousarray(pixels).tobytes())
+            if job is not None:job['frames_encoded']=index+1
         process.stdin.close()
         error = process.stderr.read()
         if process.wait() != 0:
@@ -119,6 +120,7 @@ class CreativeLane:
     def __init__(self):
         self.flux = None
         self.wan = None
+        self.wan_text = None
 
     def load(self):
         self.grace_node = bind_grace()
@@ -133,18 +135,21 @@ class CreativeLane:
             if prompt_clean('A &amp; B') != 'A & B':
                 raise RuntimeError('Wan prompt normalization failed its startup check')
             self.load_video()
+        elif VIDEO_PROFILE == 'longlive':
+            raise RuntimeError('Selected video assets are missing; run ./launch.sh setup')
 
     def load_video(self):
         if self.wan is not None:
             return
         import torch
-        from diffusers import AutoencoderKLWan, WanImageToVideoPipeline
+        from diffusers import AutoencoderKLWan, WanImageToVideoPipeline, WanPipeline
         vae = AutoencoderKLWan.from_pretrained(str(WAN), subfolder='vae', torch_dtype=torch.float32, local_files_only=True)
         self.wan = WanImageToVideoPipeline.from_pretrained(str(WAN), vae=vae, torch_dtype=torch.bfloat16, image_encoder=None, image_processor=None, local_files_only=True)
         copy_cpu_weights(self.wan)
         if VIDEO_PROFILE == 'longlive':
             fuse_longlive(self.wan.transformer)
         self.wan.vae.enable_tiling()
+        self.wan_text=WanPipeline(vae=self.wan.vae,text_encoder=self.wan.text_encoder,tokenizer=self.wan.tokenizer,transformer=self.wan.transformer,scheduler=self.wan.scheduler,expand_timesteps=True)
         self.wan.enable_model_cpu_offload()
 
     def run(self, kind, prompt, path, stop, options, job):
@@ -164,7 +169,8 @@ class CreativeLane:
         torch.cuda.set_per_process_memory_fraction(min(.95, budget / total))
         torch.cuda.reset_peak_memory_stats()
         job['allocator_budget_bytes'] = budget
-        pipeline = self.wan if kind == 'video' else self.flux
+        pipeline = (self.wan if options.get('reference') is not None else self.wan_text) if kind == 'video' else self.flux
+        if kind == 'video':pipeline.enable_model_cpu_offload()
         steps = options.get('steps', 4 if VIDEO_PROFILE == 'longlive' else 50) if kind == 'video' else 4
         job.update(steps_done=0, steps_total=steps, width=options.get('width', 768), height=options.get('height', 768))
         if kind == 'video':job.update(profile=VIDEO_PROFILE, guidance=options.get('guidance', 1.0 if VIDEO_PROFILE == 'longlive' else 5.0))
@@ -180,6 +186,7 @@ class CreativeLane:
 
         began = time.monotonic()
         try:
+            job['stage']='Denoising'
             args = dict(prompt=prompt, height=job['height'], width=job['width'], num_inference_steps=steps, guidance_scale=job['guidance'] if kind == 'video' else 1.0, generator=torch.Generator('cuda').manual_seed(options.get('seed', 42)), callback_on_step_end=checkpoint)
             if options.get('reference') is not None:
                 args['image'] = options['reference']
@@ -188,13 +195,21 @@ class CreativeLane:
                 frames = pipeline(**args).frames[0]
                 if stop.is_set():
                     raise InterruptedError('Creative job cancelled')
-                export_frames(frames, path, stop)
-                job.update(frames_generated=len(frames), fps=24)
+                if not path.parent.is_dir():raise InterruptedError('Session deleted; output discarded')
+                job.update(stage='Encoding',frames_generated=len(frames),fps=24)
+                export_frames(frames, path, stop,job)
             else:
-                picture = pipeline(**args).images[0]
-                if stop.is_set():
-                    raise InterruptedError('Creative job cancelled')
-                picture.save(path)
+                batch=options.get('batch',1)
+                for index in range(batch):
+                    args['generator']=torch.Generator('cuda').manual_seed(options.get('seed',42)+index)
+                    job.update(stage=f'Image {index+1} of {batch}',batch_index=index+1)
+                    picture=pipeline(**args).images[0]
+                    if stop.is_set():raise InterruptedError('Creative job cancelled')
+                    if not path.parent.is_dir():raise InterruptedError('Session deleted; output discarded')
+                    target=path if batch==1 else path.with_stem(path.stem+'-'+str(index+1))
+                    picture.save(target);picture.close()
+                    job['images_done']=index+1
+                    if not job.get('_private'):job.setdefault('urls',[]).append('/images/'+target.name)
             torch.cuda.synchronize()
             return {'render_seconds': time.monotonic() - began, 'gpu_peak_allocated_bytes': torch.cuda.max_memory_allocated(), 'gpu_peak_reserved_bytes': torch.cuda.max_memory_reserved()}
         finally:

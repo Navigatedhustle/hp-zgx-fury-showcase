@@ -10,9 +10,9 @@ from atlas.config import ROOT
 from atlas.offline_guard import install as install_offline_guard
 install_offline_guard()
 from atlas.number_words import num2words
-model=None;g2p=None;voice=None;last_ms=None;lock=asyncio.Lock()
+model=None;g2p=None;voice=None;last_ms=None;voices={};active=0;queued=0;last_request=0;lock=asyncio.Lock()
 def load():
- global model,g2p,voice,last_ms
+ global model,g2p,voice,last_ms,voices
  import torch
  torch.set_num_threads(4)
  # English Misaki needs a number formatter; supply our MIT implementation.
@@ -27,16 +27,18 @@ def load():
  p=Path(json.loads((ROOT/'models/kokoro.json').read_text())['path'])
  model=KModel(repo_id='hexgrad/Kokoro-82M',config=str(p/'config.json'),model=str(p/'kokoro-v1_0.pth')).to('cuda').eval()
  voice=torch.load(p/'voices/af_heart.pt',weights_only=True)
+ voices={'af_heart':voice,'am_michael':torch.load(p/'voices/am_michael.pt',weights_only=True)}
  g2p=en.G2P(trf=False,british=False,fallback=None,unk='')
  generate('Welcome. Ask an executive question.')
  _,last_ms=generate('Ready for your next executive question.')
-def generate(text):
+def generate(text,voice_name='af_heart'):
+ selected=voices[voice_name]
  import torch
  start=time.perf_counter();ps,tokens=g2p(text)
  if not ps:raise ValueError('No pronunciable text')
  # Sentences are intentionally short; retain every phoneme and avoid truncation.
  if len(ps)+2>model.context_length:raise ValueError('Sentence too long. Split the answer into sentences.')
- with torch.inference_mode():audio=model(ps,voice[len(ps)-1],speed=1.0)
+ with torch.inference_mode():audio=model(ps,selected[len(ps)-1],speed=1.0)
  data=(np.clip(audio.numpy(),-1,1)*32767).astype('<i2').tobytes()
  return data,(time.perf_counter()-start)*1000
 @asynccontextmanager
@@ -45,7 +47,7 @@ async def lifespan(app):
  yield
 app=FastAPI(docs_url=None,redoc_url=None,lifespan=lifespan)
 @app.get('/health')
-async def health():return {'ready':model is not None,'model':'Kokoro-82M · v1.0','latency_ms':last_ms,'sample_rate':24000}
+async def health():return {'ready':model is not None,'model':'Kokoro-82M · v1.0','latency_ms':last_ms,'sample_rate':24000,'active':active,'queued':queued,'last_request':last_request,'voices':list(voices)}
 @app.get('/v1/models')
 async def models():return {'data':[{'id':'Kokoro-82M · v1.0','capability':'speech','device':'cuda','voice':'American English','latency_ms':last_ms}]}
 class Speech(BaseModel):
@@ -55,9 +57,20 @@ class Speech(BaseModel):
  response_format:str='pcm'
 @app.post('/v1/audio/speech')
 async def speech(q:Speech):
- global last_ms
+ global last_ms,active,queued,last_request
+ if q.voice not in voices:raise HTTPException(422,'Unknown local voice; no substitution was made')
  if q.language not in ['en','en-US']:raise HTTPException(422,'The local fallback voice supports English.')
- async with lock:
-  try:data,last_ms=await asyncio.to_thread(generate,q.input)
-  except (ValueError,RuntimeError) as e:raise HTTPException(422,str(e)) from e
- return Response(data,media_type='application/octet-stream',headers={'X-Audio-Sample-Rate':'24000','X-Synthesis-Ms':f'{last_ms:.3f}'})
+ queued+=1;entered=False
+ try:
+  async with lock:
+   queued-=1;entered=True;active+=1;last_request=time.time()
+   future=asyncio.create_task(asyncio.to_thread(generate,q.input,q.voice))
+   try:data,last_ms=await asyncio.shield(future)
+   except asyncio.CancelledError:
+    await future
+    raise
+   except (ValueError,RuntimeError) as e:raise HTTPException(422,str(e)) from e
+   finally:active-=1
+ finally:
+  if not entered:queued-=1
+ return Response(data,media_type='application/octet-stream',headers={'X-Audio-Voice':q.voice,'X-Audio-Sample-Rate':'24000','X-Synthesis-Ms':f'{last_ms:.3f}'})
