@@ -9,9 +9,6 @@
     "hbm_total_mib": 256703,
     "hbm_used_mib": 219290,
     "hbm_free_mib": 36199,
-    "grace_total_bytes": 798493376512,
-    "grace_available_bytes": 487630569472,
-    "grace_free_bytes": 68564221952,
     "service_startup_timings": {
       "text": {
         "seconds": 130.871,
@@ -53,7 +50,13 @@
         "seconds": 5.33,
         "observed_at": 1793919794.480031
       }
-    }
+    },
+    "linux_aggregate_total_bytes": 798493376512,
+    "linux_aggregate_available_bytes": 487630569472,
+    "linux_aggregate_free_bytes": 68564221952,
+    "grace_node0_total_bytes": 530594791424,
+    "grace_node0_free_bytes_estimate": 30606819328,
+    "grace_free_method": "Derived from aggregate Linux MemFree minus the same-snapshot reported HBM free; non-atomic samples and MiB rounding make this an estimate, not a direct NUMA reading."
   },
   "factory_builds": [
     {
@@ -658,9 +661,12 @@
     "hbm_total_mib": 256703,
     "hbm_used_mib": 225492,
     "hbm_free_mib": 29997,
-    "grace_total_bytes": 798493376512,
-    "grace_available_bytes": 481229996032,
-    "grace_free_bytes": 61514973184
+    "linux_aggregate_total_bytes": 798493376512,
+    "linux_aggregate_available_bytes": 481229996032,
+    "linux_aggregate_free_bytes": 61514973184,
+    "grace_node0_total_bytes": 530594791424,
+    "grace_node0_free_bytes_estimate": 30060838912,
+    "grace_free_method": "Derived from aggregate Linux MemFree minus the same-snapshot reported HBM free; non-atomic samples and MiB rounding make this an estimate, not a direct NUMA reading."
   },
   "comparison_metric": "factory_elapsed_seconds; UI wall clock and per-stage wall times also recorded. Parallel stage times are not additive.",
   "factory_memory": {
@@ -676,9 +682,12 @@
     "hbm_total_mib": 256703,
     "hbm_used_mib": 228790,
     "hbm_free_mib": 26699,
-    "grace_total_bytes": 798493376512,
-    "grace_available_bytes": 475920531456,
-    "grace_free_bytes": 56109367296
+    "linux_aggregate_total_bytes": 798493376512,
+    "linux_aggregate_available_bytes": 475920531456,
+    "linux_aggregate_free_bytes": 56109367296,
+    "grace_node0_total_bytes": 530594791424,
+    "grace_node0_free_bytes_estimate": 28113436672,
+    "grace_free_method": "Derived from aggregate Linux MemFree minus the same-snapshot reported HBM free; non-atomic samples and MiB rounding make this an estimate, not a direct NUMA reading."
   },
   "factory_slowdown_limit_seconds": 420.8813852667809,
   "frozen_source_sha256": {
@@ -716,5 +725,12 @@
     "zip_and_pdf_match_published_assets": true,
     "source_sha256sums_attached_and_download_verified": true,
     "scope": "Original immutable v2.3.0 archive; corrected baseline source is the separate commit recorded above."
+  },
+  "memory_scope_correction": {
+    "recorded_utc": "2026-11-06T03:31:42.945683+00:00",
+    "reason": "This GB300 exposes HBM as Linux NUMA node 1. The original /proc/meminfo fields combined Grace node 0 and HBM and were incorrectly labeled Grace-only. Original aggregate measurements are preserved with corrected names; GPU memory and all timing/acceptance results are unchanged.",
+    "grace_node0_total_bytes": 530594791424,
+    "grace_node0_direct_free_bytes_at_correction": 55952474112,
+    "source": "/sys/devices/system/node/node0/meminfo; future qualifications sample physical NUMA nodes directly. Per-node MemAvailable is not exposed."
   }
 }

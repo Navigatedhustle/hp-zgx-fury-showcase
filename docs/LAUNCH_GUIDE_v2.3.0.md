@@ -1,6 +1,6 @@
 # Launch HP ZGX Fury — v2.3.0
 
-Use the tested Ubuntu 24.04 ARM64 GB300 workstation with its working NVIDIA driver and CUDA toolkit, at least 700 GiB system memory, 256703 MiB GPU memory and 350 GiB free disk. See [prerequisites](PREREQUISITES.md). Do not install another model stack alongside this one.
+Use the tested Ubuntu 24.04 ARM64 GB300 workstation with its working NVIDIA driver and CUDA toolkit, the tested memory configuration (494 GiB usable Grace CPU memory and 256703 MiB reported GPU memory) and 350 GiB free disk. See [prerequisites](PREREQUISITES.md). Linux reports roughly 743 GiB combined memory, including HBM; that is not Grace-only RAM. Do not install another model stack alongside this one.
 
 **Install.** Clone the public release:
 
