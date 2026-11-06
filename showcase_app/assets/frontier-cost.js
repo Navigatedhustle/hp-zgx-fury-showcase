@@ -20,7 +20,8 @@
  function electricity(watts,hours,cloudKwh){
   const w=amount(watts),h=amount(hours),cloud=amount(cloudKwh),value=w===null||h===null?null:w*h/1000;
   const local=finite(value)?value:null;
-  return {local,cloud,ratio:local!==null&&local>0&&cloud!==null?cloud/local:null,difference:local!==null&&cloud!==null?cloud-local:null};
+  const ratio=local!==null&&local>0&&cloud!==null?cloud/local:null;
+  return {local,cloud,ratio:finite(ratio)?ratio:null,difference:local!==null&&cloud!==null?cloud-local:null};
  }
  const api={calculate,electricity};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;

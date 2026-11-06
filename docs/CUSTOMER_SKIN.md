@@ -46,3 +46,5 @@ Prep uses the same tools/gateway, prompts for ambiguity, lists local candidate f
 ## Verification
 
 See `docs/verification/customer_skin.json`. Unit tests use fictional fixtures and recorded responses without network. Committed screenshots are 1366×768 under `docs/screenshots/v3/skin/`, using Northwind Beverages only. Real lookup records contain timings and pass/fail only.
+
+This feature remains a draft because Factory latency acceptance failed. The new baseline was 320.013 s, setting a 352.014 s ceiling. The first skinned build failed the existing generated-app mobile layout check; two further builds passed functionality in 367.169 s and 358.285 s, exceeding that ceiling. All attempts are retained; the baseline and frozen Factory internals were not changed. The real public lookups passed in 6.458 s, 2.892 s and 5.088 s.

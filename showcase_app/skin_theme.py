@@ -1,5 +1,4 @@
 """Pure customer palette mathematics. Semantic status tokens are never overridden."""
-import colorsys
 import math
 import re
 from collections import Counter
@@ -106,30 +105,53 @@ def svg_colors(root):
     def number(v,default=0):
         try:return float(re.match(r'[-+.\deE]+',str(v))[0])
         except (ValueError,TypeError):return default
-    def visit(node, inherited):
+    gradients={node.get('id'):[child.get('stop-color','#000000') for child in node if child.tag.split('}')[-1]=='stop' and number(child.get('stop-opacity',1))>0]
+               for node in root.iter() if node.tag.split('}')[-1] in ('linearGradient','radialGradient')}
+    def visit(node, inherited,scale=1,alpha=1):
         attrs = dict(inherited);attrs.update(node.attrib)
         tag = node.tag.split('}')[-1]
         if tag in ('defs','clipPath','mask','title','desc'):return
-        if tag=='rect':area = number(attrs.get('width'))*number(attrs.get('height'))
-        elif tag in ('circle','ellipse'):area = math.pi*number(attrs.get('r',attrs.get('rx')))*number(attrs.get('r',attrs.get('ry')))
+        for kind,values in re.findall(r'(scale|matrix)\s*\(([^)]+)\)',node.get('transform','')):
+            nums=[float(v) for v in re.findall(r'[-+]?(?:\d*\.)?\d+(?:[eE][-+]?\d+)?',values)]
+            if kind=='scale' and nums:scale*=abs(nums[0]*(nums[1] if len(nums)>1 else nums[0]))
+            if kind=='matrix' and len(nums)==6:scale*=abs(nums[0]*nums[3]-nums[1]*nums[2])
+        alpha*=max(0,min(1,number(node.get('opacity',1))))
+        perimeter=0
+        if tag=='rect':
+            w,h=number(attrs.get('width')),number(attrs.get('height'));area=w*h;perimeter=2*(w+h)
+        elif tag in ('circle','ellipse'):
+            a,b=number(attrs.get('r',attrs.get('rx'))),number(attrs.get('r',attrs.get('ry')));area=math.pi*a*b
+            perimeter=math.pi*(3*(a+b)-math.sqrt(max(0,(3*a+b)*(a+3*b))))
         elif tag=='path':
             try:
                 from fontTools.pens.areaPen import AreaPen
                 from fontTools.svgLib.path import parse_path
                 pen=AreaPen(None);parse_path(attrs.get('d',''),pen);area=abs(pen.value)
             except (ValueError,TypeError,NotImplementedError):area=1
+            try:
+                from fontTools.pens.perimeterPen import PerimeterPen
+                pen=PerimeterPen(None);parse_path(attrs.get('d',''),pen);perimeter=pen.value
+            except (ValueError,TypeError,NotImplementedError):perimeter=0
         elif tag in ('polygon','polyline'):
             nums = [float(v) for v in re.findall(r'[-+]?(?:\d*\.)?\d+(?:[eE][-+]?\d+)?',attrs.get('d',attrs.get('points','')))]
             points=list(zip(nums[::2],nums[1::2]));area=abs(sum(x*y2-x2*y for (x,y),(x2,y2) in zip(points,points[1:]+points[:1])))/2 if points else 1
+            perimeter=sum(math.dist(a,b) for a,b in zip(points,points[1:]+(points[:1] if tag=='polygon' else [])))
+        elif tag=='line':
+            area=0;perimeter=math.hypot(number(attrs.get('x2'))-number(attrs.get('x1')),number(attrs.get('y2'))-number(attrs.get('y1')))
         else:area = 1
         if tag in ('rect','circle','ellipse','path','polygon','polyline','text','line'):
             for key in ('fill','stroke'):
                 value = attrs.get(key,'#000000' if key=='fill' else 'none')
+                if value=='currentColor':value=attrs.get('color','#000000')
+                match=re.fullmatch(r'url\(#([\w.-]+)\)',value)
+                paints=gradients.get(match[1],[]) if match else [value]
+                weight=(area if key=='fill' else perimeter*number(attrs.get('stroke-width',1)))*scale*alpha*max(0,min(1,number(attrs.get(key+'-opacity',1))))
                 try:
-                    if number(attrs.get('opacity',1))>0 and number(attrs.get(key+'-opacity',1))>0:
-                        color = '#'+''.join(f'{round(x*255):02x}' for x in rgb(value));weights[color]+=max(1,area)*(1 if key=='fill' else .1)
+                    for paint in paints:
+                        if weight>0:
+                            color = '#'+''.join(f'{round(x*255):02x}' for x in rgb(paint));weights[color]+=weight/max(1,len(paints))
                 except (ValueError,TypeError):pass
-        for child in node:visit(child,{k:v for k,v in attrs.items() if k in ('fill','stroke','opacity','fill-opacity','stroke-opacity')})
+        for child in node:visit(child,{k:v for k,v in attrs.items() if k in ('fill','stroke','color','fill-opacity','stroke-opacity','stroke-width')},scale,alpha)
     visit(root,{})
     return list(weights.items())
 
@@ -154,7 +176,8 @@ def palette(colors, hint=None, primary=None, accent=None):
     _,_,h=lch(primary);red_h=lch(SEMANTIC['--mc-red'])[2]
     red_brand = min((h-red_h)%360,(red_h-h)%360)<25
     surface_h=h+30 if red_brand else h
-    bg,panel,raised=[from_lch(l,.015 if l==.13 else .022,surface_h) for l in (.13,.17,.19)]
+    # Leave a small margin for 8-bit sRGB quantization at the requested bounds.
+    bg,panel,raised=[from_lch(l,c,surface_h) for l,c in ((.135,.015),(.17,.022),(.185,.022))]
     text=accessible(primary,panel,4.5);edge=accessible(primary,panel,3);act=accessible(accent,panel,4.5)
     variables={'--mc-bg':bg,'--mc-panel':panel,'--mc-raise':raised,'--mc-blue':text,'--mc-cyan':act,'--mc-line':edge,
                '--mc-text':'#edf5ff','--mc-muted':'#9eb0c7','--bg':bg,'--page':bg,'--panel':panel,'--surface':panel,'--surface-raised':raised,'--action':text,'--accent':act,'--border':edge,'--text':'#edf5ff','--subtle':'#9eb0c7','--on-action':bg,'--focus':text}

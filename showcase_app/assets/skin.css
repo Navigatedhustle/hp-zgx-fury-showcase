@@ -26,3 +26,11 @@ html.skin-fade{transition:--mc-bg .45s,--mc-panel .45s,--mc-blue .45s,--mc-cyan 
 
 .skin-actions [hidden],.skin-room[hidden]{display:none!important}
 .skin-brand-red .mc-lane b::before,.skin-brand-red .mc-status::before{content:'● ';font-size:.8em}.skin-brand-red .mc-state.failed::before,.skin-brand-red .mc-status[data-state=failed]::before{content:'✕ '}.skin-brand-red .mc-state.queued::before,.skin-brand-red .mc-status[data-state=queued]::before{content:'◷ '}
+
+.skin-content h3,.skin-entity strong,.skin-menu button,.mc-hero h1{overflow-wrap:anywhere}
+@media print{.skin-prepared,.skin-dialog,.skin-room,.skin-actions{display:none!important}}
+.skin-room button svg{width:16px;height:16px;flex-shrink:0}.skin-room button{white-space:nowrap}
+.skin-menu summary{list-style:none}.skin-menu summary::-webkit-details-marker{display:none}
+/* Brand surfaces are dark even when this browser prefers the default light view.
+   Keep V3's fixed dark-mode status colors; no customer color enters these tokens. */
+:root.skin-dark-surfaces{color-scheme:dark;--mc-lime:#b5ee73;--mc-amber:#f5c46d;--mc-red:#ff8d92}

@@ -107,8 +107,8 @@ class Store:
         db.execute('INSERT INTO sessions VALUES (:id,:name,:started)', session)
         db.execute('INSERT OR REPLACE INTO settings VALUES (1,?)', (session['id'],))
         if self.path == DB:
-            from showcase_app.skin import reset
-            reset()
+            # Keep the host-shell reset command standard-library-only.
+            (ROOT / 'state/skin/active.json').unlink(missing_ok=True)
         return session
 
     def current(self):

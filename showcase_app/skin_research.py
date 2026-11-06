@@ -14,7 +14,7 @@ from defusedxml import ElementTree as ET
 UA = 'HP-ZGX-Fury-Mission-Control/3 CustomerSkin (https://github.com/Navigatedhustle/hp-zgx-fury-showcase)'
 IMAGE_TYPES = {'image/svg+xml','image/png','image/webp','image/jpeg','image/x-icon','image/vnd.microsoft.icon'}
 TAGS = {'svg','g','path','rect','circle','ellipse','line','polyline','polygon','defs','linearGradient','radialGradient','stop','clipPath','title','desc','text','tspan','use'}
-ATTRS = {'viewBox','width','height','x','y','x1','x2','y1','y2','cx','cy','r','rx','ry','d','points','fill','stroke','stroke-width','stroke-linecap','stroke-linejoin','stroke-miterlimit','fill-rule','clip-rule','opacity','fill-opacity','stroke-opacity','transform','id','offset','stop-color','stop-opacity','gradientUnits','gradientTransform','spreadMethod','clip-path','preserveAspectRatio','font-size','font-family','font-weight','text-anchor','dx','dy','href'}
+ATTRS = {'viewBox','width','height','x','y','x1','x2','y1','y2','cx','cy','r','rx','ry','d','points','fill','stroke','color','stroke-width','stroke-linecap','stroke-linejoin','stroke-miterlimit','fill-rule','clip-rule','opacity','fill-opacity','stroke-opacity','transform','id','offset','stop-color','stop-opacity','gradientUnits','gradientTransform','spreadMethod','clip-path','preserveAspectRatio','font-size','font-family','font-weight','text-anchor','dx','dy','href'}
 
 
 class LookupError(ValueError):
@@ -39,14 +39,18 @@ def public_addresses(host, resolver=socket.getaddrinfo):
     if not addresses:raise LookupError('Public source could not be resolved')
     for address in addresses:
         ip=ipaddress.ip_address(address)
-        if not ip.is_global or ip.is_multicast or ip.is_unspecified or (ip.version==6 and ip.ipv4_mapped and not ip.ipv4_mapped.is_global):
+        if not ip.is_global or ip.is_multicast or ip.is_unspecified or str(ip)=='168.63.129.16' or (ip.version==6 and ip.ipv4_mapped and not ip.ipv4_mapped.is_global):
             raise LookupError('Private and local network sources are blocked')
-        if ip.version==6 and (ip.sixtofour or ip.teredo):raise LookupError('Transition network sources are blocked')
+        if ip.version==6 and (ip.sixtofour or ip.teredo or ip in ipaddress.ip_network('64:ff9b::/96') or ip in ipaddress.ip_network('64:ff9b:1::/48')):raise LookupError('Transition network sources are blocked')
     return addresses
 
 
 class PublicFetcher:
-    def __init__(self,count=lambda:None):self.requests=0;self.bytes=0;self.count=count;self.cancelled=False
+    def __init__(self,count=None):
+        if count is None:
+            from showcase_app.skin import count_request
+            count=count_request
+        self.requests=0;self.bytes=0;self.count=count;self.cancelled=False
 
     def fetch(self,url,kind='image'):
         # Each socket is pinned to the exact validated DNS answer, retaining TLS SNI.
@@ -66,8 +70,14 @@ class PublicFetcher:
             try:
                 raw=socket.create_connection((addresses[0],443),timeout=remaining)
                 if self.cancelled:raise LookupError('Research cancelled')
+                remaining=deadline-time.monotonic()
+                if remaining<=0:raise LookupError('Public source timed out')
+                raw.settimeout(remaining)
                 secure=conn._context.wrap_socket(raw,server_hostname=host);conn.sock=secure
-                conn.sock.settimeout(max(.01,deadline-time.monotonic()))
+                remaining=deadline-time.monotonic()
+                if self.cancelled:raise LookupError('Research cancelled')
+                if remaining<=0:raise LookupError('Public source timed out')
+                conn.sock.settimeout(remaining)
                 self.requests+=1;self.count()
                 conn.request('GET',path,headers={'User-Agent':UA,'Accept':'image/*' if kind=='image' else 'application/json' if kind=='json' else 'text/html','Accept-Encoding':'identity','Connection':'close'})
                 response=conn.getresponse()
@@ -82,7 +92,9 @@ class PublicFetcher:
                 if int(response.getheader('Content-Length','0'))>2*1024*1024:raise LookupError('Source exceeds two megabytes')
                 chunks=[];size=0
                 while not response.isclosed():
-                    secure.settimeout(max(.01,deadline-time.monotonic()))
+                    remaining=deadline-time.monotonic()
+                    if remaining<=0:raise LookupError('Public source timed out')
+                    secure.settimeout(remaining)
                     chunk=response.read(65536)
                     if not chunk:break
                     size+=len(chunk);self.bytes+=len(chunk)

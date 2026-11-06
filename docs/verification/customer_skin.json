@@ -1,0 +1,91 @@
+{
+  "date_utc": "2026-11-06",
+  "status": "draft_factory_latency_gate_failed",
+  "ready_for_merge": false,
+  "factory": {
+    "baseline_seconds": 320.0127007961273,
+    "ceiling_seconds": 352.0139708757401,
+    "skinned_runs": [
+      {
+        "seconds": 296.6571388244629,
+        "functional_passed": false,
+        "latency_qualified": false,
+        "change_percent": null
+      },
+      {
+        "seconds": 367.1692533493042,
+        "functional_passed": true,
+        "latency_qualified": false,
+        "change_percent": 14.735837807643515
+      },
+      {
+        "seconds": 358.28461480140686,
+        "functional_passed": true,
+        "latency_qualified": false,
+        "change_percent": 11.959498454300931
+      }
+    ],
+    "baseline_unchanged": true,
+    "worker_source_changed": false
+  },
+  "public_lookups": [
+    {
+      "seconds": 6.458,
+      "passed": true
+    },
+    {
+      "seconds": 2.892,
+      "passed": true
+    },
+    {
+      "seconds": 5.088,
+      "passed": true
+    }
+  ],
+  "privacy": "Real lookup identities and logos excluded. Real logo caches cleared after acceptance; only the fictional fixture is retained for review.",
+  "external_ai_api_calls": 0,
+  "tests": {
+    "factory_regressions": 189,
+    "core_and_skin": 93,
+    "skin_cases": 49,
+    "chart_arithmetic": 7,
+    "network_in_unit_tests": false,
+    "browser_layouts": 90,
+    "browser_layouts_passed": true,
+    "ui_checks": {
+      "pin_and_hidden_controls": true,
+      "offline_upload": true,
+      "split_preview": true,
+      "manual_color_picker": true,
+      "industry_pack": true,
+      "cross_station_sync": true,
+      "css_json_match": true,
+      "customer_text_escaped": true,
+      "cached_switch": true,
+      "six_curated_defaults_and_retained_edits": true,
+      "electricity_known_unknown_more_less": true,
+      "reduced_motion_context": true,
+      "reduced_motion_instant_swap": true,
+      "css_transition_fallback": true
+    },
+    "max_station_sync_seconds": 0.2193852140335366,
+    "theme_preference_cases": 4,
+    "lifecycle": {
+      "actual_host_event_reset": true,
+      "polling_does_not_touch_retention": true,
+      "idle_expiry_with_backdated_fixture": true,
+      "actual_booth_palette_css_only": true,
+      "actual_pptx_has_no_customer_identity": true,
+      "booth_palette_default_off_restored": true,
+      "scope": "Actual local services; idle expiry uses backdated fictional state, not an eight-hour observation. Existing fictional booth deck exported without new inference."
+    }
+  },
+  "immutable_profile_sha256": "2bb4c87c43c934277e75710e3caedaa43f6a34a50c689b76241765c1afdc5c62",
+  "scope_limits": [
+    "The final two skinned builds passed functionality but exceeded the fixed 10 percent latency ceiling.",
+    "First skinned build failed the existing generated-app mobile overflow check; Factory internals and generated previews were not edited.",
+    "Idle expiry was exercised with backdated fictional state, not an eight-hour observation.",
+    "The optional booth palette changes on-screen preview CSS only; downloaded decks retain their original styling.",
+    "Cloud electricity requires explicit same-workload estimates; no verified blanket claim that frontier inference consumes more electricity."
+  ]
+}

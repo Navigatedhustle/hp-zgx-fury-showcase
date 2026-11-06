@@ -27,9 +27,13 @@ async def main(args):
    await presenter.evaluate("fetch('/skin/reset',{method:'POST'})");await presenter.locator('#skin-close').click()
    stations=[]
    for path in ('/economics','/why-hp','/demos','/presenter'):
-    c=await browser.new_context(viewport={'width':1366,'height':768});page=await c.new_page();await page.goto('http://localhost:8080'+path);await page.wait_for_selector('#skin-prepared');stations.append((c,page))
+    c=await browser.new_context(viewport={'width':1366,'height':768});page=await c.new_page();await page.goto('http://localhost:8080'+path);await page.wait_for_selector('#skin-prepared',state='attached');stations.append((c,page))
    await presenter.click('#skin-customize');await presenter.fill('#skin-name','Northwind Beverages');await presenter.click('#skin-manual');await presenter.set_input_files('#skin-file',str(FIXTURE));await presenter.wait_for_selector('#skin-apply')
    assert '4.5' in await presenter.locator('#skin-checks').inner_text()
+   async with presenter.expect_response(lambda r:r.url.endswith('/skin/preview') and r.request.method=='POST'):
+    await presenter.locator('#skin-primary').fill('#3366cc')
+   async with presenter.expect_response(lambda r:r.url.endswith('/skin/preview') and r.request.method=='POST'):
+    await presenter.locator('#skin-primary').fill('#15b7a6')
    await presenter.select_option('#skin-pack','consumer_goods')
    if args.screenshots:
     args.screenshots.mkdir(parents=True,exist_ok=True);await presenter.screenshot(path=str(args.screenshots/'northwind-preview.png'))
@@ -39,7 +43,7 @@ async def main(args):
     return time.monotonic()-began
    report['sync_seconds']=await asyncio.gather(*(synced(page) for _,page in stations));assert max(report['sync_seconds'])<2
    for c,page in stations:await c.close()
-   report['checks'].update(pin_and_hidden_controls=True,offline_upload=True,split_preview=True,industry_pack=True,cross_station_sync=True)
+   report['checks'].update(pin_and_hidden_controls=True,offline_upload=True,split_preview=True,manual_color_picker=True,industry_pack=True,cross_station_sync=True)
    await presenter.wait_for_timeout(550)
    if args.screenshots:await presenter.screenshot(path=str(args.screenshots/'northwind-shell.png'))
    # Root JSON and served CSS must contain precisely the same active properties.
@@ -55,6 +59,26 @@ async def main(args):
    # Cached switching and reset use real endpoints and never issue model calls.
    await presenter.click('#skin-menu summary');await presenter.locator('[data-cached]').filter(has_text='Northwind Beverages').first.click();await presenter.wait_for_timeout(500)
    report['checks']['cached_switch']=True
+   # Curated defaults enter the original controls, without launching a job or
+   # overwriting a retained user edit when the presenter returns to a tile.
+   pack=state['packs']['consumer_goods']
+   for kind in ('atlas','slides','image','vision','translate','video'):
+    await presenter.click('.all-demos');await presenter.click('[data-demo="'+kind+'"]')
+    frame=presenter.frame_locator('iframe[data-demo="'+kind+'"]')
+    if kind in ('atlas','slides','image','video'):
+     node=frame.locator('#question-input' if kind=='atlas' else '#prompt')
+     await node.wait_for()
+     from playwright.async_api import expect
+     await expect(node).to_have_value(pack[kind],timeout=12000)
+     await node.fill('A fictional presenter edit that must be retained.')
+     await presenter.click('.all-demos');await presenter.click('[data-demo="'+kind+'"]');assert await node.input_value()=='A fictional presenter edit that must be retained.'
+    elif kind=='vision':
+     from playwright.async_api import expect
+     await expect(frame.locator('#vision-task')).to_have_value(pack[kind],timeout=12000)
+    else:
+     from playwright.async_api import expect
+     await expect(frame.locator('#document-name')).to_have_text('fictional-'+pack[kind]+'.pdf',timeout=12000)
+   report['checks']['six_curated_defaults_and_retained_edits']=True
   await context.close();await browser.close()
   for browser_name in ('chromium','firefox'):
    browser=await getattr(p,browser_name).launch(**({'args':['--no-sandbox']} if browser_name=='chromium' else {}))
@@ -76,6 +100,19 @@ async def main(args):
   await page.locator('[data-cloud-energy]').first.fill('');assert 'Unknown is not zero' in await page.locator('#frontier-energy-ratio').inner_text()
   if args.screenshots:await page.locator('#frontier-energy').scroll_into_view_if_needed();await page.screenshot(path=str(args.screenshots/'northwind-electricity.png'))
   report['checks']['electricity_known_unknown_more_less']=True;report['checks']['reduced_motion_context']=True
+  if not args.static_only:
+   pin=(ROOT/'state/skin-presenter.pin').read_text().strip()
+   await page.evaluate("pin=>fetch('/skin/unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})})",pin)
+   base=await page.evaluate("fetch('/skin/state').then(r=>r.json())")
+   await page.evaluate("()=>{window.skinTransitionCalls=0;const original=document.startViewTransition?.bind(document);if(original)document.startViewTransition=(fn)=>{window.skinTransitionCalls++;return original(fn)}}")
+   await page.evaluate("async value=>{const r=await fetch('/skin/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:value.active.id,primary:'#3366cc'})});const v=await r.json();window.FurySkin.update(v);if(document.documentElement.style.getPropertyValue('--mc-blue')!==v.active.theme.variables['--mc-blue'])throw Error('Reduced motion swap was delayed')}",base)
+   assert await page.evaluate('window.skinTransitionCalls')==0;report['checks']['reduced_motion_instant_swap']=True
+   await page.emulate_media(reduced_motion='no-preference')
+   await page.evaluate('document.startViewTransition=undefined')
+   await page.evaluate("async value=>{const r=await fetch('/skin/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:value.active.id,primary:'#7c44cc'})});window.FurySkin.update(await r.json())}",base)
+   await page.wait_for_function("()=>document.documentElement.classList.contains('skin-fade')")
+   await page.wait_for_function("()=>!document.documentElement.classList.contains('skin-fade')",timeout=1000);report['checks']['css_transition_fallback']=True
+   await page.evaluate("async value=>{const r=await fetch('/skin/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:value.active.id,primary:value.active.theme.primary,accent:value.active.theme.accent,pack:value.active.pack})});window.FurySkin.update(await r.json())}",base)
   await context.close();await browser.close()
  report['browser_errors']=errors;assert not errors,errors
  args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(report,indent=2));print('PASS',len(report['layouts']),'layouts; max sync',max(report['sync_seconds'],default=0),'seconds',flush=True)

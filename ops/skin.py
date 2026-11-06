@@ -18,7 +18,10 @@ async def prep(names):
    for i,row in enumerate(job['entities'],1):print(i,row['name'],row.get('domain') or 'No official domain',row['description'])
    selection=input('Entity number, or Enter to skip: ').strip()
    if not selection:continue
-   try:entity=job['entities'][int(selection)-1]
+   try:
+    index=int(selection)
+    if not 1<=index<=len(job['entities']):raise ValueError()
+    entity=job['entities'][index-1]
    except (ValueError,IndexError):print('Invalid selection; skipped.');continue
    job['status']='researching';await skin.collect_candidates(job,entity)
   candidates=job['candidates']
@@ -27,7 +30,10 @@ async def prep(names):
   for i,row in enumerate(candidates,1):print(i,row['source'],skin.STATE/'cache'/row['id']/Path(row['logo']).name)
   selection=input('Confirm logo number, or Enter to skip: ').strip()
   if not selection:continue
-  try:value=candidates[int(selection)-1]
+  try:
+   index=int(selection)
+   if not 1<=index<=len(candidates):raise ValueError()
+   value=candidates[index-1]
   except (ValueError,IndexError):print('Invalid selection; skipped.');continue
   value['confirmed']=True;skin.write_json(skin.STATE/'cache'/value['id']/'skin.json',value)
   print('Cached for one tap switching. Nothing was applied.')

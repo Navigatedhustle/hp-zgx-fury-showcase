@@ -47,4 +47,5 @@ test('unknown electricity is never a zero or an invented efficiency ratio',()=>{
  assert.equal(electricity(0,40,12).ratio,null);
  assert.deepEqual(electricity(1200,40,0),{local:48,cloud:0,ratio:0,difference:-48});
  assert.equal(electricity(1e308,1e308,1).local,null);
+ assert.equal(electricity(1e-300,1,1e308).ratio,null);
 });

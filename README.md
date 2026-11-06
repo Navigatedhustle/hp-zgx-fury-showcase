@@ -50,6 +50,8 @@ Conference stations remain at `/stations`; assignments belong to each browser. U
 
 **Customer Skin** adds a Presenter station role and six digit PIN access. Choose **Customize for customer** to research public identity/logo candidates through the local gateway, preview accessible colors and apply across station shells. HP ZGX Fury stays visible; branding stays in ignored `state/skin/`, outside generated apps and downloads. Offline uploads, eight recent confirmed skins and `./launch.sh skin prep|list|clear` support preparation. [Presenter steps and privacy](docs/CUSTOMER_SKIN.md).
 
+Customer Skin remains a draft: its fixed Factory latency acceptance gate did not pass. [Measured results and retained failures](docs/verification/customer_skin.json).
+
 Cloud vs Local separates **USD costs** from **kWh electricity**. Enter sourced, same-workload cloud energy estimates to see how many times more or less electricity they use than one Fury. Missing model-specific energy stays unknown; API prices do not establish energy use.
 
 [Quickstart](QUICKSTART.md) · [Presenter script](docs/PRESENTER.md) · [V3 launch guide](docs/V3_LAUNCH_GUIDE.md) · [Launch PDF](docs/V3_Launch_Guide_v3.0.0.pdf) · [Models and licenses](docs/ASSET-MANIFEST.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Remote access](docs/REMOTE-ACCESS.md) · [MIT source license](LICENSE)

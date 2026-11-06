@@ -25,10 +25,13 @@ JOBS={}
 TOKENS={}
 COUNTER_LOCK=threading.Lock()
 INDUSTRIES={
- 'Q31207':'healthcare','Q16917':'healthcare','Q8434':'higher_education','Q189533':'higher_education',
- 'Q1047113':'research_lab','Q11862829':'research_lab','Q187939':'manufacturing','Q190117':'automotive',
- 'Q19776773':'consumer_goods','Q11204':'public_sector','Q837171':'financial_services','Q507443':'financial_services',
- 'Q2151621':'energy','Q11661':'technology','Q7397':'technology','Q1665594':'technology'}
+ # Public concept labels checked against Wikidata; unknown P452 values fall back.
+ 'Q31207':'healthcare','Q16917':'healthcare','Q507443':'healthcare',
+ 'Q8434':'higher_education','Q136822':'higher_education','Q38723':'higher_education',
+ 'Q276099':'research_lab','Q187939':'manufacturing','Q190117':'automotive',
+ 'Q56573357':'consumer_goods','Q12216502':'consumer_goods',
+ 'Q294217':'public_sector','Q270791':'public_sector','Q11204':'public_sector',
+ 'Q837171':'financial_services','Q2151621':'energy','Q11661':'technology','Q7397':'technology'}
 
 
 def settings():return json.loads((ROOT/'config/skin.json').read_text())
@@ -45,6 +48,7 @@ def read_json(path,default=None):
 
 
 def presenter_pin():
+ STATE.mkdir(parents=True,exist_ok=True,mode=0o700);STATE.chmod(0o700)
  PIN.parent.mkdir(parents=True,exist_ok=True)
  if not PIN.exists():
   try:fd=os.open(PIN,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600)
@@ -65,8 +69,10 @@ def count_request():
 
 
 def active():
- value=read_json(STATE/'active.json')
- if value and time.time()-value.get('touched',0)>settings()['idle_hours']*3600:
+ path=STATE/'active.json';value=read_json(path)
+ try:touched=max(value.get('touched',0),path.stat().st_mtime) if value else 0
+ except FileNotFoundError:return None
+ if value and time.time()-touched>settings()['idle_hours']*3600:
   reset();return None
  return value
 
@@ -78,8 +84,10 @@ def reset():
 def snapshot():
  value=active()
  identity={k:v for k,v in value.items() if k not in ('touched','used')} if value else None
- return {'active':value,'sample_pack':packs().get(value['pack']) if value else None,'booth_palette':settings()['presentations_booth_palette'],
-         'public_web_lookups':public_count(),'revision':hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest()[:16]}
+ booth=settings()['presentations_booth_palette']
+ revision={'skin':identity,'booth_palette':booth}
+ return {'active':value,'sample_pack':packs().get(value['pack']) if value else None,'booth_palette':booth,
+         'public_web_lookups':public_count(),'revision':hashlib.sha256(json.dumps(revision,sort_keys=True).encode()).hexdigest()[:16]}
 
 
 def recent():
@@ -115,7 +123,9 @@ def apply_skin(slug,theme=None,pack=None):
   value['pack']=pack
  value['touched']=value['used']=time.time();value['confirmed']=True
  dark=value['theme']['variables'].get('--mc-panel','#101c2e')
- value['plate']=any(contrast(c,dark)<3 for c,w in value['colors'] if w>0) if value['colors'] else value['plate']
+ total=sum(w for c,w in value['colors'])
+ low=sum(w for c,w in value['colors'] if contrast(c,dark)<3)
+ value['plate']=value['plate'] or bool(total and low/total>.1)
  write_json(STATE/'cache'/slug/'skin.json',value);write_json(STATE/'active.json',value)
  return snapshot()
 
@@ -130,7 +140,10 @@ def step(job,label):
 
 def route(job,value):
  model=value.get('model','')
- if model:job['routing']={'model':model,'reason':value.get('reason','')}
+ if model:
+  label='DeepSeek' if model=='fury-lead' else 'Qwen' if 'Qwen' in model else model
+  reason=value.get('reason','') or ('DeepSeek slot free; local gateway' if label=='DeepSeek' else 'Local gateway')
+  job['routing']={'model':label,'model_id':model,'reason':reason}
 
 
 async def rank(job,entities,logos):
@@ -369,7 +382,13 @@ async def touch(request:Request):
  origin=request.headers.get('origin')
  if origin and urlsplit(origin).hostname!=request.url.hostname:raise HTTPException(403,'Use a local station')
  value=active()
- if value and time.time()-value.get('touched',0)>60:value['touched']=time.time();write_json(STATE/'active.json',value)
+ if value:
+  # Touch the existing inode. A concurrent event reset/clear must never be
+  # undone by rewriting an identity read just before its file was removed.
+  path=STATE/'active.json'
+  try:
+   if time.time()-path.stat().st_mtime>60:os.utime(path,None)
+  except FileNotFoundError:pass
  return {'active':bool(value)}
 
 
