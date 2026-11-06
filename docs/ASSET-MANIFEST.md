@@ -40,7 +40,7 @@ Excluded: personal credentials, SSH keys, authentication/browser profiles, netwo
 
 ## V2 identity assets
 
-Bundled hp-logo-keyline.png is the owner-supplied official HP HEX PNG, unchanged (source and SHA-256 in assets/PROVENANCE.md). HP trademark rights apply separately from MIT source licensing. Raw logo/stripe ZIPs and licensed HP fonts are excluded. The optional stripe is unused. All shared shell assets render locally without external fonts or marketing services.
+Bundled hp-logo-keyline.png is the owner-supplied official HP HEX PNG, unchanged (source and SHA-256 in showcase_app/assets/PROVENANCE.md). HP trademark rights apply separately from MIT source licensing. Raw logo/stripe ZIPs and licensed HP fonts are excluded. The optional stripe is unused. All shared shell assets render locally without external fonts or marketing services.
 
 ## v2.1 recorded demonstration
 

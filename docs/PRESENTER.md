@@ -1,3 +1,32 @@
+# V3 presenter script
+
+Start at http://localhost:8080. Show the eight workload cards and the live GPU/HBM/Grace/power/token counters. “These are local measurements. The external AI counter covers this gateway, not every packet on the machine.”
+
+| One-minute demo | Action and evidence |
+|---|---|
+| Atlas | Ask the 8-point Commit win-rate question. Show the grounded result, evidence and real audio-reactive orb. Explain that all business data is synthetic. Export the executive brief. |
+| Presentations | Keep the included local-AI brief, press Create, inspect the three-slide preview and download editable PowerPoint. It is a draft requiring review. |
+| Agent Factory | Choose short Live and automatic review. Start once, explain Plan → Build → Verify → Ready, then return after the real build. Open its tested application/backend. For a one-minute predictable story choose explicitly recorded Guided mode. |
+| Image Studio | Choose a style, seed and ratio; generate, then change the batch to show serial variants. Use Send to Video for continuity. |
+| Vision Lab | Pick the chart sample and Analyze. Compare actual values with the extraction and executive brief; samples are fictional. |
+| Translate Desk | Use the brief sample, select a target and Translate. Compare pages and download PDF/DOCX/TXT. Show the advisory review and disclose clean reflow and variable language quality. The ten-page sample takes longer. |
+| Video Studio | Choose text or an Image Studio reference, then generate five seconds. Show real steps, frames, model/adapters and elapsed time. This is a fixed proven preset. |
+| Action Trailer | Read consent before camera access. Choose an original PG genre, capture once and show screenplay/keyframes/clips as they finish. Generation exceeds a minute. Tap final fullscreen with sound, then Done to visibly delete photo and video. |
+
+## Fury Rush
+
+Press **Launch Fury Rush** once. “Six workflows are submitting through their real controls. One Factory build remains the global limit; visible queues preserve the workstation's admission limits.” Show DeepSeek/Qwen/FLUX lanes and measured throughput. Open completed workspaces without abandoning Factory. Wait for every tile to reach complete or failed; a failed tile is a real failure, not a canned replacement. The longest workload is the live Factory build.
+
+## Privacy and recovery
+
+Only Action Trailer's consented camera collects a visitor photo. No consent means no camera. Its photo and media are local, temporarily stored outside the repository, and deleted on Done/New/explicit deletion/idle/service startup. The browser receives a private preview; only localhost offers the final station download. Physical camera/microphone and remote device behavior require site validation.
+
+Inspect `/models`, `/performance`, `/economics` and `/secure` for pinned identities, resources, sourced scenarios and code evidence. Electricity is GPU-only energy, not total ownership cost; cloud examples have different outputs/capabilities.
+
+If a job fails, show its real state, preserve the evidence and retry only within the stated bounds. Inspect `./launch.sh status` and active jobs before guarded recovery. Do not restart a busy shared workstation or kill a process by port. All networking remains site-managed.
+
+Historical presenter guidance follows for retained V2 features.
+
 # Conference presenter guide — V2
 
 The v2.3 visual edition upgrades new generated travel applications and the supplied Guided interface. Keep the distinction explicit: short builds generate application code live, with labeled supplied artwork; complete travel supplies its frontend and generates backend/QA. Focus product expands the checked application while retaining compact progress/token information. Existing saved applications keep their original files.
