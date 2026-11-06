@@ -6,6 +6,7 @@ from collections import deque
 import httpx
 from devteam_sandbox import execute,available,check_javascript,check_backend_contract,check_generated_qa
 from devteam_browser import check_frontend,check_visual_frontend
+from visual_source_edits import reconstruct as reconstruct_visual_source,allowed_lists
 ROOT=Path(__file__).resolve().parent
 ALLOWED={'index.html','styles.css','app.js','backend.py','test_backend.py','README.md','architecture.md','contract_review.md'}
 SPECIALIST='unsloth/Qwen3.6-27B-NVFP4';LEAD='fury-lead'
@@ -277,18 +278,19 @@ class DevRun:
      if title=='Visual acceptance':
       try:
        async with asyncio.timeout(45):await check_visual_frontend(source,workspace/'visual-precheck',self.stop_event)
-       prompt+='\nIndependent desktop/mobile and empty/populated accessibility precheck PASSED. Preserve working code. If the visual design is already good, return changes:[] with a truthful review summary. Do not make arbitrary edits just to change a file.'
+       prompt+='\nIndependent desktop/mobile and empty/populated accessibility precheck PASSED. Preserve working code. If the visual design is already good, return list_ids:[] and css_lines:[] with a truthful review summary. Do not make arbitrary edits just to change a file.'
       except (ValueError,RuntimeError) as error:
-       prompt+='\nActual independent visual precheck failed: '+str(error)[:1800]+' Repair these measured defects with small exact edits. Copy old snippets verbatim from the current owned source; do not guess classes or indentation.'
-     feedback='';repair_source=source
+       prompt+='\nActual independent visual precheck failed: '+str(error)[:1800]+' Repair these measured defects with the bounded list-container and CSS override plan; preserve application logic and use actual selectors.'
+     feedback='';repair_source=source;visual_candidate_changed=False
      for attempt in range(2):
       validation=None
       try:
-       selected_model=LEAD if attempt and model==SPECIALIST and 'backend.py' in FILE_SCOPES[title] else model
+       selected_model=LEAD if title=='Visual acceptance' or (attempt and model==SPECIALIST and 'backend.py' in FILE_SCOPES[title]) else model
        if selected_model!=model:
         task.update(planned_model=model,model=selected_model)
-        self.event('repair model selected',task_id=task['id'],from_model=model,to_model=selected_model,reason='Technical lead repairs rejected backend candidate')
-       patch=await self.call(client,title,actor,selected_model,prompt+('\nRepair the rejected candidate supplied in read_only_reference_files, preserving all other behavior and design. Fix validation failure: '+feedback if feedback else ''),source=repair_source,task_id=task['id'])
+        self.event('repair model selected',task_id=task['id'],from_model=model,to_model=selected_model,reason='Technical lead handles bounded visual acceptance' if title=='Visual acceptance' else 'Technical lead repairs rejected backend candidate')
+       current_prompt='Repair ONLY the latest validation failure in the current candidate; preserve previously fixed source and unrelated code. Current failure: '+feedback if attempt and title=='Visual acceptance' and visual_candidate_changed else prompt+('\nRepair the rejected candidate supplied in read_only_reference_files, preserving all other behavior and design. Fix validation failure: '+feedback if feedback else '')
+       patch=await self.call(client,title,actor,selected_model,current_prompt,source=repair_source,task_id=task['id'])
        validation=workspace/('contract-check-'+str(attempt));copy_workspace(repair_source,validation)
        for filename,content in patch['files'].items():
         destination=validation/filename
@@ -311,7 +313,7 @@ class DevRun:
        feedback=str(exc)[:2000];self.event('contract validation failed',task_id=task['id'],attempt=attempt+1,error=feedback)
        if attempt==1:raise RuntimeError('Ticket contract validation failed after one repair: '+feedback) from exc
        if validation is not None:
-        repair_source=validation
+        repair_source=validation;visual_candidate_changed=True
         self.event('repair candidate supplied',task_id=task['id'],workspace=str(validation.relative_to(self.root)),files=sorted(patch['files']))
      task['status']='awaiting merge';task['call_id']=next(c['id'] for c in reversed(self.calls) if c.get('task_id')==task['id'])
      output=workspace/'output';output.mkdir()
@@ -372,9 +374,13 @@ class DevRun:
   payload['temperature']=1.0 if model==LEAD else 0.0
   payload['response_format']={'type':'json_schema','json_schema':{'name':'file_patch','strict':True,'schema':{'type':'object','properties':{'summary':{'type':'string','maxLength':400},'files':{'type':'object','properties':{name:{'type':'string'} for name in names},'additionalProperties':False,'required':names}},'required':['summary','files'],'additionalProperties':False}}}
   if title=='Visual acceptance':
-   call['output_protocol']='visual_edits'
-   payload['messages'][0]['content']=contract+' You are refining a working fictional application. Return JSON with summary and changes only. Each change has file, old, new. The old string must match exactly once in the named owned frontend source; edits apply in order. Copy short exact snippets, including actual whitespace; never invent class names. Prefer one to four coherent edits. If the independent checks pass and no meaningful improvement is necessary, return an empty changes list. Keep API behavior, selectors, validation and all working interactions. Backend and QA are read-only. No markdown. All imagery is supplied or illustrative, never a real property claim.'
-   payload['response_format']['json_schema']['schema']={'type':'object','properties':{'summary':{'type':'string','maxLength':400},'changes':{'type':'array','minItems':0,'maxItems':8,'items':{'type':'object','properties':{'file':{'type':'string','enum':names},'old':{'type':'string','minLength':1,'maxLength':12000},'new':{'type':'string','maxLength':12000}},'required':['file','old','new'],'additionalProperties':False}}},'required':['summary','changes'],'additionalProperties':False}
+   call['output_protocol']='visual_repair_plan'
+   payload['messages'][0]['content']=contract+' Complete visual acceptance of this already designed working fictional application. Return JSON with summary, list_ids, css_lines. No application source rewrites. list_ids chooses only eligible existing container IDs: the coordinator gives those generic containers role=list and their existing direct children role=listitem, including asynchronous empty/populated states, without replacing nodes or changing any event/API logic. Select the actual containers needed to fix list/table role defects; choosing all eligible lists is safe. css_lines contains at most 40 small CSS override lines appended to the unchanged stylesheet. Fix measured contrast, overflow or target size using actual selectors; never hide controls or suppress error messages. For color-contrast defects explicitly set opacity:1 as well as a sufficiently contrasting text color: on white/light backgrounds use the existing deep ink #173c34 or #222, not a muted midtone; on dark backgrounds use #f7fafc. Increasing font weight alone is insufficient. For responsive flex overflow, make BOTH the overflowing children and their reported flex parents wrap and shrink with flex-wrap:wrap and min-width:0; fixing only children of a nowrap parent is insufficient. Encode double quotes as @DQ@ and backslashes as @BS@ in CSS source. Do not redesign an already working page. Keep summary plain prose. For a passing design return empty arrays. Backend, HTML and application logic are read-only. No markdown.'
+   eligible=allowed_lists(source)
+   context={'ticket':task,'eligible_list_ids':eligible,'read_only_reference_files':{name:content for name,content in source.items() if name in ('index.html','styles.css')}}
+   call['reference_files']=sorted(context['read_only_reference_files'])
+   payload['messages'][1]['content']=json.dumps(context)
+   payload['response_format']['json_schema']['schema']={'type':'object','properties':{'summary':{'type':'string','maxLength':400},'list_ids':{'type':'array','maxItems':min(8,len(eligible)),'items':{'type':'string',**({'enum':eligible} if eligible else {})}},'css_lines':{'type':'array','maxItems':40,'items':{'type':'string','maxLength':500}}},'required':['summary','list_ids','css_lines'],'additionalProperties':False}
   edit_name=None
   repair_name=names[0] if getattr(self,'travel',False) and title.startswith('Repair ') and len(names)==1 and names[0] in source and names[0].endswith('.py') else None
   text='';first=None
@@ -455,7 +461,7 @@ class DevRun:
    call['response_complete']=call.get('finish_reason')=='stop'
    if call.get('finish_reason')!='stop':raise OutputTruncated('Generation incomplete ('+str(call.get('finish_reason'))+'); output budget '+str(payload['max_tokens'])+'. No changes applied. Retry with one small localized edit.' if edit_name else 'Generation incomplete ('+str(call.get('finish_reason'))+'); output budget '+str(payload['max_tokens'])+'. No changes applied.')
    if call['usage'] and call['usage'].get('prompt_tokens') not in (None,call['prompt_tokens_preflight']):raise RuntimeError('Exact tokenization differs from final endpoint usage')
-   if title=='Visual acceptance':patch=apply_visual_edits(text,source)
+   if title=='Visual acceptance':patch=parse_patch(json.dumps(reconstruct_visual_source(text,source)))
    elif edit_name:
     try:patch=apply_exact_edits(text,edit_name,source[edit_name])
     except ValueError:

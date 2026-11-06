@@ -87,16 +87,23 @@ async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inven
 async def audit_visual(page,frame):
  embedded=page.frames[-1]
  await embedded.add_script_tag(path=str(Path(__file__).resolve().parent/'vendor/axe/axe.min.js'))
+ problems=[];seen_issues=set()
  for width in (1366,375):
   await page.set_viewport_size({'width':width+24,'height':950})
   await page.locator('iframe').evaluate('(el,w)=>el.style.width=w+"px"',width)
   await asyncio.sleep(.1)
-  geometry=await frame.locator('body').evaluate('()=>({viewport:innerWidth,content:document.documentElement.scrollWidth,offenders:[...document.querySelectorAll("body *")].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1}).slice(0,3).map(e=>({tag:e.tagName,id:e.id,classes:e.className}))})')
-  if geometry['content']>geometry['viewport']+1:raise ValueError('Fix actual responsive overflow in HTML/CSS, preserving controls: '+str(geometry))
+  geometry=await frame.locator('body').evaluate('()=>({viewport:innerWidth,content:document.documentElement.scrollWidth,offenders:[...document.querySelectorAll("body *")].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1}).slice(0,3).map(e=>({tag:e.tagName,id:e.id,classes:e.className,parent:e.parentElement?{classes:e.parentElement.className,display:getComputedStyle(e.parentElement).display,wrap:getComputedStyle(e.parentElement).flexWrap}:null}))})')
+  if geometry['content']>geometry['viewport']+1:problems.append('Fix actual responsive overflow in HTML/CSS, preserving controls: '+str(geometry))
   result=await frame.locator('body').evaluate('async body=>await axe.run(body,{runOnly:{type:"tag",values:["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]}})')
-  if result['violations']:
-   issues=[{'id':v['id'],'elements':[{'html':n['html'][:200],'why':n.get('failureSummary','')[:350]} for n in v['nodes'][:2]]} for v in result['violations'][:3]]
-   raise ValueError('Fix these actual accessibility defects without removing features. Prefer native semantic HTML and keep empty reservation states valid: '+str(issues))
+  for violation in result['violations']:
+   node=violation['nodes'][0];key=(violation['id'],node['html'])
+   if key in seen_issues:continue
+   seen_issues.add(key)
+   problems.append('Accessibility '+violation['id']+': '+str({'html':node['html'][:160],'why':node.get('failureSummary','')[:300]}))
+ if problems:
+  # Keep the same criteria, but disclose mobile overflow before duplicated a11y details.
+  problems.sort(key=lambda problem:0 if problem.startswith('Fix actual responsive overflow') else 1)
+  raise ValueError('Fix all measured desktop/mobile visual defects, preserving every feature: '+' | '.join(problems))
 
 async def check_visual_frontend(code,data,stop=None):
  await check_frontend(code,data/'empty',stop,interactions=False,visual=True,seed_reservation=False)
