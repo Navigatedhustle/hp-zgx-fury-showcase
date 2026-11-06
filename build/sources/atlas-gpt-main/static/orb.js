@@ -27,7 +27,7 @@ window.AtlasOrb=class {
   if(this.analyser&&active&&!this.paused){this.analyser.getByteFrequencyData(this.bands);this.analyser.getByteTimeDomainData(this.waveform);let squares=0;for(let i=0;i<128;i++){low+=i<24?this.bands[i]:0;high+=i>64?this.bands[i]:0}for(const value of this.waveform)squares+=((value-128)/128)**2;energy=Math.min(1,Math.sqrt(squares/this.waveform.length)*2.2);low/=24*255;high/=63*255}
   this.level=energy;this.energy+=(energy-this.energy)*.3;
   const motion=this.reduced.matches?0:1,t=now*.00018*motion,e=this.paused?0:this.energy,thinking=this.state==='thinking';
-  const radius=Math.min(w,h)*.345*(1+e*.16),angle=t*(thinking?1.8:1),dark=document.documentElement.classList.contains('dark'),ink=dark?'237,244,255':'2,74,216';
+  const radius=Math.min(w,h)*.345*(1+e*.16),angle=t*(thinking?1.8:1),dark=document.documentElement.classList.contains('dark'),ink=dark?'105,217,238':'2,74,216';
   const points=this.points.map(([x,y,z],i)=>{const a=angle+y*.18,xx=x*Math.cos(a)+z*Math.sin(a),zz=z*Math.cos(a)-x*Math.sin(a),wave=e*(Math.sin(y*11+t*10)*.17+Math.cos(x*9-t*8)*high*.3)+low*.075;return {x:w/2+xx*radius*(1+wave),y:h/2+(y+Math.sin(xx*4+t*3)*e*.09)*radius*(1+wave),z:zz,i}}).sort((a,b)=>a.z-b.z);
   c.strokeStyle=`rgba(${ink},${.11+e*.13})`;c.lineWidth=.7;
   for(let lat=-2;lat<=2;lat++){const y=lat*.31,r=Math.sqrt(1-y*y);c.beginPath();for(let n=0;n<=72;n++){const a=n*Math.PI/36+angle,xx=Math.cos(a)*r,zz=Math.sin(a)*r,wave=e*Math.sin(a*4+y*8+t*7)*.07,x=w/2+xx*radius*(1+wave),yy=h/2+(y+zz*.16)*radius;if(n===0)c.moveTo(x,yy);else c.lineTo(x,yy)}c.stroke()}

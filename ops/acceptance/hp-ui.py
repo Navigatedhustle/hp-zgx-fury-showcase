@@ -36,7 +36,7 @@ async def main(a):
     if name in ['slides','image']:
      assert not await page.get_by_role('button',name='Cancel job',exact=True).is_visible(),name+' idle cancel control'
     if name=='home':
-     assert await page.locator('a[data-demo]').count()==4
+     assert await page.locator('a[data-demo]').count()==8
      expected='dark' if mode=='light' else 'system'
      await page.locator('.hp-theme').click();assert await page.locator('html').get_attribute('data-hp-theme')==expected
      # Persist a user choice without the navigation init script overwriting it.

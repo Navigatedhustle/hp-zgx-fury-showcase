@@ -68,6 +68,8 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="HP Deck Builder", lifespan=lifespan)
+from showcase_app.chrome import TelemetryProxy
+app.add_middleware(TelemetryProxy)
 from .booth import router as booth_router
 app.include_router(booth_router)
 from pathlib import Path as _ShowcasePath

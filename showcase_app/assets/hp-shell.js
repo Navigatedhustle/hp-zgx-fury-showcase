@@ -4,7 +4,7 @@
  if(window.self!==window.top)html.dataset.furyEmbedded='true';
  const height=()=>html.style.setProperty('--fury-height',Math.floor(window.visualViewport?.height||innerHeight)+'px');
  height();addEventListener('resize',height);window.visualViewport?.addEventListener('resize',height);
- let choice='light';try{choice=localStorage.getItem('hp-experience-theme')||'light'}catch{}
+ let choice='dark';try{choice=localStorage.getItem('hp-experience-theme')||'dark'}catch{}
  function theme(){html.dataset.hpTheme=choice;html.classList.toggle('dark',choice==='dark'||(choice==='system'&&matchMedia('(prefers-color-scheme:dark)').matches));document.querySelectorAll('.hp-theme').forEach(b=>b.textContent='Theme: '+choice)}
  function notify(text){let node=document.getElementById('fury-shell-status');if(!node){node=document.createElement('p');node.id='fury-shell-status';node.setAttribute('role','status');document.body.append(node)}node.textContent=text;clearTimeout(notify.timer);notify.timer=setTimeout(()=>node.remove(),6000)}
  function fullscreen(){if(document.fullscreenElement)document.exitFullscreen().catch(()=>notify('Use Escape to leave fullscreen.'));else if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>notify('Fullscreen is unavailable here. The workspace remains usable in this window.'));else notify('Use your browser’s fullscreen control if available.')}
@@ -25,9 +25,13 @@
    const details=document.createElement('details');details.className='atlas-secondary';details.innerHTML='<summary>Camera, devices & model details</summary><div class="atlas-secondary-content"></div>';
    const content=details.lastElementChild;for(const selector of ['.camera-block','.model-strip']){const node=document.querySelector(selector);if(node)content.append(node)}
    document.querySelector('.action-bar')?.before(details);
+   const fitAtlas=()=>{if(innerWidth>=1000&&!document.body.classList.contains('record-vertical')&&document.getElementById('orb-setting')?.checked){const chart=document.querySelector('.chart-block');if(chart)document.querySelector('.left-column')?.append(chart)}};
+   requestAnimationFrame(fitAtlas);addEventListener('resize',()=>requestAnimationFrame(fitAtlas));new MutationObserver(()=>requestAnimationFrame(fitAtlas)).observe(document.body,{attributes:true,attributeFilter:['class']});
   }
   if(document.body.dataset.hpApp==='factory'){if(new URLSearchParams(location.search).get('station')==='1'&&!document.getElementById('product').disabled){document.getElementById('product').value='short';document.getElementById('product').dispatchEvent(new Event('change'))}factoryWorkspace();}
   const main=document.querySelector('main');if(main&&!main.id)main.id='main';
+  if(!document.querySelector('link[href="/showcase-assets/mission.css"]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/showcase-assets/mission.css';document.head.append(css)}
+  if(!document.querySelector('script[src="/showcase-assets/mission.js"]')){const js=document.createElement('script');js.src='/showcase-assets/mission.js';document.head.append(js)}
  }
  function factoryWorkspace(){
   const main=document.querySelector('main'),progress=document.querySelector('.presenter-progress'),metrics=document.querySelector('main>.metrics');progress.tabIndex=0;progress.setAttribute('role','region');progress.setAttribute('aria-label','Build progress and token metrics');if(metrics){progress.querySelector('#stage-explanation').after(metrics);const notes=['Observed output over 5 s','Final endpoint usage','Two development slots','Final endpoint usage','Checked versions'];[...metrics.querySelectorAll('article span')].forEach((span,i)=>{span.title=span.textContent;span.textContent=notes[i]||span.textContent})}
