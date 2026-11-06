@@ -134,7 +134,7 @@
     }
   ],
   "bytes": 34201436033,
-  "qualification_status": "blocked",
+  "qualification_status": "in progress after owner-approved simplification",
   "selected_profile": null,
   "reviewed_adapters": [
     {
@@ -221,5 +221,6 @@
         }
       ]
     }
-  ]
+  ],
+  "candidate_profile": "longlive"
 }

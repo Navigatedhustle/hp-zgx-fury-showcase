@@ -35,3 +35,28 @@ def test_ambiguous_ids_and_native_list_tags_are_not_eligible():
 
 def test_passing_review_can_preserve_existing_source():
     assert reconstruct(plan(), SOURCE)['files'] == {'styles.css': SOURCE['styles.css']}
+
+
+def test_structured_color_repair_compiles_punctuation_and_preserves_source():
+    patch = {'summary': 'Repair actual contrast', 'list_ids': [], 'css_rules': [
+        {'selector': '.reservation-date', 'property': 'color', 'value': '#173c34'},
+        {'selector': '.reservation-date', 'property': 'opacity', 'value': '1'}]}
+    css = reconstruct(json.dumps(patch), SOURCE)['files']['styles.css']
+    assert css.startswith(SOURCE['styles.css'])
+    assert '.reservation-date {color:#173c34 !important;}' in css
+    assert '.reservation-date {opacity:1 !important;}' in css
+
+
+@pytest.mark.parametrize('selector,prop,value', [
+    ('.reservation-date', 'color', '#173c34 " opacity: 1 "'),
+    ('.reservation-date', 'color', '#173c34; display:none'),
+    ('form', 'display', 'none'),
+    ('form', 'opacity', '0'),
+    ('.reservation-date', 'font-size', '0'),
+    ('body', 'background-image', 'url(https://example.com)'),
+    ('body{display:none}', 'color', '#111')])
+def test_structured_repair_rejects_malformed_css_and_hidden_controls(selector, prop, value):
+    patch = {'summary': 'Rejected repair', 'list_ids': [], 'css_rules': [
+        {'selector': selector, 'property': prop, 'value': value}]}
+    with pytest.raises(ValueError):
+        reconstruct(json.dumps(patch), SOURCE)

@@ -5,10 +5,53 @@ import time
 import subprocess
 import ctypes
 import ctypes.util
+import json
+import hashlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WAN = ROOT / 'models/Wan2.2-TI2V-5B-Diffusers'
+CREATIVE_CONFIG = json.loads((ROOT / 'config/creative-models.json').read_text())
+VIDEO_PROFILE = CREATIVE_CONFIG.get('candidate_profile', 'base')
+VIDEO_MODEL = 'Wan2.2-TI2V-5B' + (' + LongLive-Plug few-step 1.0 / CFG 0.5' if VIDEO_PROFILE == 'longlive' else '')
+
+
+def fuse_longlive(transformer):
+    """Fuse the pinned, same-backbone Apache-2.0 adapters on Grace, once."""
+    import torch
+    from safetensors.torch import load_file
+    from diffusers.loaders.lora_conversion_utils import _convert_non_diffusers_wan_lora_to_diffusers
+    states = []
+    for entry, scale in zip(CREATIVE_CONFIG['reviewed_adapters'], (1.0, .5)):
+        folder = ROOT / 'models' / entry['repo'].split('/')[-1]
+        path = folder / 'adapter_model.safetensors'
+        expected = next(f['sha256'] for f in entry['files'] if f['path'] == path.name)
+        with path.open('rb') as stream:
+            if hashlib.file_digest(stream, 'sha256').hexdigest() != expected:
+                raise RuntimeError('Pinned video adapter checksum failed')
+        raw = load_file(str(path), device='cpu')
+        if len(raw) != 600 or not all(k.startswith('base_model.model.blocks.') for k in raw):
+            raise RuntimeError('Unexpected video adapter architecture')
+        original = {'diffusion_model.' + k.removeprefix('base_model.model.'): v for k, v in raw.items()}
+        states.append((_convert_non_diffusers_wan_lora_to_diffusers(original), scale))
+    modules = {k.removesuffix('.lora_A.weight').removeprefix('transformer.') for k in states[0][0] if k.endswith('.lora_A.weight')}
+    if len(modules) != 300 or any(set(state) != set(states[0][0]) for state, _ in states):
+        raise RuntimeError('Video adapters do not cover the matching 300 linear modules')
+    with torch.no_grad():
+        for name in sorted(modules):
+            weight = transformer.get_submodule(name).weight
+            if weight.device.type != 'cpu':
+                raise RuntimeError('Video adapters must be fused on Grace before GPU offload')
+            merged = weight.float()
+            for state, scale in states:
+                a, b = (state['transformer.' + name + '.lora_' + suffix + '.weight'] for suffix in ('A', 'B'))
+                delta = b.float() @ a.float()
+                if delta.shape != weight.shape:
+                    raise RuntimeError('Video adapter shape mismatch')
+                merged = merged + scale * delta
+            if not torch.isfinite(merged).all():
+                raise RuntimeError('Nonfinite fused video weights')
+            weight.copy_(merged.to(weight.dtype))
 
 
 def bind_grace():
@@ -80,6 +123,7 @@ class CreativeLane:
     def load(self):
         self.grace_node = bind_grace()
         import torch
+        torch.set_num_threads(8)
         from diffusers import Flux2KleinPipeline
         self.flux = Flux2KleinPipeline.from_pretrained(str(ROOT / 'models/FLUX.2-klein-4B'), torch_dtype=torch.bfloat16, local_files_only=True)
         copy_cpu_weights(self.flux)
@@ -98,6 +142,8 @@ class CreativeLane:
         vae = AutoencoderKLWan.from_pretrained(str(WAN), subfolder='vae', torch_dtype=torch.float32, local_files_only=True)
         self.wan = WanImageToVideoPipeline.from_pretrained(str(WAN), vae=vae, torch_dtype=torch.bfloat16, image_encoder=None, image_processor=None, local_files_only=True)
         copy_cpu_weights(self.wan)
+        if VIDEO_PROFILE == 'longlive':
+            fuse_longlive(self.wan.transformer)
         self.wan.vae.enable_tiling()
         self.wan.enable_model_cpu_offload()
 
@@ -119,8 +165,9 @@ class CreativeLane:
         torch.cuda.reset_peak_memory_stats()
         job['allocator_budget_bytes'] = budget
         pipeline = self.wan if kind == 'video' else self.flux
-        steps = options.get('steps', 50) if kind == 'video' else 4
+        steps = options.get('steps', 4 if VIDEO_PROFILE == 'longlive' else 50) if kind == 'video' else 4
         job.update(steps_done=0, steps_total=steps, width=options.get('width', 768), height=options.get('height', 768))
+        if kind == 'video':job.update(profile=VIDEO_PROFILE, guidance=options.get('guidance', 1.0 if VIDEO_PROFILE == 'longlive' else 5.0))
 
         def checkpoint(pipe, step, timestep, kwargs):
             if stop.is_set():
@@ -133,7 +180,7 @@ class CreativeLane:
 
         began = time.monotonic()
         try:
-            args = dict(prompt=prompt, height=job['height'], width=job['width'], num_inference_steps=steps, guidance_scale=options.get('guidance', 5.0) if kind == 'video' else 1.0, generator=torch.Generator('cuda').manual_seed(options.get('seed', 42)), callback_on_step_end=checkpoint)
+            args = dict(prompt=prompt, height=job['height'], width=job['width'], num_inference_steps=steps, guidance_scale=job['guidance'] if kind == 'video' else 1.0, generator=torch.Generator('cuda').manual_seed(options.get('seed', 42)), callback_on_step_end=checkpoint)
             if options.get('reference') is not None:
                 args['image'] = options['reference']
             if kind == 'video':
@@ -158,4 +205,4 @@ class CreativeLane:
     def placement(self):
         def device(module):
             return str(next(module.parameters()).device) if module is not None else 'not loaded'
-        return {'flux_loaded': self.flux is not None, 'video_loaded': self.wan is not None, 'flux_transformer': device(self.flux.transformer) if self.flux else 'not loaded', 'video_transformer': device(self.wan.transformer) if self.wan else 'not loaded', 'grace_cpu_node': self.grace_node, 'policy': 'Resident CPU-offloaded models bound to Grace; one active GPU job across images and video'}
+        return {'flux_loaded': self.flux is not None, 'video_loaded': self.wan is not None, 'video_profile': VIDEO_PROFILE, 'video_model': VIDEO_MODEL, 'flux_transformer': device(self.flux.transformer) if self.flux else 'not loaded', 'video_transformer': device(self.wan.transformer) if self.wan else 'not loaded', 'grace_cpu_node': self.grace_node, 'policy': 'Resident CPU-offloaded models bound to Grace; one active GPU job across images and video'}

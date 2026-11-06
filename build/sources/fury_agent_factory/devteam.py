@@ -6,7 +6,7 @@ from collections import deque
 import httpx
 from devteam_sandbox import execute,available,check_javascript,check_backend_contract,check_generated_qa
 from devteam_browser import check_frontend,check_visual_frontend
-from visual_source_edits import reconstruct as reconstruct_visual_source,allowed_lists
+from visual_source_edits import reconstruct as reconstruct_visual_source,allowed_lists,CSS_PROPERTIES,CSS_VALUES,allowed_style_selectors
 ROOT=Path(__file__).resolve().parent
 ALLOWED={'index.html','styles.css','app.js','backend.py','test_backend.py','README.md','architecture.md','contract_review.md'}
 SPECIALIST='unsloth/Qwen3.6-27B-NVFP4';LEAD='fury-lead'
@@ -278,9 +278,9 @@ class DevRun:
      if title=='Visual acceptance':
       try:
        async with asyncio.timeout(45):await check_visual_frontend(source,workspace/'visual-precheck',self.stop_event)
-       prompt+='\nIndependent desktop/mobile and empty/populated accessibility precheck PASSED. Preserve working code. If the visual design is already good, return list_ids:[] and css_lines:[] with a truthful review summary. Do not make arbitrary edits just to change a file.'
+       prompt+='\nIndependent desktop/mobile and empty/populated accessibility precheck PASSED. Preserve working code. If the visual design is already good, return list_ids:[] and css_rules:[] with a truthful review summary. Do not make arbitrary edits just to change a file.'
       except (ValueError,RuntimeError) as error:
-       prompt+='\nActual independent visual precheck failed: '+str(error)[:1800]+' Repair these measured defects with the bounded list-container and CSS override plan; preserve application logic and use actual selectors.'
+       prompt+='\nActual independent visual precheck failed: '+str(error)[:4000]+' Repair these measured defects with the bounded list-container and CSS override plan; preserve application logic and use actual selectors.'
      feedback='';repair_source=source;visual_candidate_changed=False
      for attempt in range(2):
       validation=None
@@ -375,12 +375,14 @@ class DevRun:
   payload['response_format']={'type':'json_schema','json_schema':{'name':'file_patch','strict':True,'schema':{'type':'object','properties':{'summary':{'type':'string','maxLength':400},'files':{'type':'object','properties':{name:{'type':'string'} for name in names},'additionalProperties':False,'required':names}},'required':['summary','files'],'additionalProperties':False}}}
   if title=='Visual acceptance':
    call['output_protocol']='visual_repair_plan'
-   payload['messages'][0]['content']=contract+' Complete visual acceptance of this already designed working fictional application. Return JSON with summary, list_ids, css_lines. No application source rewrites. list_ids chooses only eligible existing container IDs: the coordinator gives those generic containers role=list and their existing direct children role=listitem, including asynchronous empty/populated states, without replacing nodes or changing any event/API logic. Select the actual containers needed to fix list/table role defects; choosing all eligible lists is safe. css_lines contains at most 40 small CSS override lines appended to the unchanged stylesheet. Fix measured contrast, overflow or target size using actual selectors; never hide controls or suppress error messages. For color-contrast defects explicitly set opacity:1 as well as a sufficiently contrasting text color: on white/light backgrounds use the existing deep ink #173c34 or #222, not a muted midtone; on dark backgrounds use #f7fafc. Increasing font weight alone is insufficient. For responsive flex overflow, make BOTH the overflowing children and their reported flex parents wrap and shrink with flex-wrap:wrap and min-width:0; fixing only children of a nowrap parent is insufficient. Encode double quotes as @DQ@ and backslashes as @BS@ in CSS source. Do not redesign an already working page. Keep summary plain prose. For a passing design return empty arrays. Backend, HTML and application logic are read-only. No markdown.'
-   eligible=allowed_lists(source)
-   context={'ticket':task,'eligible_list_ids':eligible,'read_only_reference_files':{name:content for name,content in source.items() if name in ('index.html','styles.css')}}
+   payload['messages'][0]['content']=contract+' Complete visual acceptance of this working fictional application. Return summary, list_ids and css_rules. No application rewrites. list_ids selects eligible generic containers for supplied role=list/listitem compilation, preserving nodes/listeners/API logic. css_rules contains only the declarations needed for measured defects, each with an eligible selector, property and value. No media queries, display none or unrelated redesign. The coordinator serializes valid CSS with punctuation and important priority; provide plain values ONLY, no braces, semicolons, quotes, importance marker or encoding tokens. Fix ALL reported empty AND populated state defects. For contrast use color #173c34 and opacity 1 on light backgrounds, #f7fafc and opacity 1 on dark backgrounds; font weight alone is insufficient. Use actual selectors from source and diagnostics. For flex overflow fix both parent and child: flex-wrap wrap, min-width 0. Preserve controls, errors, content, backend and application logic. Only the artwork fallback may be hidden when real supplied artwork is present. Keep the existing design. For an already passing page return empty arrays. No markdown.'
+   eligible=allowed_lists(source);selectors=allowed_style_selectors(source)
+   payload['temperature']=0.0
+   task=task.split('Actual independent visual precheck failed: ',1)[-1] if 'Actual independent visual precheck failed: ' in task else task
+   context={'eligible_style_selectors':selectors,'ticket':task,'eligible_list_ids':eligible,'read_only_reference_files':{name:content for name,content in source.items() if name in ('index.html','styles.css')}}
    call['reference_files']=sorted(context['read_only_reference_files'])
    payload['messages'][1]['content']=json.dumps(context)
-   payload['response_format']['json_schema']['schema']={'type':'object','properties':{'summary':{'type':'string','maxLength':400},'list_ids':{'type':'array','maxItems':min(8,len(eligible)),'items':{'type':'string',**({'enum':eligible} if eligible else {})}},'css_lines':{'type':'array','maxItems':40,'items':{'type':'string','maxLength':500}}},'required':['summary','list_ids','css_lines'],'additionalProperties':False}
+   payload['response_format']['json_schema']['schema']={'type':'object','properties':{'summary':{'type':'string','maxLength':400},'list_ids':{'type':'array','maxItems':min(8,len(eligible)),'items':{'type':'string',**({'enum':eligible} if eligible else {})}},'css_rules':{'type':'array','maxItems':40,'items':{'type':'object','properties':{'selector':{'type':'string','enum':selectors},'property':{'type':'string','enum':list(CSS_PROPERTIES)},'value':{'type':'string','enum':list(CSS_VALUES)}},'required':['selector','property','value'],'additionalProperties':False}}},'required':['summary','list_ids','css_rules'],'additionalProperties':False}
   edit_name=None
   repair_name=names[0] if getattr(self,'travel',False) and title.startswith('Repair ') and len(names)==1 and names[0] in source and names[0].endswith('.py') else None
   text='';first=None

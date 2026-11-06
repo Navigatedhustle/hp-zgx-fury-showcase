@@ -5,7 +5,7 @@ from fastapi import FastAPI,HTTPException
 from fastapi.responses import HTMLResponse,FileResponse
 from pydantic import BaseModel,Field
 from typing import Literal
-from showcase_app.creative import CreativeLane,reference_image
+from showcase_app.creative import CreativeLane,reference_image,VIDEO_MODEL,VIDEO_PROFILE
 from showcase_app.gateway import record,execution_start,execution_end
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'state/images';OUT.mkdir(parents=True,exist_ok=True)
 lane=CreativeLane();pipe=None;jobs={};queue=asyncio.Queue(maxsize=3)
@@ -60,14 +60,14 @@ class Edit(Prompt):
 class Video(Prompt):
  image:str=Field(min_length=20,max_length=12000000)
  height:Literal[704,480]=704
- steps:int=Field(default=50,ge=1,le=50)
- guidance:float=Field(default=5.0,ge=1,le=6)
+ steps:int=Field(default=4 if VIDEO_PROFILE=='longlive' else 50,ge=1,le=50)
+ guidance:float=Field(default=1.0 if VIDEO_PROFILE=='longlive' else 5.0,ge=1,le=6)
 
 def enqueue_reference(p,kind):
  if queue.full():raise HTTPException(429,'Creative queue full; try after current work completes')
  try:reference=reference_image(p.image)
  except (ValueError,OSError):raise HTTPException(422,'Invalid bounded reference image')
- cid=uuid.uuid4().hex;model='Wan2.2-TI2V-5B' if kind=='video' else 'FLUX.2-klein-4B'
+ cid=uuid.uuid4().hex;model=VIDEO_MODEL if kind=='video' else 'FLUX.2-klein-4B'
  options={'reference':reference,'height':p.height,'width':1280 if kind=='video' and p.height==704 else 832 if kind=='video' else p.width}
  if kind=='video':options.update(steps=p.steps,guidance=p.guidance)
  jobs[cid]={'kind':kind,'status':'queued','created':time.time(),'model':model,'location':'Fury + Grace CPU offload','_stop':threading.Event()}

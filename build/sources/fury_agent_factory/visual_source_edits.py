@@ -1,5 +1,6 @@
 """Compile bounded visual repair plans without rewriting working application logic."""
 import json
+import re
 from html.parser import HTMLParser
 
 
@@ -23,8 +24,48 @@ def allowed_lists(source):
     return sorted(value for value in set(parsed.ids) if parsed.all_ids.count(value) == 1)
 
 
+CSS_VALUES = ('#173c34', '#111111', '#ffffff', '#f7fafc', '#0b1220', '1', '0', '2', '3', '100%', 'auto', 'relative', 'absolute', 'static', 'wrap', 'anywhere', 'break-word', 'cover', 'center', 'block', 'flex', 'grid', 'inline-block', '1fr', 'minmax(0, 1fr)', 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', 'var(--fury-artwork-hero)', '400', '500', '600', '700', '14px', '16px', '18px', '20px', '1.5', '0.5rem', '1rem', '1.5rem', '0.5rem 1rem', '1 1 280px', '1 1 300px')
+
+
+def allowed_style_selectors(source):
+    text = '\n'.join(source.values())
+    return sorted(set(re.findall(r'[.#][A-Za-z_][A-Za-z0-9_-]*', text)) | {'body', 'main', 'nav', 'header', 'form', 'img', 'section', 'article'})
+
+
+CSS_PROPERTIES = ('color', 'opacity', 'background-color', 'background-image', 'border-color', 'outline-color', 'font-size', 'font-weight', 'line-height', 'min-width', 'max-width', 'width', 'min-height', 'height', 'padding', 'gap', 'flex', 'flex-wrap', 'overflow-wrap', 'word-break', 'grid-template-columns', 'position', 'inset', 'z-index', 'object-fit', 'object-position', 'display')
+
+
+def structured_css(rules):
+    if not isinstance(rules, list) or len(rules) > 40:
+        raise ValueError('Expected up to 40 structured CSS declarations')
+    lines = []
+    for rule in rules:
+        if not isinstance(rule, dict) or set(rule) != {'selector', 'property', 'value'}:
+            raise ValueError('CSS declaration needs selector, property and value')
+        selector, prop, value = rule['selector'], rule['property'], rule['value']
+        if (not isinstance(selector, str) or not 1 <= len(selector) <= 180
+                or not re.fullmatch(r"[a-zA-Z0-9_#.,:>+~*()\[\]=\"' -]+", selector)
+                or prop not in CSS_PROPERTIES or not isinstance(value, str)
+                or not 1 <= len(value) <= 160 or not re.fullmatch(r'[a-zA-Z0-9#%().,/ _+!-]+', value)
+                or 'url(' in value.lower() or '!important' in value.lower()):
+            raise ValueError('Invalid bounded CSS declaration: '+repr(rule)+'. Use a plain element selector and plain value; no media query or CSS punctuation.')
+        if prop == 'display' and value == 'none':
+            if selector != '.hero-fallback':
+                raise ValueError('Visual repair cannot hide application controls or content')
+            selector = ':root[style*="--fury-artwork-hero"] .hero-fallback'
+        if (prop == 'opacity' and value != '1') or (prop in ('font-size', 'width', 'height', 'max-width') and value == '0'):
+            raise ValueError('Visual repair cannot make text or controls invisible')
+        lines.append(selector + ' {' + prop + ':' + value + ' !important;}')
+    return lines
+
+
 def reconstruct(text, source):
     plan = json.loads(text)
+    if isinstance(plan, dict) and 'css_rules' in plan:
+        if set(plan) != {'summary', 'list_ids', 'css_rules'}:
+            raise ValueError('Expected summary, list_ids and css_rules')
+        plan = {**plan, 'css_lines': structured_css(plan['css_rules'])}
+        del plan['css_rules']
     if (not isinstance(plan, dict) or set(plan) != {'summary', 'list_ids', 'css_lines'}
             or not isinstance(plan['summary'], str) or len(plan['summary']) > 400
             or not isinstance(plan['list_ids'], list) or len(plan['list_ids']) > 8

@@ -96,18 +96,26 @@ async def audit_visual(page,frame):
   if geometry['content']>geometry['viewport']+1:problems.append('Fix actual responsive overflow in HTML/CSS, preserving controls: '+str(geometry))
   result=await frame.locator('body').evaluate('async body=>await axe.run(body,{runOnly:{type:"tag",values:["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]}})')
   for violation in result['violations']:
-   node=violation['nodes'][0];key=(violation['id'],node['html'])
-   if key in seen_issues:continue
-   seen_issues.add(key)
-   problems.append('Accessibility '+violation['id']+': '+str({'html':node['html'][:160],'why':node.get('failureSummary','')[:300]}))
+   for node in violation['nodes']:
+    # Each violating element class matters: reporting only nodes[0] hid the
+    # reservation-date defect behind hotel-price in the same axe violation.
+    classes=re.search(r'class=[\"\']([^\"\']+)',node['html'])
+    identity=classes.group(1) if classes else node['html'][:100]
+    key=(violation['id'],identity)
+    if key in seen_issues:continue
+    seen_issues.add(key)
+    problems.append('Accessibility '+violation['id']+': '+str({'html':node['html'][:120],'why':node.get('failureSummary','')[:300]}))
  if problems:
   # Keep the same criteria, but disclose mobile overflow before duplicated a11y details.
   problems.sort(key=lambda problem:0 if problem.startswith('Fix actual responsive overflow') else 1)
   raise ValueError('Fix all measured desktop/mobile visual defects, preserving every feature: '+' | '.join(problems))
 
 async def check_visual_frontend(code,data,stop=None):
- await check_frontend(code,data/'empty',stop,interactions=False,visual=True,seed_reservation=False)
- await check_frontend(code,data/'reserved',stop,visual=True)
+ problems=[]
+ for name,options in [('empty',{'interactions':False,'seed_reservation':False}),('reserved',{})]:
+  try:await check_frontend(code,data/name,stop,visual=True,**options)
+  except ValueError as error:problems.append(name+' state: '+str(error))
+ if problems:raise ValueError(' | '.join(problems))
 
 
 async def reveal_control(frame,control):
