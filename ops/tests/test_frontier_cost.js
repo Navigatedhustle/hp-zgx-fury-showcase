@@ -1,7 +1,7 @@
 /* Independent arithmetic cases for the public monthly comparison. */
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {calculate}=require('../../showcase_app/assets/frontier-cost.js');
+const {calculate,electricity}=require('../../showcase_app/assets/frontier-cost.js');
 const pricing=require('../../config/event-pricing.json');
 const counts={prompts:10000,images:1000,video:1000,vision:5000,pages:1000};
 const power={watts:1200,hours:40,tariff:.25};
@@ -37,4 +37,15 @@ test('overflow never appears as a numeric cost or a zero-cost claim',()=>{
  assert.equal(calculate(pricing,{...counts,prompts:1e308},power).invalid,true);
  assert.equal(calculate(pricing,{...counts,prompts:1e304},power).invalid,true);
  assert.equal(calculate(pricing,counts,{...power,watts:1e308,hours:1e308}).local,null);
+});
+test('electricity compares explicit same-workload kWh, independent of API prices',()=>{
+ assert.deepEqual(electricity(1200,40,240),{local:48,cloud:240,ratio:5,difference:192});
+ assert.deepEqual(electricity(1200,40,2.4),{local:48,cloud:2.4,ratio:.049999999999999996,difference:-45.6});
+});
+test('unknown electricity is never a zero or an invented efficiency ratio',()=>{
+ for(const v of ['',null,undefined,-1,Infinity,'bad'])assert.equal(electricity(1200,40,v).ratio,null);
+ assert.equal(electricity(0,40,12).ratio,null);
+ assert.deepEqual(electricity(1200,40,0),{local:48,cloud:0,ratio:0,difference:-48});
+ assert.equal(electricity(1e308,1e308,1).local,null);
+ assert.equal(electricity(1e-300,1,1e308).ratio,null);
 });

@@ -45,10 +45,10 @@ async def request_body(request):
 def select(prefix,requested):
  if prefix.startswith('lead/'):
   demo=prefix.split('/')[1]
-  if demo not in ('vision','translate','trailer'):raise HTTPException(400,'Unknown brief-call demo')
+  if demo not in ('vision','translate','trailer','skin'):raise HTTPException(400,'Unknown brief-call demo')
   return demo,LEAD
  demo=prefix.split('/')[0] if '/' in prefix else ('atlas' if prefix=='atlas' else 'slides')
- if demo not in ('atlas','agent','slides','devteam','vision','translate','trailer'):raise HTTPException(400,'Unknown demo')
+ if demo not in ('atlas','agent','slides','devteam','vision','translate','trailer','skin'):raise HTTPException(400,'Unknown demo')
  if demo!='devteam':return demo,MODEL
  if requested not in BACKENDS:raise HTTPException(400,'Unknown local model alias')
  return 'agent',requested
@@ -143,7 +143,7 @@ async def chat(prefix:str,request:Request):
     raw=await response.aread();payload=json.loads(raw)
     if payload.get('error'):raise RuntimeError('Upstream error')
     usage=payload.get('usage')
-    if demo in ('vision','translate','trailer'):
+    if demo in ('vision','translate','trailer','skin'):
      payload['fury_routing']={'requested':requested,'model':alias,'reason':reason};raw=json.dumps(payload).encode()
     yield raw
    status='complete'

@@ -3,29 +3,40 @@ from pathlib import Path
 import httpx
 from fastapi import FastAPI, Request, HTTPException
 from contextlib import asynccontextmanager
-from showcase_app.event import Monitor, authorized
+from showcase_app.event import Monitor, station_origin_allowed
 from fastapi.responses import FileResponse,HTMLResponse,StreamingResponse,JSONResponse
 from showcase_app.gateway import connect,ROOT
 from fastapi.staticfiles import StaticFiles
 from showcase_app.ui import ASSETS
 from showcase_app.costs import comparison
-from showcase_app import workloads,trailer,samples
+from showcase_app import workloads,trailer,samples,skin_runtime as skin
 from showcase_app.creative_auth import private_key
 monitor=Monitor()
 @asynccontextmanager
 async def lifespan(app):
- trailer.visitors.start();private_key()
+ trailer.visitors.start();private_key();skin.initialize()
  task=asyncio.create_task(monitor.run(collect_live))
  privacy=asyncio.create_task(trailer.sweep())
  try:yield
  finally:
+  await skin.shutdown()
   for sid in list(trailer.visitors.sessions):await trailer.erase(sid)
   tasks=[task,privacy,*[j['_task'] for j in workloads.JOBS.values() if not j['_task'].done()]]
   for pending in tasks:pending.cancel()
   await asyncio.gather(*tasks,return_exceptions=True)
 app=FastAPI(lifespan=lifespan)
 app.include_router(workloads.router);app.include_router(trailer.router);app.include_router(samples.router)
+if skin.service is not None:app.include_router(skin.service.router)
 app.mount("/showcase-assets",StaticFiles(directory=ASSETS),name="showcase-assets")
+
+@app.post('/api/appearance/reset')
+async def default_appearance(request:Request):
+ # Recovery deliberately has no dependency on the optional skin service.
+ if not station_origin_allowed(request.headers.get('origin'),request.url.hostname):raise HTTPException(403,'Use a local station')
+ try:(ROOT/'state/skin/active.json').unlink(missing_ok=True)
+ except OSError:raise HTTPException(503,'Appearance storage unavailable; open /demos?skin=off') from None
+ return {'active':None}
+
 def sync_agent():
  for path in (ROOT/'build/sources/fury_agent_factory/runs').glob('*.sqlite'):
   try:
@@ -63,6 +74,8 @@ async def collect_live():
  from showcase_app.model_hub import models
  measured['models']=models(live);measured['workflow_jobs']=workloads.summaries()
  measured['factory_jobs']=services.get('factory_jobs',{}).get('data',{}).get('jobs',[])
+ live['skin']=skin.snapshot()
+ measured['public_web_lookups']=skin.public_count()
  return live
 @app.get('/')
 async def home():return FileResponse(ROOT/'showcase_app/launcher.html')
@@ -127,7 +140,7 @@ async def model_hub():
  from showcase_app.model_hub import models
  return {'models':models(monitor.latest_live or {}),'as_of':(monitor.latest_live or {}).get('timestamp')}
 
-PROOF_FILES={'ops/runtime.py','config/gb300.json','config/model-pins.json','config/creative-models.json','showcase_app/gateway.py','build/sources/fury_agent_factory/devteam_sandbox.py','showcase_app/visitor_store.py','AGENTS.md','docs/ASSET-MANIFEST.md'}
+PROOF_FILES={'showcase_app/skin_research.py','ops/runtime.py','config/gb300.json','config/model-pins.json','config/creative-models.json','showcase_app/gateway.py','build/sources/fury_agent_factory/devteam_sandbox.py','showcase_app/visitor_store.py','AGENTS.md','docs/ASSET-MANIFEST.md'}
 @app.get('/api/source/{name:path}')
 async def source_proof(name:str):
  if name not in PROOF_FILES:raise HTTPException(404)
@@ -172,7 +185,7 @@ async def event_telemetry():
 
 @app.post('/api/event/reset')
 async def reset_event(request:Request):
- if not authorized(request.headers.get('x-fury-presenter')):raise HTTPException(403,'Presenter code required; retrieve it through your authorized SSH terminal')
+ if not station_origin_allowed(request.headers.get('origin'),request.url.hostname):raise HTTPException(403,'Use the event controls on this station')
  body=await request.json()
  try:session=await asyncio.to_thread(monitor.store.reset,body.get('name','Conference session'))
  except (ValueError,AttributeError):raise HTTPException(422,'Use an event name between 1 and 80 characters')

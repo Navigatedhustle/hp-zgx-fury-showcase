@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Linux process supervisor: identity-checked sessions, readiness and verified shutdown."""
-import argparse,fcntl,json,os,re,signal,socket,subprocess,sys,time,urllib.request,urllib.error
+import argparse,fcntl,json,math,os,re,signal,socket,subprocess,sys,time,urllib.request,urllib.error
 from pathlib import Path
 from runtime import ROOT,COMPONENTS,SERVE,environment
 STATE=ROOT/'state';STOP_REQUEST=STATE/'stop-request';PIDFILE=STATE/'processes.json';REGISTRY=STATE/'supervisor.json'
@@ -219,7 +219,20 @@ def gpu_status():
   return {'verified':True,'summary':summary.stdout.strip(),'processes':apps.stdout.strip().splitlines() if apps.stdout.strip() else []}
  except (OSError,subprocess.TimeoutExpired):return {'verified':False,'summary':'nvidia-smi unavailable','processes':[]}
 
+def skin_status():
+ try:
+  customer=json.loads((STATE/'skin/active.json').read_text())
+  if not isinstance(customer,dict) or not isinstance(customer.get('name'),str) or not 1<=len(customer['name'])<=80 or any(ord(c)<32 for c in customer['name']):return 'default · HP ZGX Fury'
+  try:hours=json.loads((ROOT/'config/skin.json').read_text()).get('idle_hours',8)
+  except (OSError,ValueError,AttributeError):hours=8
+  if type(hours) not in (int,float) or not math.isfinite(hours) or not 0<hours<=168:hours=8
+  if time.time()-(STATE/'skin/active.json').stat().st_mtime<hours*3600:return customer['name']
+ except (OSError,ValueError,KeyError,TypeError):pass
+ return 'default · HP ZGX Fury'
+
 def status():
+ print('Customer skin:',skin_status())
+ print('Presenter controls: available without a PIN')
  print(f'{"COMPONENT":12} {"PORT":6} {"PID":8} {"PROCESS / READINESS":24} MODEL')
  for name,spec in COMPONENTS.items():
   row=discover(name);healthy=ready(name) if row else False
