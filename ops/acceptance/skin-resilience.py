@@ -8,10 +8,36 @@ import argparse
 import asyncio
 import json
 from pathlib import Path
+import httpx
 from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[2]
 HOST='http://localhost:8080'
+
+
+async def live_state_faults():
+ """Exercise the real collector with damaged fictional/default state only."""
+ path=ROOT/'state/skin/active.json';original=path.read_bytes() if path.exists() else None
+ if original and json.loads(original).get('name')!='Northwind Beverages':
+  raise RuntimeError('Use default appearance or the fictional fixture before live state checks')
+ async with httpx.AsyncClient(trust_env=False) as client:
+  try:
+   before=(await client.get(HOST+'/api/live')).json()['timestamp']
+   for broken in ('[]','not json','{"name":"Northwind Beverages"}'):
+    temporary=path.with_suffix('.acceptance.tmp');temporary.write_text(broken);temporary.replace(path)
+    response=await client.get(HOST+'/skin/state');assert response.status_code==200
+    assert response.json()['active'] is None
+    assert (await client.get(HOST+'/skin/active.css')).text==':root{}'
+   await asyncio.sleep(3)
+   live=(await client.get(HOST+'/api/live')).json()
+   assert live['timestamp']>before
+   assert live['skin']['active'] is None
+   assert live['telemetry']['external_api_calls']==0
+   assert (await client.get(HOST+'/api/event')).json()['timestamp']>before
+   return {'damaged_json_defaulted':True,'collector_and_sse_source_advance':True,'external_ai_api_calls':0}
+  finally:
+   if original is None:path.unlink(missing_ok=True)
+   else:path.write_bytes(original)
 
 
 async def launcher(page):
@@ -30,7 +56,7 @@ async def main(output):
  async with async_playwright() as p:
   for engine in ('chromium','firefox'):
    browser=await getattr(p,engine).launch(**({'args':['--no-sandbox']} if engine=='chromium' else {}))
-   for fault in ('missing_script','missing_styles','initialization_error','service_503','invalid_state','timeout','late_poll','late_start','safe_mode'):
+   for fault in ('missing_script','missing_styles','initialization_error','service_503','invalid_state','unknown_counter','timeout','late_poll','late_start','safe_mode'):
     context=await browser.new_context(viewport={'width':1366,'height':768});page=await context.new_page();errors=[]
     page.on('pageerror',lambda error:errors.append(str(error)))
     if fault=='missing_script':await context.route('**/showcase-assets/skin.js',lambda route:route.abort())
@@ -42,6 +68,9 @@ async def main(output):
      await context.route('**/showcase-assets/skin.js',broken_script)
     if fault=='service_503':await context.route('**/skin/**',lambda route:route.fulfill(status=503,json={'detail':'Customization unavailable'}))
     if fault=='invalid_state':await context.route('**/skin/state',lambda route:route.fulfill(json={'active':{'name':'Northwind Beverages','theme':{'variables':{'--mc-top':'#ffffff'}}},'revision':'broken'}))
+    if fault=='unknown_counter':
+     await context.route('**/skin/state',lambda route:route.fulfill(json={'active':None,'public_web_lookups':None,'revision':'unknown-counter'}))
+     await context.route('**/showcase-telemetry',lambda route:route.abort())
     if fault=='timeout':
      await context.add_init_script("""const original=window.fetch;window.fetch=(url,options={})=>String(url).startsWith('/skin/')?new Promise((resolve,reject)=>{options.signal?.addEventListener('abort',()=>reject(new DOMException('Timed out','AbortError')),{once:true})}):original(url,options)""")
     pending=asyncio.Event();release=asyncio.Event()
@@ -58,6 +87,10 @@ async def main(output):
     if fault=='safe_mode':page.on('request',lambda request:requests.append(request.url))
     await page.goto(HOST+'/demos'+('?skin=off' if fault=='safe_mode' else ''))
     await page.locator('#mc-default-appearance').wait_for()
+    if fault=='unknown_counter':
+     await page.locator('#skin-reset').wait_for(state='attached')
+     await page.click('#skin-customize');assert await page.locator('#skin-web-count').inner_text()=='unknown'
+     await page.click('#skin-close')
     if fault in ('late_poll','late_start','timeout'):
      await page.click('#skin-customize');await page.fill('#skin-name','Northwind Beverages')
      await page.locator('#skin-who button').first.click()
@@ -80,10 +113,14 @@ async def main(output):
      assert await page.frame_locator('iframe[data-demo="vision"]').locator('html').evaluate("()=>new URLSearchParams(location.search).get('skin')==='off'")
      await page.click('a[href*="/economics"]');assert 'skin=off' in page.url
      await page.locator('#frontier-bars').wait_for()
+    else:
+     await page.click('#mc-default-appearance');assert 'skin=off' in page.url
+     assert await page.locator('.mc-launch-card[data-demo]').count()==8
     assert not errors,(engine,fault,errors)
     report['checks'].append({'browser':engine,'fault':fault,'launcher_and_workspaces_passed':True})
     print(engine,fault,'PASS',flush=True);await context.close()
    await browser.close()
+ report['live_backend']=await live_state_faults()
  output.parent.mkdir(parents=True,exist_ok=True);output.write_text(json.dumps(report,indent=2)+'\n')
 
 

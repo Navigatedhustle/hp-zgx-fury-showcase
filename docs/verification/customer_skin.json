@@ -137,5 +137,6 @@
     ],
     "event_reset_requires_confirmation": true,
     "followup": "Owner removed presenter PIN/role gating to simplify sharing with HP and channel employees. Existing Factory latency failure remains open; no new generation benchmark was run for this access-only change."
-  }
+  },
+  "resilience_followup": "docs/verification/customer_skin_resilience.json"
 }
