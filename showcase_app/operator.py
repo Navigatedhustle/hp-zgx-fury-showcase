@@ -160,7 +160,7 @@ async def creative_job(cid:str):
 
 @app.get('/api/creative/media/{name}')
 async def creative_media(name:str):
- if not __import__('re').fullmatch('[0-9a-f]{32}(?:-[1-4])?\.(?:png|mp4)',name):raise HTTPException(404)
+ if not __import__('re').fullmatch(r'[0-9a-f]{32}(?:-[1-4])?\.(?:png|mp4)',name):raise HTTPException(404)
  path=ROOT/'state/images'/name
  if not path.is_file():raise HTTPException(404)
  return FileResponse(path)

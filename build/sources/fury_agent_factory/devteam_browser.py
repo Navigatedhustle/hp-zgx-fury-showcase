@@ -95,10 +95,11 @@ async def check_artwork_visibility(embedded):
    const cs=getComputedStyle(el),r=el.getBoundingClientRect();
    const image=el.tagName==='IMG' && el.currentSrc===uri && el.complete && el.naturalWidth>0;
    const background=cs.backgroundImage.includes(uri);
-   return (image||background)&&r.width>=160&&r.height>=80 ? [{index,image,selector:el.id?'#'+el.id:el.tagName.toLowerCase()+'.'+[...el.classList].join('.')}] : [];
+   return (image||background)&&r.width>=160&&r.height>=80 ? [{index,image,primary:Boolean(el.closest('header,.hero,#hero,[class*=hero]')),selector:el.id?'#'+el.id:el.tagName.toLowerCase()+'.'+[...el.classList].join('.')}] : [];
   }).slice(0,8);
  }""")
  if candidates is None:return
+ if candidates and any(item['primary'] for item in candidates):candidates=[item for item in candidates if item['primary']]
  if not candidates:raise ValueError('Supplied hero artwork has no loaded image or CSS image area at least 160 by 80 pixels; use the supplied artwork visibly, preserving content.')
  diagnostics=[]
  for candidate in candidates:
