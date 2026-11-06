@@ -342,6 +342,12 @@
         "size": 523425,
         "algorithm": "sha256",
         "hash": "0ab5709b8ffab19bfd849cd11d98f75b60af7733253ad0d67b12382a102cb4ff"
+      },
+      {
+        "path": "voices/am_michael.pt",
+        "size": 523435,
+        "algorithm": "sha256",
+        "hash": "9a443b79a4b22489a5b0ab7c651a0bcd1a30bef675c28333f06971abbd47bd37"
       }
     ]
   },

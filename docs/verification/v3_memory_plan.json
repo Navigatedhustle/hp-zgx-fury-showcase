@@ -1,0 +1,511 @@
+{
+  "phase": 1,
+  "gate": "passed",
+  "measured_at_utc": "2026-11-06T12:59:06.790392+00:00",
+  "source_commit": "16855bdd351904cc4f35cb8f1f7c59048d18b266",
+  "config_sha256": "2bb4c87c43c934277e75710e3caedaa43f6a34a50c689b76241765c1afdc5c62",
+  "baseline": {
+    "source": "docs/verification/v2.3.0_baseline.json",
+    "authorized_corrected_commit": "23468e27a0525b22f8b3a48df0819693985e0cb7",
+    "factory_mean_seconds": 382.61944115161896,
+    "factory_limit_seconds": 420.8813852667809
+  },
+  "hardware": {
+    "gpu": "NVIDIA GB300",
+    "hbm_reported_total_mib": 256703,
+    "grace_cpu_numa_node": 0,
+    "grace_node0_total_bytes": 530594791424,
+    "linux_hbm_numa_node": 1,
+    "grace_available_bytes": null,
+    "grace_available_note": "Per-node MemAvailable is not exposed. Aggregate Linux MemTotal/MemAvailable includes HBM and is not Grace capacity."
+  },
+  "measurement": {
+    "video": "121 frames at 24 fps; 5.04 second encoded clip; 1280x704 or 832x480. Client wall includes queue, module transfers, denoising, decoding and MP4 assembly; warmed resident service; download/startup excluded. Real Factory automatic short Live build starts first and has observed simultaneous gateway inference.",
+    "memory": "NVML memory_v2 used/free/reserved at approximately 10 Hz. Peak means maximum observed sample, not a continuous hardware trace; Torch allocator peaks recorded separately. Backends/creative loaded flags probed every two seconds.",
+    "creative_residency": "One process owns FLUX and Wan; idle modules remain loaded in Grace CPU memory using model CPU offload; only one creative GPU job runs at a time. FLUX is CPU resident while Wan renders, not simultaneously GPU resident. DeepSeek/Qwen stay GPU resident.",
+    "reserve": "Only this creative process receives a dynamic Torch allocation budget leaving 10 GiB reserve plus 4 GiB guard. CPU allocations bound to Grace node 0 per worker thread, no host-wide policy change. Existing engine fractions/contexts/sequences/gateway admission unchanged."
+  },
+  "vision": {
+    "passed": true,
+    "seconds": 3.186896733008325,
+    "model": "unsloth/Qwen3.6-27B-NVFP4",
+    "gateway": "existing agent/v1 endpoint, qualification role explicitly recorded",
+    "fixture": "Locally drawn fictional inspection image; no text values in prompt",
+    "answer": "```json\n{\n  \"fixture_a\": 42,\n  \"fixture_b\": 17,\n  \"status\": \"READY\"\n}\n```",
+    "usage": {
+      "prompt_tokens": 264,
+      "total_tokens": 301,
+      "completion_tokens": 37,
+      "prompt_tokens_details": null,
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    },
+    "gpu_before_mib": "228790, 26698",
+    "gpu_after_mib": "228790, 26698",
+    "new_model_loaded": false
+  },
+  "flux_reference_edit": {
+    "passed": true,
+    "model": "black-forest-labs/FLUX.2-klein-4B",
+    "diffusers": "0.41.0",
+    "reference_parameter_supported": true,
+    "reference": "Locally generated fictional webcam portrait, not a visitor photo",
+    "width": 1024,
+    "height": 576,
+    "job_seconds": 3.189310073852539,
+    "wall_seconds": 3.3030381959979422,
+    "render_seconds": 3.1559709549765103,
+    "peak_allocated_bytes": 9227354624,
+    "peak_reserved_bytes": 9514778624,
+    "text_image_seconds": 3.065356492996216,
+    "health_after": {
+      "ready": true,
+      "queued": 0,
+      "active": 0,
+      "limit": 1,
+      "queue_limit": 3,
+      "flux_loaded": true,
+      "video_loaded": true,
+      "flux_transformer": "cpu",
+      "video_transformer": "cpu",
+      "policy": "Resident CPU-offloaded models; one active GPU job across images and video"
+    },
+    "cpu_offload_policy": "Creative worker allocations bound to Grace NUMA node; original CPU weights materialized there",
+    "identity_preservation_observation": "Manual review of this fictional pair found consistent facial appearance, hair and navy jacket with a changed background; a single-sample observation, not a universal identity guarantee."
+  },
+  "video_trials": [
+    {
+      "model": "Wan2.2-TI2V-5B + LongLive-Plug few-step 1.0 / CFG 0.5",
+      "serialization": "official Diffusers + pinned Apache-2.0 adapters",
+      "height": 480,
+      "width": 832,
+      "steps": 4,
+      "guidance": 1.0,
+      "fps": 24,
+      "planned_frames": 121,
+      "passed": true,
+      "video_client_wall_seconds": 18.89786645298591,
+      "factory": {
+        "passed": true,
+        "wall_seconds": 387.74930596351624,
+        "build_seconds": 383.2580614089966,
+        "terminal_state": "finished",
+        "error": null
+      },
+      "factory_limit_seconds": 420.8813852667809,
+      "minimum_hbm_free_mib": 21394.5625,
+      "peak_hbm_used_mib": 234093.4375,
+      "all_health_probes_passed": true,
+      "inference_overlap_observed": true,
+      "decoded_video": {
+        "ffmpeg_version": "n9.0.2-17-g2a571b6068-20260930 built with gcc 16.2.0 (crosstool-NG 1.29.0.7_b1a94f6)",
+        "codec": "h264",
+        "pix_fmt": "yuv420p(progressive)",
+        "fps": 24.0,
+        "source_size": [
+          832,
+          480
+        ],
+        "size": [
+          832,
+          480
+        ],
+        "rotate": 0,
+        "duration": 5.04,
+        "actual_frames": 121,
+        "sha256": "e530e6061bb2c521430e46c4de56a1f1d53df031effca3c9f316e025528f333d"
+      },
+      "trial": "wan-480-4-20261106T125358",
+      "at_utc": "2026-11-06T12:53:58.553952+00:00",
+      "creative_job": {
+        "status": "complete",
+        "seconds": 18.718523263931274,
+        "render_seconds": 18.62347171001602,
+        "gpu_peak_allocated_bytes": 15375396352,
+        "gpu_peak_reserved_bytes": 16546529280,
+        "allocator_budget_bytes": 23374004224,
+        "steps_done": 4,
+        "steps_total": 4,
+        "model_load_seconds": 8.319620974361897e-07
+      },
+      "sample_count": 2636,
+      "factory_change_percent": 0.1669074251573477,
+      "factory_scope": "Shares the exact Factory build used for the selected 704p trial; clip executes sequentially in the same creative lane while Factory inference runs."
+    },
+    {
+      "model": "Wan2.2-TI2V-5B",
+      "serialization": "official Diffusers",
+      "height": 480,
+      "width": 832,
+      "steps": 50,
+      "guidance": 5.0,
+      "fps": 24,
+      "planned_frames": 121,
+      "passed": false,
+      "video_client_wall_seconds": 76.47489028098062,
+      "factory": {
+        "passed": false,
+        "wall_seconds": 318.7394320964813,
+        "build_seconds": 318.17343068122864,
+        "terminal_state": "failed",
+        "error": "Visual acceptance failed; private generated snapshots and diagnostic logs retained outside publication."
+      },
+      "factory_limit_seconds": 420.8813852667809,
+      "minimum_hbm_free_mib": 21241.8125,
+      "peak_hbm_used_mib": 234246.1875,
+      "all_health_probes_passed": true,
+      "inference_overlap_observed": true,
+      "decoded_video": {
+        "ffmpeg_version": "n9.0.2-17-g2a571b6068-20260930 built with gcc 16.2.0 (crosstool-NG 1.29.0.7_b1a94f6)",
+        "codec": "h264",
+        "pix_fmt": "yuv420p(progressive)",
+        "fps": 24.0,
+        "source_size": [
+          832,
+          480
+        ],
+        "size": [
+          832,
+          480
+        ],
+        "rotate": 0,
+        "duration": 5.04,
+        "actual_frames": 121,
+        "sha256": "645b9dacff226ee95e11f4cec4f5d112f8396ba50765147f14b1fb1025ef54b3"
+      },
+      "trial": "wan-480-50-20261106T040550",
+      "at_utc": "2026-11-06T04:05:50.745957+00:00",
+      "creative_job": {
+        "status": "complete",
+        "seconds": 76.2198715209961,
+        "render_seconds": 76.18079688795842,
+        "gpu_peak_allocated_bytes": 15386906624,
+        "gpu_peak_reserved_bytes": 16565403648,
+        "allocator_budget_bytes": 26712539136,
+        "steps_done": 50,
+        "steps_total": 50,
+        "model_load_seconds": 1.9199796952307224e-06
+      },
+      "sample_count": 3152,
+      "factory_change_percent": null
+    },
+    {
+      "model": "Wan2.2-TI2V-5B + LongLive-Plug few-step 1.0 / CFG 0.5",
+      "serialization": "official Diffusers",
+      "height": 704,
+      "width": 1280,
+      "steps": 4,
+      "guidance": 1.0,
+      "fps": 24,
+      "planned_frames": 121,
+      "passed": false,
+      "video_client_wall_seconds": 32.99348399601877,
+      "factory": {
+        "passed": false,
+        "wall_seconds": 336.78089475631714,
+        "build_seconds": 336.4191915988922,
+        "terminal_state": "failed",
+        "error": "Visual acceptance failed; private generated snapshots and diagnostic logs retained outside publication."
+      },
+      "factory_limit_seconds": 420.8813852667809,
+      "minimum_hbm_free_mib": 20344.5,
+      "peak_hbm_used_mib": 235143.5,
+      "all_health_probes_passed": true,
+      "inference_overlap_observed": true,
+      "decoded_video": {
+        "ffmpeg_version": "n9.0.2-17-g2a571b6068-20260930 built with gcc 16.2.0 (crosstool-NG 1.29.0.7_b1a94f6)",
+        "codec": "h264",
+        "pix_fmt": "yuv420p(progressive)",
+        "fps": 24.0,
+        "source_size": [
+          1280,
+          704
+        ],
+        "size": [
+          1280,
+          704
+        ],
+        "rotate": 0,
+        "duration": 5.04,
+        "actual_frames": 121,
+        "sha256": "b29be957650f9366f5f2577281a1956fb5344f63b485f701f54e13ba12e49674"
+      },
+      "trial": "wan-704-4-20261106T124055",
+      "at_utc": "2026-11-06T12:40:55.447345+00:00",
+      "creative_job": {
+        "status": "complete",
+        "seconds": 32.722541093826294,
+        "render_seconds": 32.421721096965484,
+        "gpu_peak_allocated_bytes": 18489456128,
+        "gpu_peak_reserved_bytes": 21070086144,
+        "allocator_budget_bytes": 28105572352,
+        "steps_done": 4,
+        "steps_total": 4,
+        "model_load_seconds": 1.4399993233382702e-06
+      },
+      "sample_count": 3334,
+      "factory_change_percent": null,
+      "minimum_grace_node0_free_bytes": 79548710912
+    },
+    {
+      "model": "Wan2.2-TI2V-5B + LongLive-Plug few-step 1.0 / CFG 0.5",
+      "serialization": "official Diffusers",
+      "height": 704,
+      "width": 1280,
+      "steps": 4,
+      "guidance": 1.0,
+      "fps": 24,
+      "planned_frames": 121,
+      "passed": true,
+      "video_client_wall_seconds": 44.04827251896495,
+      "factory": {
+        "passed": true,
+        "wall_seconds": 387.74930596351624,
+        "build_seconds": 383.2580614089966,
+        "terminal_state": "finished",
+        "error": null
+      },
+      "factory_limit_seconds": 420.8813852667809,
+      "minimum_hbm_free_mib": 17873.0,
+      "peak_hbm_used_mib": 237615.0,
+      "all_health_probes_passed": true,
+      "inference_overlap_observed": true,
+      "decoded_video": {
+        "ffmpeg_version": "n9.0.2-17-g2a571b6068-20260930 built with gcc 16.2.0 (crosstool-NG 1.29.0.7_b1a94f6)",
+        "codec": "h264",
+        "pix_fmt": "yuv420p(progressive)",
+        "fps": 24.0,
+        "source_size": [
+          1280,
+          704
+        ],
+        "size": [
+          1280,
+          704
+        ],
+        "rotate": 0,
+        "duration": 5.04,
+        "actual_frames": 121,
+        "sha256": "b29be957650f9366f5f2577281a1956fb5344f63b485f701f54e13ba12e49674"
+      },
+      "trial": "wan-704-4-20261106T125157",
+      "at_utc": "2026-11-06T12:51:57.842186+00:00",
+      "creative_job": {
+        "status": "complete",
+        "seconds": 43.89422154426575,
+        "render_seconds": 43.845212379004806,
+        "gpu_peak_allocated_bytes": 18490084864,
+        "gpu_peak_reserved_bytes": 21065891840,
+        "allocator_budget_bytes": 26152468480,
+        "steps_done": 4,
+        "steps_total": 4,
+        "model_load_seconds": 1.6640406101942062e-06
+      },
+      "sample_count": 3828,
+      "factory_change_percent": 0.1669074251573477,
+      "minimum_grace_node0_free_bytes": 81746395136
+    },
+    {
+      "model": "Wan2.2-TI2V-5B",
+      "serialization": "official Diffusers",
+      "height": 704,
+      "width": 1280,
+      "steps": 50,
+      "guidance": 5.0,
+      "fps": 24,
+      "planned_frames": 121,
+      "passed": false,
+      "video_client_wall_seconds": 0.5423474579583853,
+      "factory": {
+        "passed": true,
+        "wall_seconds": 385.80415201187134,
+        "build_seconds": 381.01129031181335,
+        "terminal_state": "finished",
+        "error": null
+      },
+      "factory_limit_seconds": 420.8813852667809,
+      "minimum_hbm_free_mib": 41160.1875,
+      "peak_hbm_used_mib": 214327.8125,
+      "all_health_probes_passed": true,
+      "inference_overlap_observed": false,
+      "decoded_video": null,
+      "trial": "wan-704-50-20261106T034800",
+      "at_utc": "2026-11-06T03:48:00.329198+00:00",
+      "creative_job": {
+        "status": "failed",
+        "seconds": null,
+        "render_seconds": 0.0028239910025149584,
+        "gpu_peak_allocated_bytes": 0,
+        "gpu_peak_reserved_bytes": 0,
+        "allocator_budget_bytes": 28127199232,
+        "steps_done": 0,
+        "steps_total": 50,
+        "model_load_seconds": 2.1440209820866585e-06
+      },
+      "sample_count": 3813,
+      "factory_change_percent": -0.42030034724982457
+    },
+    {
+      "model": "Wan2.2-TI2V-5B",
+      "serialization": "official Diffusers",
+      "height": 704,
+      "width": 1280,
+      "steps": 50,
+      "guidance": 5.0,
+      "fps": 24,
+      "planned_frames": 121,
+      "passed": false,
+      "video_client_wall_seconds": 165.53389744198648,
+      "factory": {
+        "passed": true,
+        "wall_seconds": 450.8738257884979,
+        "build_seconds": 446.3051264286041,
+        "terminal_state": "finished",
+        "error": null
+      },
+      "factory_limit_seconds": 420.8813852667809,
+      "minimum_hbm_free_mib": 20468.1875,
+      "peak_hbm_used_mib": 235019.8125,
+      "all_health_probes_passed": true,
+      "inference_overlap_observed": true,
+      "decoded_video": {
+        "ffmpeg_version": "n9.0.2-17-g2a571b6068-20260930 built with gcc 16.2.0 (crosstool-NG 1.29.0.7_b1a94f6)",
+        "codec": "h264",
+        "pix_fmt": "yuv420p(progressive)",
+        "fps": 24.0,
+        "source_size": [
+          1280,
+          704
+        ],
+        "size": [
+          1280,
+          704
+        ],
+        "rotate": 0,
+        "duration": 5.04,
+        "actual_frames": 121,
+        "sha256": "b7053ab8e045d15e963a1b8a34b766d484ec0a607608c82840216f212f246eb7"
+      },
+      "trial": "wan-704-50-20261106T035718",
+      "at_utc": "2026-11-06T03:57:18.666006+00:00",
+      "creative_job": {
+        "status": "complete",
+        "seconds": 165.47944402694702,
+        "render_seconds": 165.1744337590062,
+        "gpu_peak_allocated_bytes": 18514730496,
+        "gpu_peak_reserved_bytes": 21061697536,
+        "allocator_budget_bytes": 28126412800,
+        "steps_done": 50,
+        "steps_total": 50,
+        "model_load_seconds": 1.4720135368406773e-06
+      },
+      "sample_count": 4449,
+      "factory_change_percent": 16.644654826033456
+    }
+  ],
+  "selected_configuration": {
+    "base_repo": "Wan-AI/Wan2.2-TI2V-5B",
+    "serialization_repo": "Wan-AI/Wan2.2-TI2V-5B-Diffusers",
+    "revision": "b8fff7315c768468a5333511427288870b2e9635",
+    "profile": "longlive",
+    "adapters": [
+      {
+        "repo": "Efficient-Large-Model/LongLive-Plug-Wan2.2-TI2V-5B-few-step",
+        "revision": "38a6ec4e8f5b644749d3072bfe1ac383d00951c0",
+        "license": "apache-2.0",
+        "weight": 1.0
+      },
+      {
+        "repo": "Efficient-Large-Model/LongLive-Plug-Wan2.2-TI2V-5B-cfg",
+        "revision": "fa1f9280778aa27c8038fe06e29fb5f2ed6be451",
+        "license": "apache-2.0",
+        "weight": 0.5
+      }
+    ],
+    "height": 704,
+    "width": 1280,
+    "steps": 4,
+    "guidance": 1.0,
+    "frames": 121,
+    "fps": 24,
+    "client_wall_seconds": 44.04827251896495,
+    "faster_proven_option": {
+      "height": 480,
+      "width": 832,
+      "client_wall_seconds": 18.89786645298591
+    },
+    "factory_shared_build_seconds": 383.2580614089966,
+    "factory_change_percent": 0.1669074251573477,
+    "minimum_sampled_hbm_free_mib": 17873.0,
+    "maximum_sampled_hbm_used_mib": 237615.0,
+    "quality_review": "Manually inspected five actual frames of the fictional portrait trial. Facial appearance remained consistent with coherent motion and changing cinematic instrument lighting. This is a single-subject quality observation, not a universal identity guarantee."
+  },
+  "candidate_licenses": {
+    "Wan-AI/Wan2.2-TI2V-5B": "Apache-2.0",
+    "Wan-AI/Wan2.2-TI2V-5B-Diffusers": "Apache-2.0; official serialization of same model",
+    "lightx2v/Wan2.2-Lightning": "Apache-2.0; excluded: published adapters target A14B, no verified 5B adapter",
+    "quanhaol/Wan2.2-TI2V-5B-Turbo": "excluded: no explicit model license on inspected card"
+  },
+  "prequalification_failures": [
+    {
+      "trial": "unbound CPU allocation trial",
+      "result": "Unqualified: aggregate Linux memory included HBM. CPU model allocations spilled into HBM and the creative allocator guard refused reference generation. Replaced with per-thread Grace binding and materialized CPU weights; no engine allocations changed. No continuous peak was captured for that initial trial."
+    },
+    {
+      "trial": "wan-704-50-20261106T034800",
+      "result": "Failed before video inference because optional ftfy prompt-cleaning dependency was missing in the already running process. Dependency pinned and service recovered through owned controller; startup now checks prompt cleaning."
+    }
+  ],
+  "privacy": "Only fictional locally generated benchmark subject used; input/output media and raw session logs excluded from Git/releases.",
+  "passed": true,
+  "phase_2_started": false,
+  "selection_reason": "Highest tested resolution meets client wall <=90 seconds, observed free HBM >=10 GiB, healthy loaded engines and a passing concurrent Factory build <=110 percent of corrected baseline. Both resolutions share one real Factory build; they are not two independent performance samples.",
+  "stop_history": [
+    {
+      "status": "stopped",
+      "reason": "Prior reservation-date contrast failed three validations; no unqualified trial was accepted."
+    },
+    {
+      "status": "reopened",
+      "reason": "Owner explicitly authorized continuation and simplification. Structured CSS selector/property/value schema, all-node/all-state diagnostics and bounded selector/value palette repaired the failure without weakening independent checks."
+    }
+  ],
+  "flux_reuse_after_video": {
+    "passed": true,
+    "wall_seconds": 2.649433295999188,
+    "job_seconds": 2.4556970596313477,
+    "model": "FLUX.2-klein-4B",
+    "width": 1024,
+    "height": 576,
+    "health_after": {
+      "ready": true,
+      "queued": 0,
+      "active": 0,
+      "limit": 1,
+      "queue_limit": 3,
+      "flux_loaded": true,
+      "video_loaded": true,
+      "video_profile": "longlive",
+      "video_model": "Wan2.2-TI2V-5B + LongLive-Plug few-step 1.0 / CFG 0.5",
+      "flux_transformer": "cpu",
+      "video_transformer": "cpu",
+      "grace_cpu_node": 0,
+      "policy": "Resident CPU-offloaded models bound to Grace; one active GPU job across images and video"
+    }
+  },
+  "source_tests": {
+    "factory": 188,
+    "core": 39,
+    "passed": true
+  },
+  "runtime_hashes": {
+    "config/gb300.json": "2bb4c87c43c934277e75710e3caedaa43f6a34a50c689b76241765c1afdc5c62",
+    "showcase_app/gateway.py": "c7311a33768686e0ea06aa130fe0095548a55d700814793bd147e1b2508c5dc5",
+    "showcase_app/creative.py": "bbdcecfe55d4fdda0e8a9a6a3114a57484458ca3797bd937d2e7c56b98ccf797",
+    "showcase_app/image.py": "afa351e98463eec200080763c27e9252d66fe608587969ecb66b850bc896e856",
+    "build/sources/fury_agent_factory/devteam.py": "1113ae14f2590c6982893e80fda6e31395ad5abeda8feed7c5b01ee118599967",
+    "build/sources/fury_agent_factory/devteam_browser.py": "f530e18509be81d0ad9bed0e5f0ac9a449eefc699101b7c04eec07a2801a51fb",
+    "build/sources/fury_agent_factory/visual_source_edits.py": "2c3990f25fa6261e7a5901e56e873a392c16f9d3e7cd37ef9f760534fc2ef970"
+  }
+}

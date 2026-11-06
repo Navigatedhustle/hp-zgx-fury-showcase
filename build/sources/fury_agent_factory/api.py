@@ -25,6 +25,8 @@ async def lifespan(app):
         else:run.stop()
     for run in devteam_routes.active_runs():await asyncio.to_thread(run.thread.join,15)
 app=FastAPI(title='Fury Agent Factory — Development Team',docs_url=None,redoc_url=None,lifespan=lifespan)
+from showcase_app.chrome import TelemetryProxy
+app.add_middleware(TelemetryProxy)
 app.mount('/showcase-assets',StaticFiles(directory=SHOWCASE),name='showcase-assets')
 @app.middleware('http')
 async def security_headers(request,call_next):

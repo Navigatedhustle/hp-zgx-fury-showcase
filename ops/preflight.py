@@ -12,8 +12,16 @@ def check(ports=False):
  if missing:errors.append('Missing host prerequisites: '+', '.join(missing)+'. See docs/PREREQUISITES.md; install through your administrator.')
  if not ctypes.util.find_library('sndfile'):errors.append('Missing libsndfile1.')
  if not Path('/usr/local/cuda/bin/nvcc').exists():errors.append('CUDA toolkit /usr/local/cuda/bin/nvcc required for kernel JIT; tested 13.3. No automatic toolkit/driver install.')
- memory={k:int(v.split()[0])*1024 for k,v in (l.split(':',1) for l in Path('/proc/meminfo').read_text().splitlines())};info['ram_gib']=round(memory['MemTotal']/1024**3,2);info['available_ram_gib']=round(memory['MemAvailable']/1024**3,2)
- if memory['MemTotal']<700*1024**3:errors.append('This complete profile requires at least 700 GiB system RAM; smaller hosts are unverified.')
+ memory={k:int(v.split()[0])*1024 for k,v in (l.split(':',1) for l in Path('/proc/meminfo').read_text().splitlines())};info['linux_aggregate_gib']=round(memory['MemTotal']/1024**3,2);info['linux_aggregate_available_gib']=round(memory['MemAvailable']/1024**3,2)
+ if memory['MemTotal']<700*1024**3:errors.append('This profile requires at least 700 GiB Linux-visible combined Grace/HBM capacity; smaller hosts are unverified.')
+ cpu_nodes=[p for p in Path('/sys/devices/system/node').glob('node[0-9]*') if (p/'cpulist').read_text().strip()]
+ if len(cpu_nodes)!=1:errors.append('Cannot identify the tested single Grace CPU NUMA node.')
+ else:
+  node={line.split()[2].rstrip(':'):int(line.split()[3])*1024 for line in (cpu_nodes[0]/'meminfo').read_text().splitlines()}
+  info['grace_gib']=round(node['MemTotal']/1024**3,2);info['grace_free_gib']=round(node['MemFree']/1024**3,2)
+  info['grace_available_gib']=None
+  if node['MemTotal']<480*1024**3:errors.append('The tested creative offload profile requires at least 480 GiB physical Grace memory.')
+ if not ctypes.util.find_library('numa'):errors.append('The creative Grace allocation policy requires the existing libnuma runtime.')
  info['disk_free_gib']=round(shutil.disk_usage(ROOT).free/1024**3,2)
  required=40 if (ROOT/'state/setup.json').exists() else 350
  if info['disk_free_gib']<required:errors.append(f'Require {required} GiB free disk for this stage.')

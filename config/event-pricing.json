@@ -1,10 +1,67 @@
 {
-  "checked": "2026-11-04",
+  "checked": "2026-11-06",
   "currency": "USD",
   "scope": "Standard text API pricing scenario per million observed tokens; no cache discounts, paid API calls, tools, taxes, images or audio.",
   "models": [
-    {"id":"gpt-6-astra","name":"GPT-6 Astra","provider":"OpenAI","input":10,"output":50,"long_threshold":272000,"long_input":20,"long_output":75,"source":"https://developers.openai.com/api/docs/models/gpt-6-astra","note":"Standard tier. Above 272K input tokens, the whole request uses $20 input / $75 output."},
-    {"id":"claude-opus-5-5","name":"Claude Opus 5.5","provider":"Anthropic","input":4,"output":20,"source":"https://platform.claude.com/docs/en/about-claude/pricing","note":"Standard global routing, no prompt-cache or batch discount."},
-    {"id":"gemini-4-argon","name":"Gemini 4 Argon","provider":"Google","input":2,"output":10,"effective_until":"2026-11-30","subsequent_input":4,"subsequent_output":20,"source":"https://aistudio.google.com/docs/pricing#gemini-4-argon","note":"Promotional standard rates through 30 November 2026; $4 / $20 from 1 December 2026. Thinking tokens count as output."}
-  ]
+    {
+      "id": "gpt-6-astra",
+      "name": "GPT-6 Astra",
+      "provider": "OpenAI",
+      "input": 10,
+      "output": 50,
+      "long_threshold": 272000,
+      "long_input": 20,
+      "long_output": 75,
+      "source": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+      "note": "Standard tier. Above 272K input tokens, the whole request uses $20 input / $75 output."
+    },
+    {
+      "id": "claude-fable-5-1",
+      "name": "Claude Fable 5.1",
+      "provider": "Anthropic",
+      "input": 10,
+      "output": 50,
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "note": "Standard global routing; no cache or batch discount. Representative demanding-reasoning model, not a usage ranking."
+    },
+    {
+      "id": "claude-opus-5-5",
+      "name": "Claude Opus 5.5",
+      "provider": "Anthropic",
+      "input": 4,
+      "output": 20,
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "note": "Standard global routing, no prompt-cache or batch discount."
+    },
+    {
+      "id": "gemini-4-argon",
+      "name": "Gemini 4 Argon",
+      "provider": "Google",
+      "input": 2,
+      "output": 10,
+      "effective_until": "2026-11-30",
+      "subsequent_input": 4,
+      "subsequent_output": 20,
+      "source": "https://aistudio.google.com/docs/pricing#gemini-4-argon",
+      "note": "Promotional standard rates through 30 November 2026; $4 / $20 from 1 December 2026. Thinking tokens count as output."
+    }
+  ],
+  "workloads": {
+    "image": {
+      "name": "Imagen 4 image generation",
+      "usd_per_unit": 0.04,
+      "unit": "image",
+      "source": "https://cloud.google.com/model-garden/pricing#imagen",
+      "retrieved": "2026-11-06",
+      "note": "Standard image generation; not upscaling. This is a cost scenario, not an output-quality equivalence claim."
+    },
+    "video": {
+      "name": "Veo 3.1 Fast / 720p with audio",
+      "usd_per_unit": 0.1,
+      "unit": "second",
+      "source": "https://aistudio.google.com/docs/pricing#veo-3-1",
+      "retrieved": "2026-11-06",
+      "note": "Official Gemini Developer API pricing, paid tier per second, 720p with audio. Capabilities and outputs differ from the local silent video model."
+    }
+  }
 }

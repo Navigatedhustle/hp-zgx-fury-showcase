@@ -1,0 +1,7 @@
+Fictional Fieldnote product brief
+
+Project Fieldnote is an imaginary workshop planning tool. The first pilot contains 24 inspection units, a budget of USD 3000 and a target handover on 18 December 2026.
+
+The team needs clear instructions, consistent product codes and readable status messages. Measurements remain on the local demonstration machine. All names, quantities and dates are fictional. No real order or delivery is created.
+
+Translate the brief without changing F-1042, quantities, currency amounts or dates. Keep inspection unit as a consistent term and highlight ambiguity for human review.

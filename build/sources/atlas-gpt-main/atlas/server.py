@@ -43,6 +43,8 @@ async def lifespan(app):
     yield
 
 app=FastAPI(title=NAME,docs_url=None,redoc_url=None,lifespan=lifespan)
+from showcase_app.chrome import TelemetryProxy
+app.add_middleware(TelemetryProxy)
 app.mount('/showcase-assets',StaticFiles(directory=ROOT.parents[2]/'showcase_app/assets'),name='showcase-assets')
 app.mount('/static',StaticFiles(directory=ROOT/'static'),name='static')
 (ROOT/'artifacts').mkdir(exist_ok=True)

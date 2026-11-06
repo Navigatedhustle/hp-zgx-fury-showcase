@@ -1,0 +1,351 @@
+{
+  "schema": 1,
+  "date_utc": "2026-11-06",
+  "status": "passed_with_disclosed_latency_failure_and_scope_limits",
+  "source_code_commit": "8bf50453c1beb06292f1aa397e9f069a8738ff6b",
+  "platform": {
+    "system": "Linux",
+    "release": "7.0.0-1024-nvidia-64k",
+    "architecture": "aarch64",
+    "gpu": "NVIDIA GB300",
+    "hbm_total_mib": 256703,
+    "grace_usable_gib": 494.1549,
+    "linux_aggregate_includes_hbm_gib": 743.65
+  },
+  "immutable_profile_sha256": "2bb4c87c43c934277e75710e3caedaa43f6a34a50c689b76241765c1afdc5c62",
+  "factory": {
+    "baseline_mean_seconds": 382.619441,
+    "ceiling_seconds": 420.881385,
+    "fresh_runs": [
+      {
+        "status": "finished",
+        "elapsed_seconds": 385.8720209598541,
+        "tests_passed": true,
+        "model_calls": 16,
+        "visual_calls": 1,
+        "ceiling_seconds": 420.881385,
+        "latency_passed": true
+      },
+      {
+        "status": "finished",
+        "elapsed_seconds": 468.78638100624084,
+        "tests_passed": true,
+        "model_calls": 17,
+        "visual_calls": 1,
+        "ceiling_seconds": 420.881385,
+        "latency_passed": false
+      },
+      {
+        "status": "finished",
+        "elapsed_seconds": 375.22823119163513,
+        "tests_passed": true,
+        "model_calls": 16,
+        "visual_calls": 1,
+        "ceiling_seconds": 420.881385,
+        "latency_passed": true
+      }
+    ],
+    "qualifying_runs": 2,
+    "slow_functional_pass_retained": true,
+    "final_visual_replays_seconds": [
+      9.706823907967191,
+      9.518552917987108,
+      10.311647043039557
+    ]
+  },
+  "rush": {
+    "jobs": 6,
+    "all_complete": true,
+    "seconds_including_existing_factory_wait": 576.4900041100336,
+    "scope": "Original Go controls; own Factory queued while prior Factory build occupied global slot; not six simultaneous inference admissions"
+  },
+  "trailers": [
+    {
+      "genre": "Space Mission",
+      "generation_seconds": 125.78673074801918,
+      "shots": 3,
+      "fallback": null,
+      "playback": {
+        "duration": 14.25,
+        "width": 1280,
+        "height": 704,
+        "error": null
+      },
+      "done_deleted_all_files": true
+    },
+    {
+      "genre": "Mountain Rescue",
+      "generation_seconds": 117.77999429497868,
+      "shots": 3,
+      "fallback": null,
+      "playback": {
+        "duration": 14.25,
+        "width": 1280,
+        "height": 704,
+        "error": null
+      },
+      "done_deleted_all_files": true
+    },
+    {
+      "genre": "Deep Sea Explorer",
+      "generation_seconds": 128.419673167984,
+      "shots": 3,
+      "fallback": null,
+      "playback": {
+        "duration": 14.25,
+        "width": 1280,
+        "height": 704,
+        "error": null
+      },
+      "done_deleted_all_files": true
+    }
+  ],
+  "camera_scope": "Real getUserMedia using a fictional video capture fixture; physical webcam not tested",
+  "private_creative_authority": {
+    "passed": true,
+    "existing_private_records_checked": 18,
+    "checks": [
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      },
+      {
+        "read_without_authority": 404,
+        "cancel_without_authority": 404,
+        "read_with_authority": 200
+      }
+    ],
+    "private_submit_without_authority": 403
+  },
+  "restart_privacy": {
+    "passed": true,
+    "files_before": 2,
+    "files_after": 0,
+    "old_session_status": 401,
+    "scope": "Actual identity-checked operator process restart with fictional photo/video retention sentinels; consent invalidated"
+  },
+  "translation": {
+    "target": "Spanish",
+    "pages": 10,
+    "processed": 10,
+    "numeric_and_product_code_coverage_checked": true,
+    "source_lines_preserved_in_structured_cardinality": true,
+    "exports": [
+      "PDF",
+      "DOCX",
+      "TXT"
+    ],
+    "layout": "Clean text reflow; original layout not preserved",
+    "terminology": "Advisory review, not automatic rewrite",
+    "quality": "Human review required; language quality varies"
+  },
+  "vision": {
+    "actual_qwen_extraction": true,
+    "actual_lead_brief": true,
+    "busy_reason": "Routed to Qwen: DeepSeek is busy with Agent Factory",
+    "busy_routing_ui_and_ledger_passed": true
+  },
+  "video": {
+    "t2v": {
+      "passed": true,
+      "width": 1280,
+      "height": 704,
+      "duration_seconds": 5.041667
+    },
+    "i2v": {
+      "passed": true,
+      "generation_seconds": 44.69490885734558,
+      "duration": 5.041667,
+      "width": 1280,
+      "height": 704,
+      "currentTime": 1.008,
+      "ready": 4
+    },
+    "profile": "Wan2.2 TI2V 5B with pinned LongLive-Plug few-step 1.0 and CFG 0.5; 4 steps, CFG 1; 121 frames at 24 fps"
+  },
+  "image": {
+    "styles_tested": 5,
+    "aspects_tested": [
+      "16:9",
+      "1:1",
+      "9:16",
+      "4:3"
+    ],
+    "batches_tested": [
+      1,
+      2,
+      4
+    ],
+    "seed_metadata_passed": true,
+    "owned_cancellation_passed": true,
+    "completed_job_reload_passed": true,
+    "send_to_video_passed": true
+  },
+  "tests": {
+    "factory": 189,
+    "core_gateway_booth": 44,
+    "v3_page_viewports": 98,
+    "v3_page_viewports_passed": true,
+    "conference_layouts": 72,
+    "conference_layouts_passed": true,
+    "conference_isolated_endpoints_and_idle_passed": true,
+    "atlas_isolation_exports_passed": true,
+    "atlas_orb_audio_and_6_viewports_passed": true,
+    "tts_asr_roundtrip_passed": true,
+    "guided_portal_checks": 13,
+    "reference_passed": true,
+    "editor_passed": true,
+    "all_existing_acceptance_entrypoints_exercised": true
+  },
+  "failures_and_cuts": [
+    "Second fresh Factory build exceeded fixed latency ceiling while passing functional checks",
+    "Initial advisory review hit output-length bound; no complete claim",
+    "Initial ten-page trial omitted body text on three pages; fixed line/numeric/code coverage then retested",
+    "Conference idle-ledger attempts were contaminated by concurrent inference/voice work; isolated no-inference rerun passed",
+    "Atlas inherited footer/narrow layout defects fixed and original orb acceptance passed",
+    "WebKit could not launch because host libraries are missing; no host changes made",
+    "No two-shot trailer cuts were needed in the three measured trials"
+  ],
+  "soak": {
+    "status": "passed",
+    "requested_seconds": 1200,
+    "processes": [
+      {
+        "engine": "chromium",
+        "version": "156.0.8078.4",
+        "seconds": 1202.8784067630768,
+        "samples": 121,
+        "browser_exceptions": 0,
+        "passed": true
+      },
+      {
+        "engine": "firefox",
+        "version": "157.0",
+        "seconds": 1202.2631378173828,
+        "samples": 121,
+        "browser_exceptions": 0,
+        "passed": true
+      },
+      {
+        "engine": "chromium",
+        "version": "156.0.8078.4",
+        "seconds": 1202.5794293880463,
+        "samples": 121,
+        "browser_exceptions": 0,
+        "passed": true
+      }
+    ],
+    "scope": "Three independent browser processes across Chromium and Firefox; stable UI assets, one guarded idle Factory recovery observed near the end",
+    "webkit": "Downloaded but missing host GStreamer/Flite/AVIF dependencies; no WebKit acceptance claim"
+  },
+  "idle_retention": {
+    "status": "passed",
+    "elapsed_seconds": 900.4406830659718,
+    "seconds_required": 900,
+    "polling_does_not_touch_retention": true,
+    "files_after": 0,
+    "unauthorized_after_expiry": 401
+  },
+  "hbm": {
+    "source": "NVML memory_v2, nominal 10 Hz; sampled, not continuous trace",
+    "samples": 25746,
+    "window_seconds": 2578.2556216716766,
+    "window_start_utc": "2026-11-06T15:00:57.835056+00:00",
+    "window_end_utc": "2026-11-06T15:43:56.090678+00:00",
+    "peak_used_mib": 240728.0625,
+    "peak_used_gib": 235.08599853515625,
+    "minimum_free_mib": 14759.9375,
+    "minimum_free_gib": 14.41400146484375,
+    "maximum_driver_reserved_mib": 1215.0,
+    "reserve_gib": 10,
+    "sampled_reserve_preserved": true
+  },
+  "publication": {
+    "state": "prepared_for_unmerged_v3_owner_review",
+    "main_and_tags_unchanged": true,
+    "release_created": false,
+    "raw_private_evidence_included": false,
+    "checks": "Source inclusion/hashes, secret scan and exact staged-blob audit are run against the final reviewed source before push; private source archive packaging is checked without publishing a release"
+  }
+}

@@ -172,6 +172,11 @@ def _start_one(name,registry):
   if port_open(COMPONENTS[name]['port']):raise RuntimeError(name+' port '+str(COMPONENTS[name]['port'])+' is occupied by an unverified process. Inspect ss -ltnp and /proc/PID/{cwd,cmdline}; use the configured active deployment controller. No process was adopted or signalled.')
   command=COMPONENTS[name]['command'];program=ROOT/command[0]
   if '/' in command[0] and not program.exists():raise RuntimeError('Run bash ops/bootstrap.sh first: missing '+command[0])
+  # The consent policy expires visitor media on every actual service start.
+  # Status/idempotent launches do not clear a live session or signal a process.
+  sys.path.insert(0,str(ROOT))
+  from showcase_app.visitor_store import clear_on_start
+  clear_on_start()
   with (ROOT/'logs'/f'{name}.log').open('ab') as log:p=subprocess.Popen(command,cwd=ROOT,env=environment(),stdout=log,stderr=log,start_new_session=True)
   time.sleep(.15);row=process(p.pid)
   if not row or not identity(row,name):raise RuntimeError(name+' failed to start; inspect logs/'+name+'.log')

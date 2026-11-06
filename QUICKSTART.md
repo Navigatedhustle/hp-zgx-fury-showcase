@@ -1,20 +1,16 @@
-# HP ZGX Fury demo experience — V2
+# Fury V3 quickstart
 
-Open the home page at http://localhost:8080 for Demos, Why HP ZGX Fury, Shared AI and the presenter guide. Use [PRESENTER.md](docs/PRESENTER.md) for talk tracks and recovery.
+Use the tested Ubuntu 24.04 ARM64 GB300 with its existing working driver and CUDA toolkit. Physical Grace memory is 494.15 GiB; the approximately 743.65 GiB Linux aggregate includes HBM. Reserve 350 GiB initially free disk; model files are about 227.566 GiB. See [prerequisites](docs/PREREQUISITES.md).
 
-# Quickstart
+1. Clone branch `v3` and enter the checkout. V3 is an unmerged review branch, not a published tag or release.
+2. Run `./launch.sh`. Keep setup progress visible; cold compilation may take tens of minutes.
+3. Open **http://localhost:8080**. Eight cards open retained local workspaces.
+4. Try Atlas, a three-slide presentation, an image or the included Vision/Translate samples. Video uses a fixed five-second preset.
+5. For real concurrency, press **Launch Fury Rush** once. It submits six real workflows and shows their queued/submitted/complete/failed states.
+6. For Action Trailer, read and tap consent before camera access. Choose a PG genre, capture once, play the final cut, then press **Done** to delete photo and video. Fullscreen sound requires a tap. Localhost downloads stay on the station.
+7. Inspect `/models`, `/performance`, `/economics` and `/secure` for model identity, measured resources, dated scenarios and source evidence.
+8. Use `./launch.sh status`, `./launch.sh diagnostics` and `./launch.sh stop`. Guarded recovery: `./launch.sh recover agent` after workloads finish.
 
-Use the tested Ubuntu 24.04 ARM64 GB300 host with its existing working driver, CUDA toolkit and [prerequisites](docs/PREREQUISITES.md). Reserve 350 GiB free disk for first setup; models alone download about 194 GiB.
+Translate reflows text and offers advisory terminology review; it does not preserve source layout. Video/trailer model adapters and any two-shot fallback are disclosed. Guided Factory is recorded playback. Use fictional/public demonstration material outside the consented Action Trailer camera flow.
 
-1. Clone tag `v2.3.0` or extract the matching versioned release ZIP. See the README for exact commands.
-2. Open a terminal in its root. For a ZIP, `chmod +x launch.sh showcase` if necessary.
-3. Run `./launch.sh`. Read progress and errors in the terminal. The first run creates local environments, downloads/verifies assets, builds the editor and waits for all services.
-4. Open **http://localhost:8080**. Subsequent launches use the same `./launch.sh` command.
-5. For a predictable walkthrough, choose Factory Guided demonstration (recorded). To show genuine four-way inference, start an automatic short Factory Live build, then submit an Atlas query, booth deck and image concurrently. See the README table for prompts and URLs.
-6. Use `./launch.sh status`, `./launch.sh diagnostics`, and `./launch.sh stop`. Recovery: `./launch.sh recover agent` after jobs finish.
-
-Optional desktop shortcut: `./launch.sh desktop`; a copied desktop file may require **Allow Launching**. Remote browsers need [your own access setup](docs/REMOTE-ACCESS.md). No account or token from the publisher is needed.
-
-[Colorado deployment PDF](docs/Colorado-Deployment-v2.3.0.pdf) includes site-owned Tailscale setup, recipient sharing, presenter steps and recovery.
-
-Conference screens: open `/stations` on port 8080. Assign Economics (`/operator`), Why HP (`/why-hp`), or Interactive (`/demos`) independently in each browser. See docs/CONFERENCE.md.
+[Presenter](docs/PRESENTER.md) · [V3 launch guide](docs/V3_LAUNCH_GUIDE.md) · [PDF](docs/V3_Launch_Guide_v3.0.0.pdf). Private remote access uses the recipient's existing configuration; this upgrade changes no network or Tailscale settings.

@@ -33,4 +33,21 @@ class GatewayTests(unittest.TestCase):
  def test_valid_stream_completes(self):
   r=self.run_case(True,lambda q:httpx.Response(200,headers={'content-type':'text/event-stream'},text='data: {"choices":[{"delta":{"content":"OK"}}]}\n\ndata: [DONE]\n\n'))
   self.assertNotIn('"error"',r.text);self.assertIn('[DONE]',r.text)
+ def test_busy_factory_lead_routes_brief_to_qwen_and_records_reason(self):
+  real=httpx.AsyncClient;sent=[]
+  def handler(request):
+   sent.append(json.loads(request.content));return httpx.Response(200,json={'choices':[{'message':{'content':'Fixture brief'}}],'usage':{'prompt_tokens':5,'completion_tokens':2}})
+  def client(**kwargs):return real(transport=httpx.MockTransport(handler),**kwargs)
+  with tempfile.TemporaryDirectory() as folder,patch.object(g,'DB',Path(folder)/'ledger.db'):
+   g.connect().close()
+   with TestClient(g.app) as c,patch.object(g.httpx,'AsyncClient',side_effect=client):
+    g.active['factory-fixture']={'demo':'agent','model':g.LEAD}
+    try:r=c.post('/lead/vision/v1/chat/completions',json={'messages':[{'role':'user','content':'Fixture brief'}],'max_tokens':50})
+    finally:g.active.pop('factory-fixture',None)
+   self.assertEqual(r.status_code,200);self.assertEqual(sent[0]['model'],g.MODEL)
+   self.assertEqual(r.json()['fury_routing']['reason'],'Routed to Qwen: DeepSeek is busy with Agent Factory')
+   with g.connect() as db:
+    requested,actual,reason,external=db.execute('SELECT requested,actual,reason,external_calls FROM routing').fetchone()
+   self.assertEqual((requested,actual,external),(g.LEAD,g.MODEL,0));self.assertIn('Agent Factory',reason)
+   self.assertEqual((g.total._value,g.normal._value,g.lead_slots._value),(4,3,1))
 if __name__=='__main__':unittest.main()

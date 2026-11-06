@@ -14,7 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / 'state/event-session.sqlite'
 PRICING = ROOT / 'config/event-pricing.json'
-SAMPLE_SECONDS = 5
+SAMPLE_SECONDS = 2
+TEXT_DEMOS = ('atlas','slides','agent','vision','translate','trailer')
 MAX_POWER_GAP = 20
 
 
@@ -58,7 +59,7 @@ def prices(today=None):
 def price_rows(rows, models):
     # The gateway's events primary key is the physical upstream call identity.
     # Source ledgers upsert that same ID; their token totals are never added again.
-    eligible = {r['id']: r for r in rows if r.get('demo') in ('atlas', 'slides', 'agent')
+    eligible = {r['id']: r for r in rows if r.get('demo') in TEXT_DEMOS
                 and r.get('status') in ('complete', 'failed', 'cancelled')
                 and number(r.get('input_tokens')) and number(r.get('output_tokens'))}
     costs = {}
@@ -154,6 +155,8 @@ class Monitor:
         self.previous_power = None
         self.session_id = None
         self.lock = asyncio.Lock()
+        self.changed = asyncio.Condition()
+        self.stream = None
 
     def snapshot(self, live, now=None):
         now = now or time.time()
@@ -168,7 +171,7 @@ class Monitor:
             db.row_factory = sqlite3.Row
             rows = [dict(r) for r in db.execute('SELECT * FROM events WHERE started>=?', (session['started'],))]
         eligible, costs = price_rows(rows, pricing['models'])
-        known = {r['id']: r for r in rows if r['demo'] in ('atlas', 'slides', 'agent') and number(r.get('output_tokens')) and r['status'] in ('complete', 'failed', 'cancelled')}
+        known = {r['id']: r for r in rows if r['demo'] in TEXT_DEMOS and number(r.get('output_tokens')) and r['status'] in ('complete', 'failed', 'cancelled')}
         power = read_power(live, now)
         energies = dict(prior.get('energies_kwh', {}))
         coverage = dict(prior.get('coverage_seconds', {}))
@@ -201,7 +204,7 @@ class Monitor:
                 'power': power, 'pricing': pricing, 'activity': activity,
                 'capacity': {'agent': {'active': jobs.get('active'), 'limit': jobs.get('limit')},
                              'slides': {'active': booth.get('active'), 'pending': booth.get('pending'), 'limit': booth.get('limit')}},
-                'unknown_usage_requests': sum(r['demo'] in ('atlas','slides','agent') and r['status'] in ('complete','failed','cancelled') and (not number(r.get('input_tokens')) or not number(r.get('output_tokens'))) for r in rows),
+                'unknown_usage_requests': sum(r['demo'] in TEXT_DEMOS and r['status'] in ('complete','failed','cancelled') and (not number(r.get('input_tokens')) or not number(r.get('output_tokens'))) for r in rows),
                 'services': {k: {'connected': v.get('connected'), 'ready': v.get('ready')} for k,v in live.get('services',{}).items()},
                 'recorded_activity_included': False, 'collection_interval_seconds': SAMPLE_SECONDS,
                 'token_scope': 'Reported endpoint usage for unique terminal live requests started since this event reset, including failed calls when final usage is available. Recorded playback excluded. API estimates require both input and output usage.',
@@ -212,13 +215,16 @@ class Monitor:
             live = await collect()
             self.latest_live = live
             self.latest = await asyncio.to_thread(self.snapshot, live)
+            self.stream = json.dumps({'telemetry':live.get('telemetry'),'event':self.latest},separators=(',',':'))
+        async with self.changed:self.changed.notify_all()
 
     async def run(self, collect):
         while True:
+            began = time.monotonic()
             try:
                 await self.refresh(collect)
             except Exception:
                 # Retain timestamp so clients can visibly reject stale measurements.
                 import logging
                 logging.exception('Event telemetry collection failed')
-            await asyncio.sleep(SAMPLE_SECONDS)
+            await asyncio.sleep(max(0.05,SAMPLE_SECONDS-(time.monotonic()-began)))
