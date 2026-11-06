@@ -169,6 +169,7 @@
   "build/sources/fury_agent_factory/static/prospecting.js",
   "build/sources/fury_agent_factory/static/roles.svg",
   "build/sources/fury_agent_factory/tests/test_accounting.py",
+  "build/sources/fury_agent_factory/tests/test_artwork_visibility.py",
   "build/sources/fury_agent_factory/tests/test_backoffice.py",
   "build/sources/fury_agent_factory/tests/test_browser_contract.py",
   "build/sources/fury_agent_factory/tests/test_browser_feedback.py",

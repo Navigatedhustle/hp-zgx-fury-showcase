@@ -1,5 +1,5 @@
 """Real generated-backend/browser contract check before publishing model output."""
-import asyncio,html,re,uuid
+import asyncio,html,io,re,uuid
 from pathlib import Path
 from playwright.async_api import async_playwright,expect
 from devteam_sandbox import execute
@@ -84,6 +84,44 @@ async def check_frontend(code:Path,data:Path,stop=None,*,interactions=True,inven
    if inventory_checks:await check_inventory(frame,hotels)
   finally:await browser.close()
 
+async def check_artwork_visibility(embedded):
+ """Measure supplied artwork's rendered contribution, restoring exact inline styles."""
+ from PIL import Image, ImageChops
+ candidates=await embedded.evaluate("""async () => {
+  const uri=window.furyArtwork?.hero;
+  if (!uri) return null;
+  const loaded=new Image();loaded.src=uri;await loaded.decode();
+  return [...document.querySelectorAll('body *')].flatMap((el,index)=>{
+   const cs=getComputedStyle(el),r=el.getBoundingClientRect();
+   const image=el.tagName==='IMG' && el.currentSrc===uri && el.complete && el.naturalWidth>0;
+   const background=cs.backgroundImage.includes(uri);
+   return (image||background)&&r.width>=160&&r.height>=80 ? [{index,image,selector:el.id?'#'+el.id:el.tagName.toLowerCase()+'.'+[...el.classList].join('.')}] : [];
+  }).slice(0,8);
+ }""")
+ if candidates is None:return
+ if not candidates:raise ValueError('Supplied hero artwork has no loaded image or CSS image area at least 160 by 80 pixels; use the supplied artwork visibly, preserving content.')
+ diagnostics=[]
+ for candidate in candidates:
+  target=embedded.locator('body *').nth(candidate['index'])
+  await target.scroll_into_view_if_needed()
+  box=await target.bounding_box()
+  if not box:continue
+  before=await target.screenshot(animations='disabled',timeout=5000)
+  saved=await target.get_attribute('style')
+  try:
+   await target.evaluate("(el,image)=>el.style.setProperty(image?'opacity':'background-image',image?'0':'none','important')",candidate['image'])
+   after=await target.screenshot(animations='disabled',timeout=5000)
+  finally:
+   await target.evaluate("(el,s)=>s===null?el.removeAttribute('style'):el.setAttribute('style',s)",saved)
+  first=Image.open(io.BytesIO(before)).convert('RGB');second=Image.open(io.BytesIO(after)).convert('RGB')
+  difference=ImageChops.difference(first,second).convert('L')
+  changed=sum(difference.histogram()[9:])/(first.width*first.height)
+  if changed>=.005:return
+  overlays=await target.evaluate("el=>{const r=el.getBoundingClientRect();return document.elementsFromPoint(r.x+r.width/2,r.y+r.height/2).slice(0,5).map(e=>({tag:e.tagName,classes:e.className,z:getComputedStyle(e).zIndex,background:getComputedStyle(e).backgroundColor}))}")
+  diagnostics.append({'selector':candidate['selector'],'changed_fraction':round(changed,6),'overlays':overlays})
+ raise ValueError('Loaded supplied hero contributes no visible artwork (under 0.5% changed crop pixels). Repair actual image positioning/z-index or the opaque .hero-fallback overlay; translucent gradients may remain. '+str(diagnostics))
+
+
 async def audit_visual(page,frame):
  embedded=page.frames[-1]
  await embedded.add_script_tag(path=str(Path(__file__).resolve().parent/'vendor/axe/axe.min.js'))
@@ -105,6 +143,8 @@ async def audit_visual(page,frame):
     if key in seen_issues:continue
     seen_issues.add(key)
     problems.append('Accessibility '+violation['id']+': '+str({'html':node['html'][:120],'why':node.get('failureSummary','')[:300]}))
+ try:await check_artwork_visibility(embedded)
+ except ValueError as error:problems.append(str(error))
  if problems:
   # Keep the same criteria, but disclose mobile overflow before duplicated a11y details.
   problems.sort(key=lambda problem:0 if problem.startswith('Fix actual responsive overflow') else 1)

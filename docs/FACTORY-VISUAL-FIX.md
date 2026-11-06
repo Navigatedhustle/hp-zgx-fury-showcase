@@ -19,3 +19,9 @@ Visual repair now returns structured selector/property/value declarations. The s
 The newly failed snapshot passed the updated real local-model replay on its first proposal in 14.93 seconds. This is repair evidence, not a substitute for fresh concurrent Factory qualification or final V3 hardware acceptance.
 
 The final bounded schema offers only selectors present in source and a small value palette, with deterministic Visual sampling. It cannot request media-query fragments, make text transparent or collapse controls. Both recent failed snapshots passed the final real replay: 15.64 seconds on one proposal and 26.46 seconds including one ordinary repair. Those repair costs are retained.
+
+## V3 rendered artwork check
+
+A loaded image can still contribute no pixels beneath an opaque fallback. The real-browser Visual gate now finds matching supplied image/CSS artwork areas, captures their actual crops with and without the image contribution, and restores the exact original inline style attribute in a finally block. At least one substantial artwork area must change at least 0.5% of crop pixels above a small difference threshold. A useful translucent gradient passes; a fully opaque overlay fails with selector/stacking diagnostics. Legacy runs without pinned artwork retain their original environment. Existing generated versions are never edited.
+
+The bounded Visual model can select conditional hiding of `.hero-fallback` or repair position/z-index. The compiler permits hiding only that fallback and only when supplied artwork is present; other controls/content cannot be hidden. Model sampling, two-proposal bound, independent axe/mobile checks, real booking/conflict/filter/sort checks and sandbox remain in force. A real browser regression covers opaque overlay rejection, gradient acceptance, CSS background contribution and exact style restoration.

@@ -24,7 +24,7 @@ def allowed_lists(source):
     return sorted(value for value in set(parsed.ids) if parsed.all_ids.count(value) == 1)
 
 
-CSS_VALUES = ('#173c34', '#111111', '#ffffff', '#f7fafc', '#0b1220', '1', '0', '2', '3', '100%', 'auto', 'relative', 'absolute', 'static', 'wrap', 'anywhere', 'break-word', 'cover', 'center', 'block', 'flex', 'grid', 'inline-block', '1fr', 'minmax(0, 1fr)', 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', 'var(--fury-artwork-hero)', '400', '500', '600', '700', '14px', '16px', '18px', '20px', '1.5', '0.5rem', '1rem', '1.5rem', '0.5rem 1rem', '1 1 280px', '1 1 300px')
+CSS_VALUES = ('none', '#173c34', '#111111', '#ffffff', '#f7fafc', '#0b1220', '1', '0', '2', '3', '100%', 'auto', 'relative', 'absolute', 'static', 'wrap', 'anywhere', 'break-word', 'cover', 'center', 'block', 'flex', 'grid', 'inline-block', '1fr', 'minmax(0, 1fr)', 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', 'var(--fury-artwork-hero)', '400', '500', '600', '700', '14px', '16px', '18px', '20px', '1.5', '0.5rem', '1rem', '1.5rem', '0.5rem 1rem', '1 1 280px', '1 1 300px')
 
 
 def allowed_style_selectors(source):
