@@ -32,3 +32,19 @@ def test_legitimate_read_only_sql_and_created_artifact_are_retained(tmp_path,mon
     result=sandbox.run('from pathlib import Path\nPath("result.txt").write_text("fictional result")\nprint("verified")')
     assert result['success'] and result['stdout']=='verified\n'
     assert result['files']==[{'name':'result.txt','content':'fictional result'}]
+
+
+def test_generated_code_cannot_change_its_host_parent_resource_limits(tmp_path):
+    import subprocess
+    canary_db=tmp_path/'fictional.sqlite'
+    with sqlite3.connect(canary_db) as c:c.execute('CREATE TABLE fictional (value TEXT)')
+    coordinator='''import json,resource,sys
+from pathlib import Path
+sys.path.insert(0,sys.argv[1]);from atlas import sandbox
+sandbox.DB=Path(sys.argv[2]);before=resource.getrlimit(resource.RLIMIT_NOFILE)
+result=sandbox.run('import os,resource\\nresource.prlimit(os.getppid(),resource.RLIMIT_NOFILE,(64,64))')
+print(json.dumps({'before':before,'after':resource.getrlimit(resource.RLIMIT_NOFILE),'worker_success':result['success']}))
+'''
+    process=subprocess.run([sys.executable,'-c',coordinator,str(ROOT/'build/sources/atlas-gpt-main'),str(canary_db)],cwd=ROOT,capture_output=True,text=True,check=True)
+    result=json.loads(process.stdout)
+    assert result['after']==result['before'], 'Generated code altered the host coordinator resource limit'
