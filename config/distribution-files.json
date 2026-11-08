@@ -830,6 +830,7 @@
   "ops/tests/test_creative_inputs.py",
   "ops/tests/test_event.py",
   "ops/tests/test_frontier_cost.js",
+  "ops/tests/test_model_manifest_security.py",
   "ops/tests/test_request_security.py",
   "ops/tests/test_setup_stamp.py",
   "ops/tests/test_skin.py",

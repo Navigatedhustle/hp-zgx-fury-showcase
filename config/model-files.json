@@ -7,38 +7,38 @@
       {
         "path": "README.md",
         "size": 64817,
-        "algorithm": "sha1",
-        "hash": "0f3cce7161de300a70bf0852b62de71a5775e57a"
+        "algorithm": "sha256",
+        "hash": "b8a14bfde5af90f23fd1aed49a2c7b497fa7659c7deddf8651908aea3050ba59"
       },
       {
         "path": "added_tokens.json",
         "size": 904,
-        "algorithm": "sha1",
-        "hash": "9955816d3da3e9560559861b82fc5a27cff5b364"
+        "algorithm": "sha256",
+        "hash": "e5f9bfb644ead13bd36dd6cfc41553a93b7c264c0a2e1ac67d033aa8250c8538"
       },
       {
         "path": "chat_template.jinja",
         "size": 8057,
-        "algorithm": "sha1",
-        "hash": "f7a7d1b0f69c2f4d4e167cab1b7a91c2ec6aaefb"
+        "algorithm": "sha256",
+        "hash": "55d4931433fe502b794226ee7f4d206a6bdd436ac9f80eb7d8ebb4c639f9ea0c"
       },
       {
         "path": "config.json",
         "size": 22660,
-        "algorithm": "sha1",
-        "hash": "3d956cd9d761c91b819b2bf4cade4754a5a02830"
+        "algorithm": "sha256",
+        "hash": "eab648bc912e75dacf3244526161e1384c6c224d22448dc1e23e6862a95fba3c"
       },
       {
         "path": "configuration.json",
         "size": 51,
-        "algorithm": "sha1",
-        "hash": "3a6d425685de8896b2bc8b59b671e41aea1d7bf3"
+        "algorithm": "sha256",
+        "hash": "2d4464e2ead06bc9bc718c781309ad1e7baded626d66e8dcdc8b469ba185faf0"
       },
       {
         "path": "generation_config.json",
         "size": 214,
-        "algorithm": "sha1",
-        "hash": "c8e006f318ad592a476773d493eadb966b476308"
+        "algorithm": "sha256",
+        "hash": "d0dbf670c6a372817b2ff92d5d47e3130d35de9c3a7164ba455fd7a88255b362"
       },
       {
         "path": "model-00001-of-00005.safetensors",
@@ -73,26 +73,26 @@
       {
         "path": "model.safetensors.index.json",
         "size": 193831,
-        "algorithm": "sha1",
-        "hash": "06642cf70e11bdbf55aac95322fbb6baf39f5945"
+        "algorithm": "sha256",
+        "hash": "86b4cdfa8d1f3d145e999d37c6c087ec28416e3f4fd862b34bbd279dc2635c6f"
       },
       {
         "path": "preprocessor_config.json",
         "size": 781,
-        "algorithm": "sha1",
-        "hash": "484b50c430e48aa6732a3ebb1b72f77cdaf8fc9e"
+        "algorithm": "sha256",
+        "hash": "b99182e09450f26453502b3c3390cce36b33dc8c4a1f3ee21807762e168c74ab"
       },
       {
         "path": "processor_config.json",
         "size": 1327,
-        "algorithm": "sha1",
-        "hash": "32f0145253cd59b67b707cae2603915dd4c59e6a"
+        "algorithm": "sha256",
+        "hash": "ce20be9a2d2898073e87ff7dabc0d7fd453fde21e9309aa36485a899b4c29107"
       },
       {
         "path": "special_tokens_map.json",
         "size": 876,
-        "algorithm": "sha1",
-        "hash": "fca0ded4fda885a161deeda0547c114ddbc97093"
+        "algorithm": "sha256",
+        "hash": "ce5cbe737f4aacc7696180aac743091101b59e4dc5a338d9fc8a6f716aa513f7"
       },
       {
         "path": "tokenizer.json",
@@ -103,20 +103,20 @@
       {
         "path": "tokenizer_config.json",
         "size": 1192,
-        "algorithm": "sha1",
-        "hash": "b29bf997c2175819101840be89387c63c25f24ed"
+        "algorithm": "sha256",
+        "hash": "bfd46bda4ad4feb24dc16fd7a0780bcfdf6a93e8ebb9a712b9657ddc4aba6a46"
       },
       {
         "path": "video_preprocessor_config.json",
         "size": 817,
-        "algorithm": "sha1",
-        "hash": "e32b1d90356f74457edbfca27aa1e121dab7cdc7"
+        "algorithm": "sha256",
+        "hash": "59c5c9eb52182eb14c06ffb10ca9effd29adce5f238a95de23ca14a38dbd2cb1"
       },
       {
         "path": "vocab.json",
         "size": 5234494,
-        "algorithm": "sha1",
-        "hash": "b94df23d650b0c60a2264d9de779cb3b7fb8570c"
+        "algorithm": "sha256",
+        "hash": "4ab0d5c096294054b66444a116a20baf6e29998fc1fae410ffe4b6fadbc56b5c"
       }
     ]
   },
@@ -128,14 +128,14 @@
       {
         "path": "LICENSE.md",
         "size": 9584,
-        "algorithm": "sha1",
-        "hash": "0afa7632c1a195ea6627a3c53e6ebf18d1be3aa5"
+        "algorithm": "sha256",
+        "hash": "ca02bc51900ab07789d1b70283329e7137f5af98f5161c23a1c81fc38a4af1fe"
       },
       {
         "path": "README.md",
         "size": 9991,
-        "algorithm": "sha1",
-        "hash": "7b3cca65056e19a6ef27bdd0be671a030f067942"
+        "algorithm": "sha256",
+        "hash": "bd447051cf2db4bf67b992e563d89c35ebf1123f009c063361a222ab14e1c4f7"
       },
       {
         "path": "editing.jpg",
@@ -146,8 +146,8 @@
       {
         "path": "model_index.json",
         "size": 446,
-        "algorithm": "sha1",
-        "hash": "554a39bf1019138dd0b28809b745df8ef33657c8"
+        "algorithm": "sha256",
+        "hash": "51a76cb1cf3ed37423a1128c79c22faee8e6fbe7f5aaeb737f0a258930dbaac0"
       },
       {
         "path": "others.jpg",
@@ -164,20 +164,20 @@
       {
         "path": "scheduler/scheduler_config.json",
         "size": 486,
-        "algorithm": "sha1",
-        "hash": "7e53605e2643440b310fa554f087641893883c5f"
+        "algorithm": "sha256",
+        "hash": "067afb012cef64553a763447d1efd93daeffcc0123ca7e25b09f8de20b90762e"
       },
       {
         "path": "text_encoder/config.json",
         "size": 1536,
-        "algorithm": "sha1",
-        "hash": "86f951d170cfd1fdc1c8a57a041e05c27b7b789b"
+        "algorithm": "sha256",
+        "hash": "214b4c29a0d975e9fddf9994a5673f22cb2c4c5750352f9227c2c3251ebeab40"
       },
       {
         "path": "text_encoder/generation_config.json",
         "size": 214,
-        "algorithm": "sha1",
-        "hash": "f5af93d0c7764fa38e3b1cd3aaba1b6307246d3b"
+        "algorithm": "sha256",
+        "hash": "4347b1aeed2b2b78bc059920a0b7f5fec71482e1344952b76d7665d638d71f13"
       },
       {
         "path": "text_encoder/model-00001-of-00002.safetensors",
@@ -194,32 +194,32 @@
       {
         "path": "text_encoder/model.safetensors.index.json",
         "size": 32855,
-        "algorithm": "sha1",
-        "hash": "b65d8063815c8679d85bb919337b36fae8de75cf"
+        "algorithm": "sha256",
+        "hash": "06b3d5319b6d76d1a4a2433419180016cfd54ed62d086a5e6567a809f8c82634"
       },
       {
         "path": "tokenizer/added_tokens.json",
         "size": 707,
-        "algorithm": "sha1",
-        "hash": "b54f9135e44c1e81047e8d05cb027af8bc039eed"
+        "algorithm": "sha256",
+        "hash": "c0284b582e14987fbd3d5a2cb2bd139084371ed9acbae488829a1c900833c680"
       },
       {
         "path": "tokenizer/chat_template.jinja",
         "size": 4168,
-        "algorithm": "sha1",
-        "hash": "01be9b307daa2d425f7c168c9fb145a286e0afb4"
+        "algorithm": "sha256",
+        "hash": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8"
       },
       {
         "path": "tokenizer/merges.txt",
         "size": 1671853,
-        "algorithm": "sha1",
-        "hash": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7"
+        "algorithm": "sha256",
+        "hash": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
       },
       {
         "path": "tokenizer/special_tokens_map.json",
         "size": 613,
-        "algorithm": "sha1",
-        "hash": "ac23c0aaa2434523c494330aeb79c58395378103"
+        "algorithm": "sha256",
+        "hash": "76862e765266b85aa9459767e33cbaf13970f327a0e88d1c65846c2ddd3a1ecd"
       },
       {
         "path": "tokenizer/tokenizer.json",
@@ -230,20 +230,20 @@
       {
         "path": "tokenizer/tokenizer_config.json",
         "size": 5404,
-        "algorithm": "sha1",
-        "hash": "ddaf69808214a44fdd26d3785b66c1367c78277a"
+        "algorithm": "sha256",
+        "hash": "443bfa629eb16387a12edbf92a76f6a6f10b2af3b53d87ba1550adfcf45f7fa0"
       },
       {
         "path": "tokenizer/vocab.json",
         "size": 2776833,
-        "algorithm": "sha1",
-        "hash": "4783fe10ac3adce15ac8f358ef5462739852c569"
+        "algorithm": "sha256",
+        "hash": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
       },
       {
         "path": "transformer/config.json",
         "size": 541,
-        "algorithm": "sha1",
-        "hash": "f21592ae2bc9f43052e78785bde7414f219ae369"
+        "algorithm": "sha256",
+        "hash": "09733c74a3da6d17dd0a0472a091a8950c7c6935889c32c16cc800ede05029de"
       },
       {
         "path": "transformer/diffusion_pytorch_model.safetensors",
@@ -254,8 +254,8 @@
       {
         "path": "vae/config.json",
         "size": 821,
-        "algorithm": "sha1",
-        "hash": "c3f38eb4c188a96a462519159356bd0fcc28cd14"
+        "algorithm": "sha256",
+        "hash": "0d6dfb69ae95a5e2ac9836284bbb63d8b38ce67b25ba2dff380752b2a10ab948"
       },
       {
         "path": "vae/diffusion_pytorch_model.safetensors",
@@ -273,8 +273,8 @@
       {
         "path": "README.md",
         "size": 216,
-        "algorithm": "sha1",
-        "hash": "cb864962f371aa02e5716610cf4afc480b166a16"
+        "algorithm": "sha256",
+        "hash": "c914dd28e23310a6dd345ea10495003d3e4820d2ed987181e4c2d67e501b6b76"
       },
       {
         "path": "decoder-epoch-99-avg-1-chunk-16-left-128.int8.onnx",
@@ -315,8 +315,8 @@
       {
         "path": "tokens.txt",
         "size": 5048,
-        "algorithm": "sha1",
-        "hash": "b4d1bf82e68de1354f2a3f5fd51094d61d65c77c"
+        "algorithm": "sha256",
+        "hash": "49e3c2646595fd907228b3c6787069658f67b17377c60aeb8619c4551b2316fb"
       }
     ]
   },
@@ -328,8 +328,8 @@
       {
         "path": "config.json",
         "size": 2351,
-        "algorithm": "sha1",
-        "hash": "14a726edd3718279eac426630879ff743955b16a"
+        "algorithm": "sha256",
+        "hash": "5abb01e2403b072bf03d04fde160443e209d7a0dad49a423be15196b9b43c17f"
       },
       {
         "path": "kokoro-v1_0.pth",
@@ -365,14 +365,14 @@
       {
         "path": "LICENSE",
         "size": 1084,
-        "algorithm": "sha1",
-        "hash": "d62e3bef9f054f21b7fc616365850fbf879a99ff"
+        "algorithm": "sha256",
+        "hash": "f2c6c602815669d292889e5be8c802f2ed950653b77999b1584e8e6aed25d040"
       },
       {
         "path": "README.md",
         "size": 8880,
-        "algorithm": "sha1",
-        "hash": "e94e34aeeb29059c36b1b382c03db25bc7d1f52c"
+        "algorithm": "sha256",
+        "hash": "bbffec410db41306b61a5073e59c970f8d51a3e48e1ebed631e4875a2b9aec06"
       },
       {
         "path": "assets/dsv4_performance.png",
@@ -383,134 +383,134 @@
       {
         "path": "cast_mxfp4_to_nvfp4.log",
         "size": 110447,
-        "algorithm": "sha1",
-        "hash": "28909d1de6ab02167d3169533d4ed51b88cf800e"
+        "algorithm": "sha256",
+        "hash": "5e8bb1695a6d9759a31fdddf4a75918c8ec10f0d46900a60938265d08ac76a7d"
       },
       {
         "path": "config.json",
         "size": 6873,
-        "algorithm": "sha1",
-        "hash": "d5c67b2dcaa261e13b495a901431aa02aab39bdd"
+        "algorithm": "sha256",
+        "hash": "0c5dc7303ff322d73e0cd5caf9cc1b65d6efeff68fab53514531c2e959b1d616"
       },
       {
         "path": "encoding/README.md",
         "size": 8118,
-        "algorithm": "sha1",
-        "hash": "f9bf68d953bb81a1532b52c3663d390ac1409bc8"
+        "algorithm": "sha256",
+        "hash": "605363e9e43ee91beba88ea96c7806ce6ecdb2924e481459c9d16e1526470c10"
       },
       {
         "path": "encoding/encoding_dsv4.py",
         "size": 27908,
-        "algorithm": "sha1",
-        "hash": "cdb68f233a71b142732372b901fa140d7d2148a3"
+        "algorithm": "sha256",
+        "hash": "bdbd57c132a1b3725042323d02b98b9d1df28e5f388f134399555d041f5055e0"
       },
       {
         "path": "encoding/test_encoding_dsv4.py",
         "size": 3741,
-        "algorithm": "sha1",
-        "hash": "1c896e797e3f0cc6a95f6dd51079df1e6ba1887e"
+        "algorithm": "sha256",
+        "hash": "c2bc54c4c934f5c64096bd9c555efa7d1ddf179c1eff58f01ceb2dcd60adcf28"
       },
       {
         "path": "encoding/tests/test_input_1.json",
         "size": 2748,
-        "algorithm": "sha1",
-        "hash": "d423b221fa88153a826f7724cc938e0703858c21"
+        "algorithm": "sha256",
+        "hash": "10e0c074c977c3a80daab758af28219c6b1c2bd7f3f5cf2890c84b361cc32897"
       },
       {
         "path": "encoding/tests/test_input_2.json",
         "size": 526,
-        "algorithm": "sha1",
-        "hash": "13b3454a902deecafe75644b41cd6b3e4a0e5354"
+        "algorithm": "sha256",
+        "hash": "c44ae0db20fafff38a6021e8068d7ed6e28605d76cafd20be80b03398509f447"
       },
       {
         "path": "encoding/tests/test_input_3.json",
         "size": 4546,
-        "algorithm": "sha1",
-        "hash": "10034844edfc33b954ae530f35590132cdf4a342"
+        "algorithm": "sha256",
+        "hash": "37bf8ef95e0411ea5f411be0b02fbafec7363438b6ccefddca0c52ec9aeaf69a"
       },
       {
         "path": "encoding/tests/test_input_4.json",
         "size": 2730,
-        "algorithm": "sha1",
-        "hash": "d5e0791dd6997a2007f3aa917919a680521bcd51"
+        "algorithm": "sha256",
+        "hash": "c45bbd0a1b7a2f75033d8db4ba74ee5b7653bd01114045a52f79d3b387663465"
       },
       {
         "path": "encoding/tests/test_output_1.txt",
         "size": 2390,
-        "algorithm": "sha1",
-        "hash": "7e3c9bd5a394617f02d76384d613d991e60d48bd"
+        "algorithm": "sha256",
+        "hash": "9b366d9d2eac842a6e890594aac0b58648e5623717202b33497afadf03e26540"
       },
       {
         "path": "encoding/tests/test_output_2.txt",
         "size": 342,
-        "algorithm": "sha1",
-        "hash": "fc397ef549728ad6083a577010192e62f3edeee4"
+        "algorithm": "sha256",
+        "hash": "ca66b01a1ac3a204bb032c928fb607d4877171e998a50f7f89f39fa821b75665"
       },
       {
         "path": "encoding/tests/test_output_3.txt",
         "size": 3313,
-        "algorithm": "sha1",
-        "hash": "edee563300d49b0c46af1429a1e1b00b15610a72"
+        "algorithm": "sha256",
+        "hash": "b3b1cd8748b7b90d3c6be6da3f786f12e4d70be073bd445ea162dfad4dc01a64"
       },
       {
         "path": "encoding/tests/test_output_4.txt",
         "size": 2552,
-        "algorithm": "sha1",
-        "hash": "d30bd5d06cf39fe110bc4406292fccde0444c120"
+        "algorithm": "sha256",
+        "hash": "60e1643840ba9e4aeede450feb7b0498fa66ee24e4a939d48855ce04ec6fc375"
       },
       {
         "path": "generation_config.json",
         "size": 170,
-        "algorithm": "sha1",
-        "hash": "c56a8c5bf06ff7740b6a33ee67b38b6237a230b1"
+        "algorithm": "sha256",
+        "hash": "5fccff80f55a4d455bbe516bdd552edf3e9623df95e99fbf2a3c3389fdf91af0"
       },
       {
         "path": "hf_quant_config.json",
         "size": 4546,
-        "algorithm": "sha1",
-        "hash": "b301de1d133f782d00afd7da94db62af6ad83a6b"
+        "algorithm": "sha256",
+        "hash": "1fbdb2bd9831a11cb822bc048fd45180927bcfb821ba32a3a7050f96a37b0b5f"
       },
       {
         "path": "inference/README.md",
         "size": 951,
-        "algorithm": "sha1",
-        "hash": "e11577229e5e5b6f82f687f7ed755096b3edd8d6"
+        "algorithm": "sha256",
+        "hash": "b9fe8027f91f2160b46582b61eaaf7b9873b3da36ee9f98bc76a900e7c1fed94"
       },
       {
         "path": "inference/config.json",
         "size": 991,
-        "algorithm": "sha1",
-        "hash": "692cf97a8f714caf20cd30e5113212d83035e043"
+        "algorithm": "sha256",
+        "hash": "6cc6f816ca73a8d38750194e330398e4f6955b4b45f674f7d29c96da14ccb733"
       },
       {
         "path": "inference/convert.py",
         "size": 7075,
-        "algorithm": "sha1",
-        "hash": "777486468168e2b33f66e3ab776ff872ae9b1c5e"
+        "algorithm": "sha256",
+        "hash": "912acfc20bdd9ae4dbd5bde9dc7c8e61f6d27b6826d3ac2d052b2534c0881454"
       },
       {
         "path": "inference/generate.py",
         "size": 6296,
-        "algorithm": "sha1",
-        "hash": "c35c80305e5173f6b26e394a64134a75a3f17e28"
+        "algorithm": "sha256",
+        "hash": "d4d443c0be8499b20ae5eaff0a623df02f47a8309be6feeba4eb4e0eeb5342c3"
       },
       {
         "path": "inference/kernel.py",
         "size": 22204,
-        "algorithm": "sha1",
-        "hash": "ea7976fa1b4a549306ce57d7a1a78f4798b222b8"
+        "algorithm": "sha256",
+        "hash": "c4dc859a2208f9182ae00f6267cf8655deba51dcd92dfd14d0e65401658593e4"
       },
       {
         "path": "inference/model.py",
         "size": 38632,
-        "algorithm": "sha1",
-        "hash": "167ade8fdb35c0fbaabf4735b6696ef7a32f1588"
+        "algorithm": "sha256",
+        "hash": "ce962f1face79d4f633d36436576214057a7e11443c9789935e1deb5c6cd1d71"
       },
       {
         "path": "inference/requirements.txt",
         "size": 92,
-        "algorithm": "sha1",
-        "hash": "7e1cc78c33123582c00538a830d792cd2ea2f516"
+        "algorithm": "sha256",
+        "hash": "857e0b8b58e41cabe16e55bf4ab7ff791677c53b25f0f3e104ef85227cd11eab"
       },
       {
         "path": "model-00001-of-00046.safetensors",
@@ -797,14 +797,14 @@
       {
         "path": "tokenizer.json",
         "size": 6367146,
-        "algorithm": "sha1",
-        "hash": "628e3364caad11bdf9e67cea06eae7878122811d"
+        "algorithm": "sha256",
+        "hash": "8f9f37ca37fdc4f5fd36d5cf4d3b0e8392edb4e894fd10cc0d70b4957c8633cf"
       },
       {
         "path": "tokenizer_config.json",
         "size": 801,
-        "algorithm": "sha1",
-        "hash": "f3dad388a2bbfd6a8605bd02754acd86d9ca5112"
+        "algorithm": "sha256",
+        "hash": "6ac8c8dc065ed118161d02dd532749ae3f52c243deac27872134fae2f50d8547"
       }
     ]
   }
