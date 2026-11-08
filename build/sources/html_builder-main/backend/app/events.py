@@ -29,12 +29,16 @@ class EventBus:
         self._subs: dict[str, set[asyncio.Queue]] = defaultdict(set)
 
     def subscribe(self, channel: str) -> asyncio.Queue:
+        if sum(map(len,self._subs.values()))>=24:
+            from fastapi import HTTPException
+            raise HTTPException(429,'Too many presentation event subscribers')
         q: asyncio.Queue = asyncio.Queue(maxsize=500)
         self._subs[channel].add(q)
         return q
 
     def unsubscribe(self, channel: str, q: asyncio.Queue) -> None:
         self._subs[channel].discard(q)
+        if not self._subs[channel]:self._subs.pop(channel, None)
 
     def publish(self, channel: str, event: dict[str, Any]) -> None:
         for q in list(self._subs.get(channel, ())) + list(self._subs.get("*", ())):

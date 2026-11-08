@@ -5,6 +5,7 @@ import re
 def station_ancestors(hostname):
     if hostname in ('localhost', '127.0.0.1', '::1'):
         return "'self' http://localhost:8080 http://127.0.0.1:8080"
-    if hostname and re.fullmatch(r'[a-z0-9-]+\.tail[a-z0-9]+\.ts\.net', hostname):
+    from showcase_app.security import configured_hosts, LOOPBACK
+    if hostname in configured_hosts() - LOOPBACK:
         return "'self' https://" + hostname
     return "'self'"

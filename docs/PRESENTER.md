@@ -1,3 +1,44 @@
+# V3.1.0 presenter script
+
+## The customer skin moment — 20 seconds
+
+“Who is in the room today? I’ll choose the official mark, check the colors and prepare every station. This is still HP ZGX Fury, built for your conversation. The models, security boundaries and generated applications stay the same. Your brand stays on screen and out of downloads.”
+
+Open the demo and use the palette button directly. Presenter controls and settings do not require a PIN or station assignment. Confirm identity/logo, preview, and Apply. Pre-cache before an event or upload offline. [Full steps and privacy](CUSTOMER_SKIN.md).
+
+Show the separate kWh chart on `/economics`. Cloud values require sourced, same-workload estimates; the display reports more **or less** electricity rather than assuming cloud consumes more. A higher API bill is not evidence of higher energy consumption.
+
+Start at http://localhost:8080. Show the eight workload cards and the live GPU/HBM/Grace/power/token counters. “These are local measurements. The external AI counter covers this gateway, not every packet on the machine.”
+
+| One-minute demo | Action and evidence |
+|---|---|
+| Atlas | Ask the 8-point Commit win-rate question. Show the grounded result, evidence and real audio-reactive orb. Explain that all business data is synthetic. Export the executive brief. |
+| Presentations | Keep the included local-AI brief, press Create, inspect the three-slide preview and download editable PowerPoint. It is a draft requiring review. |
+| Agent Factory | Choose short Live and automatic review. Start once, explain Plan → Build → Verify → Ready, then return after the real build. Open its tested application/backend. For a one-minute predictable story choose explicitly recorded Guided mode. |
+| Image Studio | Choose a style, seed and ratio; generate, then change the batch to show serial variants. Use Send to Video for continuity. |
+| Vision Lab | Pick the chart sample and Analyze. Compare actual values with the extraction and executive brief; samples are fictional. |
+| Translate Desk | Use the brief sample, select a target and Translate. Compare pages and download PDF/DOCX/TXT. Show the advisory review and disclose clean reflow and variable language quality. The ten-page sample takes longer. |
+| Video Studio | Choose text or an Image Studio reference, then generate five seconds. Show real steps, frames, model/adapters and elapsed time. This is a fixed proven preset. |
+| Action Trailer | Read consent before camera access. Choose an original PG genre, capture once and show screenplay/keyframes/clips as they finish. Generation exceeds a minute. Tap final fullscreen with sound, then Done to visibly delete photo and video. |
+
+## Cloud vs Local
+
+Open `/economics` and show the Fury power versus cloud API bars. Change runtime or tariff, then edit the monthly workload. Explain that the initial 1,200 W, 40 hours and $0.25/kWh are illustrative inputs; the local bar excludes hardware/support. Cloud provider electricity is bundled into API charges. The graph is a cost scenario, not equal-quality or throughput evidence. Expand the dated official rates for details.
+
+## Fury Rush
+
+Press **Launch Fury Rush** once. “Six workflows are submitting through their real controls. One Factory build remains the global limit; visible queues preserve the workstation's admission limits.” Show DeepSeek/Qwen/FLUX lanes and measured throughput. Open completed workspaces without abandoning Factory. Wait for every tile to reach complete or failed; a failed tile is a real failure, not a canned replacement. The longest workload is the live Factory build.
+
+## Privacy and recovery
+
+Only Action Trailer's consented camera collects a visitor photo. No consent means no camera. Its photo and media are local, temporarily stored outside the repository, and deleted on Done/New/explicit deletion/idle/service startup. The browser receives a private preview; only localhost offers the final station download. Physical camera/microphone and remote device behavior require site validation.
+
+Inspect `/models`, `/performance`, `/economics` and `/secure` for pinned identities, resources, sourced scenarios and code evidence. Electricity is GPU-only energy, not total ownership cost; cloud examples have different outputs/capabilities.
+
+If a job fails, show its real state, preserve the evidence and retry only within the stated bounds. Inspect `./launch.sh status` and active jobs before guarded recovery. Do not restart a busy shared workstation or kill a process by port. All networking remains site-managed.
+
+Historical presenter guidance follows for retained V2 features.
+
 # Conference presenter guide — V2
 
 The v2.3 visual edition upgrades new generated travel applications and the supplied Guided interface. Keep the distinction explicit: short builds generate application code live, with labeled supplied artwork; complete travel supplies its frontend and generates backend/QA. Focus product expands the checked application while retaining compact progress/token information. Existing saved applications keep their original files.
@@ -14,13 +55,13 @@ Factory opens in short travel mode from the conference chooser. Live creates new
 
 Economics counts actual terminal live calls with reported usage, including known usage of failed calls. Final output totals can jump as responses finish; there is no invented live token rate. Recorded playback is excluded. API estimates reprice observed text tokens, and GPU energy includes measured session idle power. GPU electricity is not the complete Fury power bill or ROI. Expand Assumptions for dated sources and browser-local tariff/currency settings.
 
-An authorized presenter can reset only the event window through the host shell:
+Reset the event window through the host shell:
 
 ```bash
 .venv/bin/python ops/event-session.py reset --name "My conference"
 ```
 
-For a browser reset, retrieve a private presenter code in your SSH terminal using `.venv/bin/python ops/event-session.py presenter-code`. Enter it only in the protected reset form. Keep it out of shared documentation. Reset affects every Economics display's counter window, not station assignments, jobs, or artifacts. Clearing a station assignment is a separate local action on `/stations`.
+For a browser reset, open **Assumptions & presenter controls** on `/operator`, enter an event name and confirm **Reset event session**. No PIN or presenter code is required. Reset changes the shared counter window and restores the default skin, preserving station assignments, jobs and artifacts. Clearing a station assignment is a separate local action on `/stations`.
 
 ## Working demo flows
 
@@ -40,3 +81,9 @@ Before a session, run ./launch.sh status; confirm all ten ready and no prior act
 Recovery: ./launch.sh diagnostics, then guarded ./launch.sh recover agent once idle. Do not restart the entire model stack to recover a tab. Health alone does not prove successful generation. Keep access private. Physical microphone/speaker and remote browser permissions depend on the presenting device.
 
 Expected timing varies with input, caches and queues. Allow several minutes for short development; complete travel takes longer. See VERIFICATION.md and V2-VERIFICATION.md for observed results and scope.
+
+## Hardened release operations
+
+Use the [fresh Fury guide](FRESH_FURY_GUIDE_v3.1.0.md) and its [PDF](FRESH_FURY_GUIDE_v3.1.0.pdf) for installation and site validation. Keep approved users on localhost, SSH or the organization’s private HTTPS network. Presenter controls remain directly available without a PIN. Host/Origin rejections indicate a mismatched deployment hostname; configure its exact approved name rather than weakening guards. Queues, upload/parser/connection limits and isolated previews can reject unsafe or oversized work with a visible error. Review the result and wait for available capacity.
+
+Only fictional Northwind screenshots are distributed. Check actual cameras, microphones, speakers and remote devices at your site; same-host automated browser tests do not certify them. For security reports use [private vulnerability reporting](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/security/advisories/new), with visitor data and credentials removed.

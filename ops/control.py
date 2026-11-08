@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Linux process supervisor: identity-checked sessions, readiness and verified shutdown."""
-import argparse,fcntl,json,os,re,signal,socket,subprocess,sys,time,urllib.request,urllib.error
+import argparse,fcntl,json,math,os,re,signal,socket,subprocess,sys,time,urllib.request,urllib.error
 from pathlib import Path
 from runtime import ROOT,COMPONENTS,SERVE,environment
 STATE=ROOT/'state';STOP_REQUEST=STATE/'stop-request';PIDFILE=STATE/'processes.json';REGISTRY=STATE/'supervisor.json'
@@ -136,29 +136,47 @@ def session_member_verified(member,leader,members,name):
   current=parent
  return True
 
+def signal_saved(records, sig=signal.SIGTERM):
+ """Pin kernel process identities, then revalidate every snapshot before signalling."""
+ if not hasattr(os,'pidfd_open') or not hasattr(signal,'pidfd_send_signal'):
+  raise RuntimeError('Safe process control requires Linux pidfds; no PID signal fallback.')
+ descriptors=[]
+ try:
+  for saved in records:
+   try:descriptor=os.pidfd_open(saved['pid'],0)
+   except ProcessLookupError:continue
+   descriptors.append((descriptor,saved))
+   now=process(saved['pid'])
+   if now is None:continue  # The pinned process exited; its descriptor cannot target a replacement.
+   if fingerprint(now)!=saved:raise RuntimeError('Process identity changed while pinning stop targets.')
+  for descriptor,saved in descriptors:
+   try:signal.pidfd_send_signal(descriptor,sig,None,0)
+   except ProcessLookupError:pass
+ finally:
+  for descriptor,_ in descriptors:os.close(descriptor)
+
+
 def stop_one(name,registry):
  row=discover(name);saved=registry.get(name,{})
  if row:
   members=[r for r in processes() if same_session(r,row)]
   if not all(session_member_verified(r,row,members,name) for r in members):raise RuntimeError('Unrecognised process in '+name+' session; refusing signals.')
   saved={'leader':fingerprint(row),'members':[fingerprint(r) for r in members]};registry[name]=saved;save(registry)
-  # Recheck the exact leader and every member immediately before the group signal.
+  # Pin each exact kernel identity; never send to a process group that can gain members.
   if not identity(process(row['pid']),name) or not all(unchanged(m) for m in saved['members']):raise RuntimeError('Process identity changed before stop.')
-  os.killpg(row['pgid'],signal.SIGTERM)
+  signal_saved([saved['leader']])
   deadline=time.monotonic()+45
   while any(unchanged(m) for m in saved['members']) and time.monotonic()<deadline:time.sleep(.15)
   remaining=[m for m in saved['members'] if unchanged(m)]
   # A hung verified descendant may outlive its leader; signal only the recorded PID identity.
-  for m in remaining:
-   if unchanged(m):os.kill(m['pid'],signal.SIGTERM)
+  signal_saved(remaining)
   deadline=time.monotonic()+10
   while any(unchanged(m) for m in remaining) and time.monotonic()<deadline:time.sleep(.15)
   if any(unchanged(m) for m in remaining):raise RuntimeError(name+' did not stop gracefully; surviving verified PIDs: '+str([m['pid'] for m in remaining if unchanged(m)]))
  elif saved:
   remaining=[m for m in saved.get('members',[]) if unchanged(m)]
   if remaining:
-   for m in remaining:
-    if unchanged(m):os.kill(m['pid'],signal.SIGTERM)
+   signal_saved(remaining)
    deadline=time.monotonic()+30
    while any(unchanged(m) for m in remaining) and time.monotonic()<deadline:time.sleep(.15)
    if any(unchanged(m) for m in remaining):raise RuntimeError('Recorded orphan remains for '+name)
@@ -172,6 +190,11 @@ def _start_one(name,registry):
   if port_open(COMPONENTS[name]['port']):raise RuntimeError(name+' port '+str(COMPONENTS[name]['port'])+' is occupied by an unverified process. Inspect ss -ltnp and /proc/PID/{cwd,cmdline}; use the configured active deployment controller. No process was adopted or signalled.')
   command=COMPONENTS[name]['command'];program=ROOT/command[0]
   if '/' in command[0] and not program.exists():raise RuntimeError('Run bash ops/bootstrap.sh first: missing '+command[0])
+  # The consent policy expires visitor media on every actual service start.
+  # Status/idempotent launches do not clear a live session or signal a process.
+  sys.path.insert(0,str(ROOT))
+  from showcase_app.visitor_store import clear_on_start
+  clear_on_start()
   with (ROOT/'logs'/f'{name}.log').open('ab') as log:p=subprocess.Popen(command,cwd=ROOT,env=environment(),stdout=log,stderr=log,start_new_session=True)
   time.sleep(.15);row=process(p.pid)
   if not row or not identity(row,name):raise RuntimeError(name+' failed to start; inspect logs/'+name+'.log')
@@ -214,7 +237,20 @@ def gpu_status():
   return {'verified':True,'summary':summary.stdout.strip(),'processes':apps.stdout.strip().splitlines() if apps.stdout.strip() else []}
  except (OSError,subprocess.TimeoutExpired):return {'verified':False,'summary':'nvidia-smi unavailable','processes':[]}
 
+def skin_status():
+ try:
+  customer=json.loads((STATE/'skin/active.json').read_text())
+  if not isinstance(customer,dict) or not isinstance(customer.get('name'),str) or not 1<=len(customer['name'])<=80 or any(ord(c)<32 for c in customer['name']):return 'default · HP ZGX Fury'
+  try:hours=json.loads((ROOT/'config/skin.json').read_text()).get('idle_hours',8)
+  except (OSError,ValueError,AttributeError):hours=8
+  if type(hours) not in (int,float) or not math.isfinite(hours) or not 0<hours<=168:hours=8
+  if time.time()-(STATE/'skin/active.json').stat().st_mtime<hours*3600:return customer['name']
+ except (OSError,ValueError,KeyError,TypeError):pass
+ return 'default · HP ZGX Fury'
+
 def status():
+ print('Customer skin:',skin_status())
+ print('Presenter controls: available without a PIN')
  print(f'{"COMPONENT":12} {"PORT":6} {"PID":8} {"PROCESS / READINESS":24} MODEL')
  for name,spec in COMPONENTS.items():
   row=discover(name);healthy=ready(name) if row else False
@@ -234,7 +270,9 @@ def status():
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('action',choices=['status','start','stop','restart']);parser.add_argument('components',nargs='*');args=parser.parse_args()
  if any(name not in COMPONENTS for name in args.components):parser.error('Unknown component; choose '+', '.join(COMPONENTS))
- STATE.mkdir(exist_ok=True);(ROOT/'logs').mkdir(exist_ok=True)
+ sys.path.insert(0,str(ROOT))
+ from showcase_app.runtime_privacy import service_policy,rotate_logs
+ service_policy(ROOT);rotate_logs(ROOT/'logs')
  requested=time.time()
  if args.action=='status':status();return
  if args.action=='stop' and not args.components:STOP_REQUEST.write_text(str(requested))

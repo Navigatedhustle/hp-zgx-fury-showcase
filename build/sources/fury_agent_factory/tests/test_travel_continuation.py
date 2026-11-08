@@ -84,7 +84,7 @@ def test_rest_transport_preserves_real_backend_permissions(tmp_path,monkeypatch)
  def sandbox(code,data,mode,payload):observed.append(payload);return {'status':403,'body':{'error':'Forbidden fixture'}}
  monkeypatch.setattr(devteam_routes,'execute',sandbox)
  app=FastAPI();app.include_router(devteam_routes.router)
- response=TestClient(app).put('/api/travel/fixture/app/admin/listings/1',json={'price':222,'active':1},headers={'Authorization':'Bearer demo-fixture'})
+ response=TestClient(app,base_url="http://localhost").put('/api/travel/fixture/app/admin/listings/1',json={'price':222,'active':1},headers={'Authorization':'Bearer demo-fixture'})
  assert response.status_code==403 and response.json()['error']=='Forbidden fixture'
  assert observed[0]['headers']['authorization']=='Bearer demo-fixture'
  assert observed[0]['method']=='PUT' and observed[0]['path']=='/admin/listings/1'
@@ -142,7 +142,7 @@ def test_nonfinite_diagnostic_never_breaks_snapshot_json_or_audit(tmp_path,monke
  r=TravelRun(store=tmp_path/'runs');r.tests={'browser':{'passed':False,'events':[{'body':{'max_price':float('nan')}}]}};r.save()
  audit=json.loads((r.root/'audit.json').read_text());assert audit['tests']['browser']['events'][0]['body']['max_price']=={'invalid_numeric':'nan'}
  monkeypatch.setattr(devteam_routes,'get_current',lambda:r);app=FastAPI();app.include_router(devteam_routes.router)
- response=TestClient(app).get('/api/devteam/run');assert response.status_code==200
+ response=TestClient(app,base_url="http://localhost").get('/api/devteam/run');assert response.status_code==200
  assert response.json()['tests']['browser']['events'][0]['body']['max_price']=={'invalid_numeric':'nan'}
  json.dumps(response.json(),allow_nan=False)
 

@@ -9,6 +9,7 @@
    ============================================================ */
 (function(){
 "use strict";
+const parentOrigin = new URL(location.href).origin;
 const J = id => { const n = document.getElementById(id); try { return n ? JSON.parse(n.textContent) : null; } catch(e){ return null; } };
 const CFG = Object.assign({title:'Deck', storageKey:'hpdeck', embed:false, assetBase:null}, J('deck-config') || {});
 const Q = new URLSearchParams(location.search);
@@ -388,10 +389,17 @@ function onKey(e){
 function post(){
   if (!CFG.embed || window.parent === window) return;
   const s = DECK.slides[DECK.cur];
-  window.parent.postMessage({type:'hpdeck', event:'state', index:DECK.cur, step:DECK.step, steps:s ? s.steps : 0, count:DECK.slides.length, errors:DECK.errors.length}, '*');
+  window.parent.postMessage({type:'hpdeck', event:'state', index:DECK.cur, step:DECK.step, steps:s ? s.steps : 0, count:DECK.slides.length, errors:DECK.errors.length}, parentOrigin);
 }
 window.addEventListener('message', e => {
+  if (e.source !== window.parent || e.origin !== parentOrigin) return;
   const d = e.data; if (!d || d.type !== 'hpdeck') return;
+  if(d.cmd === 'palette' && typeof d.css === 'string' && d.css.length <= 32768){
+    let style=document.getElementById('fury-booth-palette');
+    if(!d.css){style?.remove();return}
+    if(!style){style=document.createElement('style');style.id='fury-booth-palette';document.head.append(style)}
+    style.textContent=d.css;return;
+  }
   if (d.cmd === 'goto') show(d.index || 0, d.step === 'end' ? 'end' : (d.step || 0));
   else if (d.cmd === 'next') next();
   else if (d.cmd === 'prev') prev();

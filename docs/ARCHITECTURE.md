@@ -1,5 +1,7 @@
 # Architecture
 
+Customer Skin runs in the existing operator process (`skin.py`, `skin_research.py`, pure `skin_theme.py`), behind the optional `skin_runtime.py` failure boundary. Station controls are open without a PIN, role or cookie prerequisite. Actions write customer identity only under ignored `state/skin/`. Deterministic HTTPS tools validate DNS and pin sockets; extracted metadata uses the existing DeepSeek-if-free/Qwen-otherwise lead gateway. Public request counts are separate from external inference counts. The existing cached telemetry SSE carries skin state without persisting identity in event samples or usage ledgers. Optional import, storage or snapshot failures cannot stop core startup/collection. Component-origin proxies reuse operator state. Shared CSS/JSON tokens drive the shell; Factory previews and pipelines remain isolated. The core Default appearance link propagates `skin=off`, bypassing all skin assets/API calls in that browser and its workspaces. An independent same-origin `/api/appearance/reset` endpoint clears active state without importing the feature. Color-only fades avoid full-page transition overlays. Event reset and configurable genuine-interaction idle expiry clear active branding. [Customer Skin](CUSTOMER_SKIN.md).
+
 `launch.sh` performs setup/preflight and delegates service ownership to the existing `showcase` → `ops/control.py` controller. No second supervisor is introduced. It records exact Linux process identities under this installation's `state/`, starts detached sessions in dependency order, waits for application readiness/model identity, rejects unknown listeners, rolls back failed newly started components and verifies shutdown. It does not adopt another installation's registry. `config/gb300.json` replaces the private machine-specific runtime plan; GPU selection defaults to index 0 (`FURY_GPU` can select a local index/UUID).
 
 ```mermaid
@@ -8,13 +10,13 @@ flowchart LR
  B --> A[Atlas 8200]
  B --> S[Presentations 8765]
  B --> F[Factory 8501]
- B --> I[Images 8800]
+ B --> I[Shared creative owner 8800]
  A --> G[Admission/accounting gateway 8001]
  S --> G
  F --> G
  G --> Q[Qwen vLLM 8000]
  G --> D[DeepSeek vLLM 8100]
- I --> X[FLUX diffusers CUDA]
+ I --> X[FLUX + Wan with named adapters / Grace CPU offload]
  A --> V[CPU ASR 8202 / GPU Kokoro 8204]
  F --> N[Networkless bubblewrap Python API/test workers]
 ```
@@ -39,10 +41,24 @@ Agent Factory retains its existing workers, models, sandbox and gateway. The pre
 
 The existing operator process serves `/stations`, `/demos`, `/operator`, `/why-hp`, and `/presenter`. Browser-local assignment and retained application frames provide independent screen control. The frame policy permits only the same site's chooser origin (loopback port 8080 or the current validated Tailscale hostname), while generated frames retain network/form restrictions and their existing sandbox. No Tailscale permissions, serving model settings, queues, worker lifetimes or process ownership rules change.
 
-`showcase_app/event.py` runs one five-second collector in the operator lifespan. It reuses the gateway ledger and health collection, persists aggregate session samples in additive `state/event-session.sqlite`, and serves cached `/api/live` plus aggregate-only `/api/event`. Energy integrates measured readings with gaps excluded; cached official prices live in `config/event-pricing.json`. Presenter reset changes only the measurement window and requires host-shell authority or an external private presenter key. No second supervisor, external inference API, or telemetry daemon is added.
+`showcase_app/event.py` runs one two-second collector in the operator lifespan. It reuses the gateway ledger and health collection, persists aggregate session samples in additive `state/event-session.sqlite`, and serves cached `/api/live` plus aggregate-only `/api/event`. Energy integrates measured readings with gaps excluded; cached official prices live in `config/event-pricing.json`. Event reset is available from the host shell or the browser settings without a presenter code. Browser mutations reject unrelated website origins; reset changes the measurement window and restores the default skin, preserving jobs and artifacts. No second supervisor, external inference API, or telemetry daemon is added.
 
 ## Enterprise visual review and voice rendering (v2.3)
 
 New short runs pin a disclosed public hero image under their private run root. The coordinator and independent browser validator supply that same checksummed data URI and CSS variable, with no network permission. Existing runs without that asset retain their original environment. Models author the frontend; artwork is supplied and excluded from live image/token claims. A bounded frontend-only Visual acceptance ticket uses exact edits, real generated-backend requests, local axe-core and desktop/mobile layout checks on empty/populated reservation states before final release. Earlier checked versions remain immutable and usable during a failed candidate or repair. Serving models, gateway admission, Atlas reserve and two development request slots are unchanged.
 
 Atlas's original Canvas/Web Audio orb retains actual local audio routing and analyser input. Its renderer coalesces animation frames, scales down idle rendering, and suspends for hidden workspaces, paused audio and reduced motion. Audio-driven deformation is separate from model performance accounting; it never represents extra inference or simulated token activity.
+
+## V3 Mission Control and local experiences
+
+The existing operator process owns the new Vision/Translate/Trailer orchestration and the Mission Control pages. `telemetry.py` reads native GPU process memory, power, temperature, CPU/disk and physical Grace NUMA node 0 separately from Linux's aggregate Grace/HBM memory. It derives engine output throughput from native vLLM generation-token counter differences. `event.py` serializes one cached snapshot every two seconds and uses Condition-based SSE fanout. `chrome.py` proxies the same stream on component origins without changing frame policy. Hidden frames suspend expensive rendering; the parent forwards telemetry only to visible workspaces. No second supervisor or model engine is added.
+
+`workloads.py` bounds orchestration to four active and sixteen outstanding jobs. Vision uses the existing Qwen multimodal engine, then requests a grounded executive brief. Translation parses text PDFs/DOCX/TXT and submits up to four page calls through unchanged gateway admission. Structured output requires one translation per extracted nonempty line and validates numeric/product-code coverage. Output-length termination fails the job. PDF/DOCX/TXT downloads use clean reflow; DeepSeek's terminology review is advisory. Fictional samples are rendered from included text/SVG sources. Documents live outside the repository under the user's `.cache/fury-showcase/documents`.
+
+The gateway's short-request routes record requested model, actual model and routing reason. If DeepSeek is active or waiting, short lead requests immediately use Qwen with a visible explanation, including the Factory-specific busy reason. Loopback destinations are enforced. The external request counter covers recorded inference destinations, not all host traffic. Gateway total/normal/Atlas/DeepSeek admission and engine settings remain unchanged.
+
+`creative.py` owns FLUX and Wan in one service process and one GPU lane. The image and text video pipelines share the exact same component objects/weights. Idle modules remain CPU-resident on physical Grace; per-thread CPU allocation is bound to node 0. Compatible Apache-2.0 LongLive-Plug adapters are checksum-checked and CPU-fused once before offload. The worker's process allocator budget leaves the 10 GiB reserve and an additional guard. Jobs are sequential, including image batches; one active plus three queued jobs remain the bound. Models are named in every job and health response.
+
+Action Trailer uses `visitor_store.py` for memory-only consent and 0700 per-session directories outside the repository. Only the consented camera flow accepts visitor photos. Cookie-scoped media and jobs require that session; private creative jobs additionally require an external service key. `trailer.py` creates a bounded original PG screenplay, neutral visible continuity, reference FLUX keyframes, sequential Wan clips and pinned Kokoro am_michael narration. `trailer_render.py` creates an original oscillator soundtrack, title cards and watermark with local FFmpeg. A slow run visibly cuts to two shots. Done/New/deletion/15-minute idle/service startup removes visitor files and cancels owned work; polling does not touch retention. A deleted directory is never recreated by a worker. The browser receives private previews; final download requires localhost host and client.
+
+Mission Control retains original Atlas/Slides/Factory controls and workflows. Fury Rush messages each owned iframe, deduplicates request IDs and invokes those original controls. It reports queued/submitted/complete/failed honestly. The Factory worker prompts, sandbox, models and two-proposal limit are frozen apart from the owner-authorized Visual diagnostic/compiler repair. Its real screenshot comparison detects supplied artwork hidden by an opaque overlay, while allowing useful translucent gradients and restoring exact source styles. Existing generated versions remain immutable.

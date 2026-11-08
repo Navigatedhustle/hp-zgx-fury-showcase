@@ -1,0 +1,242 @@
+{
+  "repo": "Wan-AI/Wan2.2-TI2V-5B-Diffusers",
+  "base_repo": "Wan-AI/Wan2.2-TI2V-5B",
+  "revision": "b8fff7315c768468a5333511427288870b2e9635",
+  "license": "Apache-2.0",
+  "license_source": "https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B-Diffusers/blob/b8fff7315c768468a5333511427288870b2e9635/README.md",
+  "reviewed_utc": "2026-11-06",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 17633,
+      "sha256": "b7120bb210ab14defe6cabd7ac4bf568d0f5fde42f88ea4ac3cfec9516dc2c0c",
+      "git_blob_sha1": "f940f55ea91f0d5713b7fa7b42be2590ea17a9e7"
+    },
+    {
+      "path": "model_index.json",
+      "bytes": 499,
+      "sha256": "6a72faeb564b0e894aea8fc4ef27241106eb739e8584e869b61589a65473add7",
+      "git_blob_sha1": "fe52bfbdc8e5bbc8a6a607dd301f6e1ab0889cd1"
+    },
+    {
+      "path": "scheduler/scheduler_config.json",
+      "bytes": 820,
+      "sha256": "571a3eed68bcd943a61b9fea8efa9e141472216ada59f928c8b5128ce24b32e0",
+      "git_blob_sha1": "950d26faea717c8902ee197982026cb9c1b6463e"
+    },
+    {
+      "path": "text_encoder/config.json",
+      "bytes": 855,
+      "sha256": "a2bcb24699f6c009a2427432bdd483ef8b2b42a712abc9503759cdc77d171f07",
+      "git_blob_sha1": "ab4a73bce055c6e32e66133032dcb3adfb26ee8d"
+    },
+    {
+      "path": "text_encoder/model-00001-of-00003.safetensors",
+      "bytes": 4935812536,
+      "sha256": "a8e861969c7433e707cc5a74065d795d36cca07ec96eb6763eb4083df7248f58",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "text_encoder/model-00002-of-00003.safetensors",
+      "bytes": 4983103192,
+      "sha256": "d57d948ece4837d850b7a859a4415121d57cacf8b9ee1d4db200c67f592902d7",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "text_encoder/model-00003-of-00003.safetensors",
+      "bytes": 1442935480,
+      "sha256": "0da9ee284e21d1406df708788db1d502d95d75f69faa25cd26151bf8829b7c5f",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "text_encoder/model.safetensors.index.json",
+      "bytes": 22476,
+      "sha256": "31c4c7bcce679eaa0dd4667462394ddb013dc2f748e0bffc893dc9146a320dab",
+      "git_blob_sha1": "f3d3d4da90eb33e14c92d88ea346370fa3c0b5b2"
+    },
+    {
+      "path": "tokenizer/special_tokens_map.json",
+      "bytes": 7079,
+      "sha256": "456b58fd240a06c743a7c2cf8008bec501240d68ebd1fc4018ea569505fea270",
+      "git_blob_sha1": "2ed25bf989a28d20b5d4b5822fbc24666d12a6f7"
+    },
+    {
+      "path": "tokenizer/spiece.model",
+      "bytes": 4548313,
+      "sha256": "e3909a67b780650b35cf529ac782ad2b6b26e6d1f849d3fbb6a872905f452458",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "tokenizer/tokenizer.json",
+      "bytes": 16837459,
+      "sha256": "20a46ac256746594ed7e1e3ef733b83fbc5a6f0922aa7480eda961743de080ef",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "tokenizer/tokenizer_config.json",
+      "bytes": 61758,
+      "sha256": "1d8d2a216bf8e70ac15b7ddcea566c4dd0433c024b39a58ca5e4c66bd78defbd",
+      "git_blob_sha1": "09d434f9457238f697f4c208aab47f58caa15bfe"
+    },
+    {
+      "path": "transformer/config.json",
+      "bytes": 495,
+      "sha256": "dc00d9866e72cf77db6b531aaa33be4dc7148fef9338442bd0ae9181f7075e9b",
+      "git_blob_sha1": "8180887e8ed86e4fd842824fb15fcabf43d19512"
+    },
+    {
+      "path": "transformer/diffusion_pytorch_model-00001-of-00005.safetensors",
+      "bytes": 4978254344,
+      "sha256": "511bec832a201caa410d09c5ce7dbbf8ad2708c345d82038f684fc74cce982be",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "transformer/diffusion_pytorch_model-00002-of-00005.safetensors",
+      "bytes": 4846784976,
+      "sha256": "7c42724912b1911429125dc50c0e9a49ccbada5a601b657d4ed2e15e7597c193",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "transformer/diffusion_pytorch_model-00003-of-00005.safetensors",
+      "bytes": 4972658392,
+      "sha256": "e9c3d0c76de786566382f8258101fea973ae37681c6e9fe0e5fe1fb93b806424",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "transformer/diffusion_pytorch_model-00004-of-00005.safetensors",
+      "bytes": 4846785080,
+      "sha256": "a331121771790939678db6f585553fd5184609f7d02593c699a4d241b0d834c5",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "transformer/diffusion_pytorch_model-00005-of-00005.safetensors",
+      "bytes": 354751840,
+      "sha256": "78b655685c47efdb2349f36826bb101264e9f212a16325d584aeb5f53c88e719",
+      "git_blob_sha1": null
+    },
+    {
+      "path": "transformer/diffusion_pytorch_model.safetensors.index.json",
+      "bytes": 73297,
+      "sha256": "d6c1f72d86fbddef8fb5ef1c03f5b56b2bfdb6ae58032db98c6019fd1dae9021",
+      "git_blob_sha1": "4ced518ff3eb023a0477eeab55f2a4d45d6fd43a"
+    },
+    {
+      "path": "vae/config.json",
+      "bytes": 1701,
+      "sha256": "d996c340fe9a7df5d7371f76a7d8d6956f6c98256080074d8434fa5eeac11360",
+      "git_blob_sha1": "29f65bc63e9daadb95e4c1a8344d162be4b7d533"
+    },
+    {
+      "path": "vae/diffusion_pytorch_model.safetensors",
+      "bytes": 2818777808,
+      "sha256": "62cd18f19438e35b32ac63020e2852f566e9b02f46b6cdbd87972a356e3c6f4b",
+      "git_blob_sha1": null
+    }
+  ],
+  "bytes": 34201436033,
+  "qualification_status": "passed",
+  "selected_profile": "longlive",
+  "reviewed_adapters": [
+    {
+      "repo": "Efficient-Large-Model/LongLive-Plug-Wan2.2-TI2V-5B-few-step",
+      "revision": "38a6ec4e8f5b644749d3072bfe1ac383d00951c0",
+      "license": "apache-2.0",
+      "files": [
+        {
+          "path": "README.md",
+          "bytes": 699,
+          "sha256": "fe4fd534d5dcfee2d6f3c185495851ef056393e318e52b5c2d29230f8d9793c5"
+        },
+        {
+          "path": "adapter_config.json",
+          "bytes": 9349,
+          "sha256": "d4cd3c2f82deaca2a7023474981ea05f6858f72d4a8495df8271f289657ddfb5"
+        },
+        {
+          "path": "adapter_model.safetensors",
+          "bytes": 1289824400,
+          "sha256": "69807b3bdfc4d9d153a5660dcd70812f9c973eb8bc52861fea19a5e563341316"
+        },
+        {
+          "path": "inference_config.yaml",
+          "bytes": 586,
+          "sha256": "c30da5b0674608078200422648d8cfc384b03b00a95448cf1aa1a7ee64121113"
+        },
+        {
+          "path": "provenance.json",
+          "bytes": 2641,
+          "sha256": "386b9b17431e996e7527365ad0d7204069114e1e2562041d5f048fdad6e6ea29"
+        },
+        {
+          "path": "training_config.yaml",
+          "bytes": 1853,
+          "sha256": "8c08a336f3ba7deafc44c496e7d08932baad855c343086f499c85d36a25f850b"
+        }
+      ]
+    },
+    {
+      "repo": "Efficient-Large-Model/LongLive-Plug-Wan2.2-TI2V-5B-cfg",
+      "revision": "fa1f9280778aa27c8038fe06e29fb5f2ed6be451",
+      "license": "apache-2.0",
+      "files": [
+        {
+          "path": "README.md",
+          "bytes": 1151,
+          "sha256": "a2b156caa9be2dbbcccc07f9b0204f488fd2a874310639356b99bd7fe25b54c1"
+        },
+        {
+          "path": "SHA256SUMS",
+          "bytes": 610,
+          "sha256": "4d7dc7ed2dd8e586c0a686d6c2db03b54e8bd820416edbd38908fd272d1fed12"
+        },
+        {
+          "path": "adapter_config.json",
+          "bytes": 8691,
+          "sha256": "e22386cbe19168506f036a293a11290b0130f3dab7e3461a093c94fe2fc9980c"
+        },
+        {
+          "path": "adapter_model.safetensors",
+          "bytes": 644949288,
+          "sha256": "c16212b483e3fd3d3a8a91b9732342777addc23d08ef0be055ff442c650944d4"
+        },
+        {
+          "path": "inference_overrides.yaml",
+          "bytes": 392,
+          "sha256": "e33c8259c74a4188c4781de0780813c51982e66b68739bc2d5b6127065d9e506"
+        },
+        {
+          "path": "provenance.json",
+          "bytes": 2638,
+          "sha256": "39cd4f8a99c86db1af0bb30d0818c582f8b5347b3ab11187571b5f3b8cf36281"
+        },
+        {
+          "path": "release_metadata.json",
+          "bytes": 1065,
+          "sha256": "db32274369ebcf321c99187aa8d6951ec2c64ef8f1a265ccab4628a7694da1a8"
+        },
+        {
+          "path": "training_config.yaml",
+          "bytes": 2354,
+          "sha256": "72060c553a8137df63c1dee4e3d657abc7d192c9351dfe405ef36995be23290c"
+        }
+      ]
+    }
+  ],
+  "candidate_profile": "longlive",
+  "qualified_settings": {
+    "steps": 4,
+    "guidance": 1.0,
+    "frames": 121,
+    "fps": 24,
+    "resolutions": [
+      {
+        "width": 1280,
+        "height": 704
+      },
+      {
+        "width": 832,
+        "height": 480
+      }
+    ]
+  }
+}

@@ -116,6 +116,10 @@ class Jobs:
     def spawn(self, project_id: str, coro) -> asyncio.Task:
         # the task copies the current context, so every model call it (and its children) makes is billed to
         # this deck in the usage ledger
+        if sum(len(tasks) for tasks in self.tasks.values()) >= 32:
+            from fastapi import HTTPException
+            coro.close()
+            raise HTTPException(429, 'Presentation queue full; retry shortly')
         token = usage.current_project.set(project_id)
         try:
             t = asyncio.create_task(coro)

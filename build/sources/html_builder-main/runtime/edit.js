@@ -21,6 +21,7 @@
    ============================================================ */
 (function(){
 "use strict";
+const parentOrigin = new URL(location.href).origin;
 const DECK = window.DECK;
 if (!DECK) return;
 
@@ -38,7 +39,7 @@ let raf = 0, lastRect = null, postT = 0, dirtyT = 0;
 function send(msg){
   if (!window.parent || window.parent === window) return;
   msg.type = 'hpdeck';
-  try { window.parent.postMessage(msg, '*'); } catch(e){}
+  try { window.parent.postMessage(msg, parentOrigin); } catch(e){}
 }
 
 /* ---------- geometry (the stage is transform-scaled; read it, never assume 1) ---------- */

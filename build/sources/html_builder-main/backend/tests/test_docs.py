@@ -103,7 +103,8 @@ def test_a_quote_counts_only_if_it_is_really_in_the_document():
 # ---------------------------------------------------------------- the HTTP surface and the digest
 @pytest.fixture
 def client():
-    with TestClient(main.app) as c:
+    with TestClient(main.app, base_url="http://localhost") as c:
+        c.headers["X-Fury-CSRF"] = c.get("/api/security/csrf-token").json()["token"]
         yield c
 
 
@@ -210,6 +211,8 @@ def test_documents_added_with_the_upload_are_read_before_the_first_plan(client, 
 
     monkeypatch.setattr(runner, "plan", spy)
     deck = DECKS / "hp_wolf_print_security.pptx"
+    if not deck.exists():
+        pytest.skip("Supplier evaluation deck is excluded from the public distribution")
     r = client.post("/api/projects", files=[("file", (deck.name, deck.read_bytes())),
                                             ("context", ("brief.docx", docx_bytes())),
                                             ("context", ("junk.pdf", b"not a pdf"))])

@@ -75,12 +75,11 @@ async def run(a):
    assert ledger_count()==count,'Passive displays added inference ledger events';report['checks'].append('Passive Economics and Why HP create no inference requests during 20-second observation');report['shared_sample_timestamps']=samples
    assert len(set(samples))<=4,'Telemetry is being collected per-browser instead of on shared cadence'
    for c in contexts[:2]:await c.close()
-   # Authorized reset is bounded to event state and does not remove source ledger rows.
-   from showcase_app.event import presenter_key
-   key=presenter_key(create=True);ctx=await browser.new_context();request=ctx.request;before_count=ledger_count()
-   r=await request.post(url(8080,'/api/event/reset'),data={'name':'Rejected reset'});assert r.status==403
-   r=await request.post(url(8080,'/api/event/reset'),headers={'X-Fury-Presenter':key},data={'name':'Conference verification'});assert r.status==200
-   assert ledger_count()==before_count;report['checks'].append('Unauthorized reset rejected; authorized reset preserves live ledger and artifacts')
+   # Shared setup requires no presenter secret; unrelated sites stay rejected.
+   ctx=await browser.new_context();request=ctx.request;before_count=ledger_count()
+   r=await request.post(url(8080,'/api/event/reset'),headers={'Origin':'https://unrelated.invalid'},data={'name':'Rejected reset'});assert r.status==403
+   r=await request.post(url(8080,'/api/event/reset'),data={'name':'Conference verification'});assert r.status==200
+   assert ledger_count()==before_count;report['checks'].append('No-code station reset preserves ledger/artifacts; unrelated origins rejected')
    await ctx.close()
   except Exception:
    report['errors'].append(traceback.format_exc())

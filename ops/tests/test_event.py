@@ -1,4 +1,4 @@
-"""Accounting, power integration, presenter authorization, and framing contracts."""
+"""Accounting, power integration, open presenter controls, and framing contracts."""
 import json
 import sqlite3
 from datetime import date
@@ -93,13 +93,12 @@ def test_reset_preserves_jobs_ledger_and_prior_event_history(monitor):
         assert db.execute('SELECT count(*) FROM events').fetchone()[0]==1
 
 
-def test_presenter_key_stays_outside_repo_and_is_required(tmp_path,monkeypatch):
-    monkeypatch.setenv('FURY_PRESENTER_KEY_FILE',str(tmp_path/'private/presenter.key'))
-    assert not event.authorized(None)
-    key=event.presenter_key(create=True)
-    assert event.authorized(key)
-    assert not event.authorized('incorrect')
-    assert event.presenter_key_path().stat().st_mode&0o777==0o600
+@pytest.mark.parametrize('origin,hostname,allowed',[
+    (None,'localhost',True),('http://localhost:8080','localhost',True),
+    ('http://localhost:8765','localhost',True),('https://station.example','station.example',True),
+    ('https://evil.example','localhost',False),('null','localhost',False)])
+def test_shared_presenter_controls_accept_station_origins_without_a_code(origin,hostname,allowed):
+    assert event.station_origin_allowed(origin,hostname) is allowed
 
 
 @pytest.mark.parametrize('host,expected',[
@@ -108,7 +107,8 @@ def test_presenter_key_stays_outside_repo_and_is_required(tmp_path,monkeypatch):
     ('evil.example',"'self'"),('evil.ts.net.example',"'self'"),
     ('demo.'+'tail123.ts.net; script-src *',"'self'"),
 ])
-def test_station_framing_only_allows_own_private_host(host,expected):
+def test_station_framing_only_allows_own_private_host(host,expected,monkeypatch):
+    monkeypatch.setenv("FURY_SERVE_HOSTNAMES", "demo."+"tail123.ts.net")
     assert station_ancestors(host)==expected
 
 

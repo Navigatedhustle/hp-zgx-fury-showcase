@@ -13,6 +13,6 @@
   "qwen_prefill": 8192,
   "lead_sequences": 1,
   "qwen_sequences": 4,
-  "runtime_vllm_version": "0.31.0",
+  "runtime_vllm_version": "0.32.0",
   "profile_note": "Public GB300 profile: 168 GiB lead engine allocation preserves 16384 context and one sequence; Qwen concurrency/context and gateway limits unchanged. Original live installation used 176 GiB lead."
 }

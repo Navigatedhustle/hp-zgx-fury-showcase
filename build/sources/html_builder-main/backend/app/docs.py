@@ -41,6 +41,17 @@ class DocRefused(ValueError):
     """The file cannot be used as a reference document. The message is safe to show the user."""
 
 
+def safe_extract(path):
+    """Application boundary: actual document decoding stays in a bounded worker."""
+    import base64
+    from showcase_app.document_parser import run_parser
+    try:
+        result = run_parser('presentation', path)
+        return DocText(pages=result['pages'], truncated=result['truncated']), [base64.b64decode(p, validate=True) for p in result['pictures']]
+    except (ValueError, KeyError, OSError) as error:
+        raise DocRefused("That document couldn't be read safely within the local parser limits.") from error
+
+
 @dataclass
 class DocText:
     pages: list[str]                 # one entry per PDF page; one entry for a Word or text file

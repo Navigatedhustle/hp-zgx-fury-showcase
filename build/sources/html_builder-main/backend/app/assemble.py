@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .config import BRAND_DIR, RUNTIME_DIR
 from .spec import SlideSpec
+from showcase_app.security import DOCUMENT_CSP
 
 _FONT_FILES = [("Archivo", 400), ("Archivo", 600), ("Archivo", 700), ("Archivo", 800), ("PlexMono", 400), ("PlexMono", 700)]
 _ASSET_REF = re.compile(r"""asset:([\w.-]+)|H\.asset\(\s*['"]([\w.-]+)['"]\s*\)""")
@@ -139,6 +140,7 @@ def assemble(deck: DeckInput, *, embed: bool = False, asset_base: str | None = N
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="{htmllib.escape(DOCUMENT_CSP.split('; sandbox')[0], quote=True)}">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="generator" content="HP Deck Builder">
 <title>{htmllib.escape(deck.title)}</title>

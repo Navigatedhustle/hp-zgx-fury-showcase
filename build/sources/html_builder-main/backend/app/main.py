@@ -68,6 +68,8 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="HP Deck Builder", lifespan=lifespan)
+from showcase_app.chrome import TelemetryProxy
+app.add_middleware(TelemetryProxy)
 from .booth import router as booth_router
 app.include_router(booth_router)
 from pathlib import Path as _ShowcasePath
@@ -847,7 +849,7 @@ async def version_preview(vid: str, embed: bool = True):
         return HTMLResponse("<body style='font:14px system-ui;color:#888;display:grid;place-items:center;height:100vh'>Not ready</body>")
     deck = DeckInput(title="Preview", slides=[DeckSlide(id=v.slide_id, spec=SlideSpec.model_validate(v.spec))], storage_key=f"preview-{v.slide_id}",
                      assets=db.asset_files(v.project_id))
-    html = assembler.assemble(deck, embed=embed, asset_base=f"/api/projects/{v.project_id}/assets/")
+    html = assembler.assemble(deck, embed=embed)
     return HTMLResponse(html, headers={"Cache-Control": "no-store"})
 
 
@@ -1043,10 +1045,9 @@ async def _store_doc(pid: str, file: UploadFile) -> ProjectDoc:
                     raise HTTPException(413, f"File too large (max {docs.MAX_BYTES // (1024 * 1024)} MB)")
                 f.write(chunk)
         try:
-            text = await asyncio.to_thread(docs.extract, raw)
+            text, figures = await asyncio.to_thread(docs.safe_extract, raw)
         except docs.DocRefused as e:
             raise HTTPException(400, str(e)) from e
-        figures = await asyncio.to_thread(docs.pictures, raw)
     finally:
         shutil.rmtree(work, ignore_errors=True)
     d = db.save(ProjectDoc(project_id=pid, name=name, pages=len(text.pages), chars=len(text.text), truncated=text.truncated))
@@ -1192,7 +1193,7 @@ def _safe_name(p: Project) -> str:
 @app.get("/api/projects/{pid}/deck")
 async def deck_preview(pid: str, fill: bool = True):
     _project(pid)
-    html, _ = runner.build_deck(pid, fill_unapproved=fill, asset_base=f"/api/projects/{pid}/assets/", embed=True)
+    html, _ = runner.build_deck(pid, fill_unapproved=fill, embed=True)
     return HTMLResponse(html, headers={"Cache-Control": "no-store"})
 
 
@@ -1304,3 +1305,10 @@ else:
     @app.get("/", include_in_schema=False)
     async def root():
         return JSONResponse({"message": "Frontend not built. Run: cd frontend && npm install && npm run build"})
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard, RequestGuard
+from showcase_app.security import GeneratedDocumentGuard
+app.add_middleware(GeneratedDocumentGuard)
+app.add_middleware(RequestGuard)
+app.add_middleware(HostGuard)

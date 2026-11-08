@@ -141,7 +141,8 @@ def test_resizing_an_image_may_lift_the_figure_cap():
 # ---------------------------------------------------------------- the HTTP surface
 @pytest.fixture
 def client():
-    with TestClient(main.app) as c:
+    with TestClient(main.app, base_url="http://localhost") as c:
+        c.headers["X-Fury-CSRF"] = c.get("/api/security/csrf-token").json()["token"]
         yield c
 
 

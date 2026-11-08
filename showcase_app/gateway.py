@@ -2,6 +2,7 @@
 import anyio,logging,asyncio,json,sqlite3,time,uuid,os,re
 from pathlib import Path
 import httpx
+from urllib.parse import urlparse
 from fastapi import FastAPI,Request,HTTPException
 from fastapi.responses import StreamingResponse,Response
 ROOT=Path(__file__).resolve().parents[1]
@@ -18,6 +19,10 @@ def connect():
  c=sqlite3.connect(DB,timeout=15);c.execute('PRAGMA journal_mode=WAL')
  c.execute('CREATE TABLE IF NOT EXISTS execution_intervals(id TEXT PRIMARY KEY,demo TEXT,model TEXT,started REAL,ended REAL,status TEXT)')
  c.execute('CREATE TABLE IF NOT EXISTS events(id TEXT PRIMARY KEY,demo TEXT,role TEXT,model TEXT,status TEXT,started REAL,seconds REAL,input_tokens INTEGER,output_tokens INTEGER,cached_tokens INTEGER,error TEXT)')
+ c.execute('CREATE TABLE IF NOT EXISTS routing(id TEXT PRIMARY KEY,requested TEXT,actual TEXT,reason TEXT,external_calls INTEGER,started REAL)')
+ c.execute('CREATE TABLE IF NOT EXISTS gateway_settings(name TEXT PRIMARY KEY,value REAL)')
+ c.execute("INSERT OR IGNORE INTO gateway_settings VALUES ('external_counter_since',?)",(time.time(),))
+ c.commit()
  return c
 def record(cid,demo,role,model,status,start,usage=None,error=''):
  u=usage or {};d=u.get('prompt_tokens_details') or {}
@@ -38,8 +43,12 @@ async def request_body(request):
  if 'model' in body and not isinstance(body['model'],str):raise HTTPException(422,'Model alias must be text')
  return body
 def select(prefix,requested):
+ if prefix.startswith('lead/'):
+  demo=prefix.split('/')[1]
+  if demo not in ('vision','translate','trailer','skin'):raise HTTPException(400,'Unknown brief-call demo')
+  return demo,LEAD
  demo=prefix.split('/')[0] if '/' in prefix else ('atlas' if prefix=='atlas' else 'slides')
- if demo not in ('atlas','agent','slides','devteam'):raise HTTPException(400,'Unknown demo')
+ if demo not in ('atlas','agent','slides','devteam','vision','translate','trailer','skin'):raise HTTPException(400,'Unknown demo')
  if demo!='devteam':return demo,MODEL
  if requested not in BACKENDS:raise HTTPException(400,'Unknown local model alias')
  return 'agent',requested
@@ -53,7 +62,11 @@ async def backend_health():
 @app.get('/health')
 async def health():
  backends=await backend_health()
- return {'ready':backends.get(MODEL,False),'backends':backends,'active':active,'queued':waiting,'limit':4,'normal_limit':3,'atlas_reserved':1,'lead_limit':1,'lead_wait_seconds':LEAD_WAIT_SECONDS}
+ with connect() as c:
+  external=c.execute('SELECT coalesce(sum(external_calls),0) FROM routing').fetchone()[0]
+  since=c.execute("SELECT value FROM gateway_settings WHERE name='external_counter_since'").fetchone()[0]
+  recent=[{'requested':r[0],'model':r[1],'reason':r[2],'at':r[3]} for r in c.execute("SELECT requested,actual,reason,started FROM routing WHERE reason!='' ORDER BY started DESC LIMIT 8")]
+ return {'ready':backends.get(MODEL,False),'backends':backends,'active':active,'queued':waiting,'limit':4,'normal_limit':3,'atlas_reserved':1,'lead_limit':1,'lead_wait_seconds':LEAD_WAIT_SECONDS,'external_api_calls':external,'external_counter_since':since,'local_only':all(urlparse(u).hostname in ('127.0.0.1','localhost','::1') for u,_ in BACKENDS.values()),'recent_routing':recent}
 @app.get('/{prefix:path}/models')
 async def models(prefix:str):
  if prefix.startswith('devteam'):
@@ -78,7 +91,18 @@ async def tokenize(request:Request):
 @app.post('/{prefix:path}/chat/completions')
 async def chat(prefix:str,request:Request):
  body=await request_body(request);demo,alias=select(prefix,body.get('model'))
+ requested=alias;reason=''
+ if prefix.startswith('lead/'):
+  pending=[*active.values(),*waiting.values()]
+  if lead_slots.locked() or any(v.get('model')==LEAD for v in pending):
+   factory_busy=any(v.get('demo')=='agent' and v.get('model')==LEAD for v in pending)
+   alias=MODEL;reason='Routed to Qwen: DeepSeek is busy with Agent Factory' if factory_busy else 'Routed to Qwen: DeepSeek is busy'
+  cap=body.get('max_tokens',768)
+  if type(cap) is not int or cap<1:raise HTTPException(422,'Brief-call output limit must be a positive integer')
+  body['max_tokens']=min(cap,768)
  url,served=BACKENDS[alias];body['model']=served
+ external_destination=int(urlparse(url).hostname not in ('127.0.0.1','localhost','::1'))
+ if external_destination:raise HTTPException(503,'External inference is disabled')
  if alias==MODEL:body.setdefault('chat_template_kwargs',{})['enable_thinking']=False
  cid=request.headers.get('x-fury-call-id') or uuid.uuid4().hex
  if not re.fullmatch(r'[A-Za-z0-9_:.-]{1,160}',cid):raise HTTPException(422,'Invalid call identity')
@@ -88,7 +112,8 @@ async def chat(prefix:str,request:Request):
  # A completed physical request cannot be replayed with the same identity.
  with connect() as c:
   if c.execute('SELECT 1 FROM events WHERE id=?',(cid,)).fetchone():raise HTTPException(409,'Physical call identity already recorded')
- waiting[cid]={'demo':demo,'model':alias,'since':start};record(cid,demo,role,alias,'queued',start)
+  c.execute('INSERT INTO routing VALUES (?,?,?,?,?,?)',(cid,requested,alias,reason,external_destination,start))
+ waiting[cid]={'demo':demo,'model':alias,'since':start,'routing':reason,'role':role};record(cid,demo,role,alias,'queued',start)
  outcome={'http_status':200}
  async def run():
   usage=None;status='failed';client=None;response=None;acquired=False;normal_acquired=False;lead_acquired=False;error=''
@@ -97,7 +122,7 @@ async def chat(prefix:str,request:Request):
    if alias==LEAD:await asyncio.wait_for(lead_slots.acquire(),LEAD_WAIT_SECONDS);lead_acquired=True
    if demo!='atlas':await asyncio.wait_for(normal.acquire(),60);normal_acquired=True
    await asyncio.wait_for(total.acquire(),60);acquired=True
-   waiting.pop(cid,None);active[cid]={'demo':demo,'model':alias,'since':time.time()};record(cid,demo,role,alias,'active',start)
+   waiting.pop(cid,None);active[cid]={'demo':demo,'model':alias,'since':time.time(),'routing':reason,'role':role};record(cid,demo,role,alias,'active',start)
    client=httpx.AsyncClient(timeout=240,trust_env=False)
    execution_start(cid,demo,alias)
    response=await client.send(client.build_request('POST',url+'/v1/chat/completions',json=body),stream=True)
@@ -117,7 +142,10 @@ async def chat(prefix:str,request:Request):
    else:
     raw=await response.aread();payload=json.loads(raw)
     if payload.get('error'):raise RuntimeError('Upstream error')
-    usage=payload.get('usage');yield raw
+    usage=payload.get('usage')
+    if demo in ('vision','translate','trailer','skin'):
+     payload['fury_routing']={'requested':requested,'model':alias,'reason':reason};raw=json.dumps(payload).encode()
+    yield raw
    status='complete'
   except asyncio.CancelledError:status='cancelled';raise
   except Exception as e:
@@ -157,3 +185,8 @@ async def recover_interrupted():
  with connect() as c:
   c.execute("UPDATE execution_intervals SET ended=?,status='interrupted' WHERE ended IS NULL AND demo!='image'",(time.time(),))
   c.execute("UPDATE events SET status='failed',error='Gateway restarted during request' WHERE status IN ('queued','active') AND demo!='image'")
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard, RequestGuard
+app.add_middleware(RequestGuard)
+app.add_middleware(HostGuard)

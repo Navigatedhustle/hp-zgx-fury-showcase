@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Real browser checks for HP shell, routes, theme, keyboard and responsive layout.
-No inference is submitted. Evidence remains local under reports/. Optional axe audit
+No generation controls are submitted; Atlas initialization may issue persona routing
+calls. Evidence remains local under reports/. Optional axe audit
 uses an explicitly supplied local axe.min.js; no third-party runtime/CDN dependency.
 """
 import argparse,asyncio,json,time
@@ -36,7 +37,7 @@ async def main(a):
     if name in ['slides','image']:
      assert not await page.get_by_role('button',name='Cancel job',exact=True).is_visible(),name+' idle cancel control'
     if name=='home':
-     assert await page.locator('a[data-demo]').count()==4
+     assert await page.locator('a[data-demo]').count()==8
      expected='dark' if mode=='light' else 'system'
      await page.locator('.hp-theme').click();assert await page.locator('html').get_attribute('data-hp-theme')==expected
      # Persist a user choice without the navigation init script overwriting it.

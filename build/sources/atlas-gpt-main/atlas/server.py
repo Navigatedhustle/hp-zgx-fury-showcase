@@ -25,6 +25,7 @@ brain=Brain();decisions=Decisions();telemetry=Telemetry();last_results={};result
 developer=Developer(brain)
 FEATURES={k:os.environ.get('ATLAS_'+k.upper(),'1')!='0' for k in ['orb','developer','graph','documents','feed']}
 traces=OrderedDict()
+query_pending=0
 def stage(trace,label):
     if not trace:return
     traces.setdefault(trace,[]).append({'label':label,'timestamp':time.time()})
@@ -43,6 +44,8 @@ async def lifespan(app):
     yield
 
 app=FastAPI(title=NAME,docs_url=None,redoc_url=None,lifespan=lifespan)
+from showcase_app.chrome import TelemetryProxy
+app.add_middleware(TelemetryProxy)
 app.mount('/showcase-assets',StaticFiles(directory=ROOT.parents[2]/'showcase_app/assets'),name='showcase-assets')
 app.mount('/static',StaticFiles(directory=ROOT/'static'),name='static')
 (ROOT/'artifacts').mkdir(exist_ok=True)
@@ -97,6 +100,9 @@ def selected_result(q):
 
 @app.post('/api/query')
 async def query(q:Query,request:Request):
+    global query_pending
+    if query_pending>=8:raise HTTPException(429,'Atlas queue full; retry shortly')
+    query_pending+=1
     task=asyncio.create_task(query_work(q))
     try:
         async with asyncio.timeout(100):
@@ -107,6 +113,7 @@ async def query(q:Query,request:Request):
     except TimeoutError:raise HTTPException(504,'Atlas took too long. Please try another question.')
     finally:
         if not task.done():task.cancel();await asyncio.gather(task,return_exceptions=True)
+        query_pending-=1
 
 async def query_work(q:Query):
     if q.persona not in PERSONAS:raise HTTPException(422,'Unknown persona')
@@ -260,7 +267,8 @@ async def transcribe(request:Request):
     start=time.perf_counter()
     try:
         async with httpx.AsyncClient(timeout=15,trust_env=False) as c:
-            r=await c.post(SPEECH+'/v1/audio/transcriptions',files={'file':('question.wav',audio,'audio/wav')},data={'language':'en'});r.raise_for_status();d=r.json()
+            from showcase_app.security import csrf_headers
+            r=await c.post(SPEECH+'/v1/audio/transcriptions',headers=csrf_headers(),files={'file':('question.wav',audio,'audio/wav')},data={'language':'en'});r.raise_for_status();d=r.json()
     except httpx.HTTPError as e:raise HTTPException(503,'Local speech recognition is unavailable. Use the question box.') from e
     stage_metrics['asr_ms']=(time.perf_counter()-start)*1000
     return {**d,'asr_ms':stage_metrics['asr_ms']}
@@ -343,3 +351,8 @@ async def detect(request:Request):
             r=await c.post('http://127.0.0.1:8205/detect',content=image,headers={'Content-Type':'image/jpeg'});r.raise_for_status()
         result=r.json();stage_metrics['vision_ms']=result['latency_ms'];return result
     except (httpx.HTTPError,ValueError) as e:raise HTTPException(503,'Person detection is loading. The live camera feed is available.') from e
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard, RequestGuard
+app.add_middleware(RequestGuard)
+app.add_middleware(HostGuard)

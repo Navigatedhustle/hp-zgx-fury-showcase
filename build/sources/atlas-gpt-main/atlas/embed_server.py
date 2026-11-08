@@ -13,8 +13,8 @@ async def lifespan(app):
     import torch
     from transformers import AutoModel,AutoTokenizer
     path=ROOT/'models/embed';torch.set_num_threads(4)
-    tokenizer=AutoTokenizer.from_pretrained(path,trust_remote_code=True,local_files_only=True)
-    model=AutoModel.from_pretrained(path,trust_remote_code=True,local_files_only=True,dtype=torch.bfloat16,attn_implementation='sdpa').to('cuda').eval()
+    tokenizer=AutoTokenizer.from_pretrained(path,trust_remote_code=False,local_files_only=True)
+    model=AutoModel.from_pretrained(path,trust_remote_code=False,local_files_only=True,dtype=torch.bfloat16,attn_implementation='sdpa').to('cuda').eval()
     yield
 app=FastAPI(docs_url=None,redoc_url=None,lifespan=lifespan)
 class Input(BaseModel):

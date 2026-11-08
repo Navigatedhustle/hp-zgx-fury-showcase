@@ -42,7 +42,7 @@ GPT-6 Astra requests above 272K input use 20/75 for the full request. Gemini's p
 
 ## Presenter authorization
 
-Host-shell users already authorized to operate the installation can run `.venv/bin/python ops/event-session.py reset --name "Event"`. For browser reset, `presenter-code` creates/reads a private key under the user's external `~/.config/fury-showcase/presenter.key` with mode 0600. The optional `FURY_PRESENTER_KEY_FILE` must point outside the repository. Browser reset requires this code in a request header; it is never embedded in source, URLs, logs, public telemetry, or a persisted browser preference. A failed authorization returns 403. The UI asks for confirmation before reset.
+Event reset is available through `.venv/bin/python ops/event-session.py reset --name "Event"` or the browser's **Assumptions & presenter controls** form. No presenter code, PIN, account or role assignment is required. The browser asks for confirmation. Reset starts a new shared counter window and restores the default skin, preserving jobs, artifacts and station assignments. Unrelated website origins cannot submit browser mutations.
 
 ## Rollback
 

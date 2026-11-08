@@ -14,8 +14,19 @@ jobs:
           python-version: '3.12'
       - run: bash ops/scan-secrets.sh
       - run: python ops/check-source.py
-      - run: python ops/package-release.py --version v2.3.0
+      - run: python ops/package-release.py --version v3.1.0
       - run: pip install -r ops/apps-requirements.lock
-      - name: Hardware-independent controller and API failure fixtures
+      - name: Install isolated parser and browser test prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap libsndfile1 apparmor-profiles apparmor-utils
+          # Ubuntu's packaged bwrap policy permits namespace setup and strips
+          # capabilities from its children. Keep the global userns restriction.
+          # https://discourse.ubuntu.com/t/understanding-apparmor-user-namespace-restriction/58007
+          sudo install -m 0644 /usr/share/apparmor/extra-profiles/bwrap-userns-restrict /etc/apparmor.d/bwrap-userns-restrict
+          sudo apparmor_parser -r /etc/apparmor.d/bwrap-userns-restrict
+          bwrap --unshare-all --ro-bind / / /bin/true
+          python -m playwright install --with-deps chromium
+      - name: Controller, API, isolated parser and browser boundary regressions
         run: python -m pytest -q ops/tests ops/acceptance/test_gateway.py ops/acceptance/test_booth.py
-      # GPU/browser/namespace/model generation acceptance is intentionally separate.
+      # GPU model generation and long hardware acceptance run on the Fury separately.

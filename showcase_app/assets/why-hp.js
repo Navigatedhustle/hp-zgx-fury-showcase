@@ -1,0 +1,1 @@
+document.getElementById('why-details-open').onclick=()=>document.getElementById('why-details').showModal();document.getElementById('why-details-close').onclick=()=>document.getElementById('why-details').close();

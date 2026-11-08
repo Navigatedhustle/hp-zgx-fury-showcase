@@ -1,0 +1,188 @@
+{
+  "date_utc": "2026-11-06",
+  "scope": "Customer customization reliability follow-up on the local Fury. Exact reported failure was not reproduced before changes. No current customer identity or screenshot recorded.",
+  "behavior": {
+    "core_optional_import_and_lifecycle_boundary": true,
+    "core_telemetry_isolated_from_skin_snapshot_failures": true,
+    "persisted_state_and_logo_validation": true,
+    "core_default_appearance_bypass": "/demos?skin=off",
+    "bypass_propagates_to_navigation_and_workspaces": true,
+    "independent_same_origin_reset": "/api/appearance/reset",
+    "whole_document_view_transitions_removed": true,
+    "explicit_apply_color_fade_ms": 450,
+    "background_and_reduced_motion_swap_instantly": true,
+    "close_and_cancel_ignore_late_responses": true,
+    "requests_bounded": true,
+    "presenter_and_settings_require_no_pin": true
+  },
+  "tests": {
+    "factory_regressions": 189,
+    "core_and_skin": 124,
+    "new_resilience_cases": 26,
+    "chart_arithmetic": 7,
+    "network_in_unit_tests": false,
+    "browser_fault_cases": 20,
+    "browser_faults": [
+      {
+        "browser": "chromium",
+        "fault": "missing_script",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "missing_styles",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "initialization_error",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "service_503",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "invalid_state",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "unknown_counter",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "timeout",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "late_poll",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "late_start",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "chromium",
+        "fault": "safe_mode",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "missing_script",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "missing_styles",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "initialization_error",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "service_503",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "invalid_state",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "unknown_counter",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "timeout",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "late_poll",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "late_start",
+        "launcher_and_workspaces_passed": true
+      },
+      {
+        "browser": "firefox",
+        "fault": "safe_mode",
+        "launcher_and_workspaces_passed": true
+      }
+    ],
+    "live_backend": {
+      "damaged_json_defaulted": true,
+      "collector_and_sse_source_advance": true,
+      "external_ai_api_calls": 0
+    },
+    "live_neutral_png_and_reset": {
+      "black_png_manual_apply": true,
+      "white_png_manual_apply": true,
+      "independent_reset": true,
+      "external_ai_api_calls": 0
+    },
+    "full_workflow_checks": {
+      "no_pin_or_station_assignment_required": true,
+      "offline_upload": true,
+      "split_preview": true,
+      "manual_color_picker": true,
+      "industry_pack": true,
+      "cross_station_sync": true,
+      "css_json_match": true,
+      "customer_text_escaped": true,
+      "cached_switch": true,
+      "six_curated_defaults_and_retained_edits": true,
+      "electricity_known_unknown_more_less": true,
+      "reduced_motion_context": true,
+      "reduced_motion_instant_swap": true,
+      "css_transition_fallback": true
+    },
+    "browser_layouts": 90,
+    "max_cross_station_sync_seconds": 0.0729305679560639,
+    "hardware_outputs": [
+      {
+        "workflow": "atlas",
+        "passed": true,
+        "latency_seconds": 0.8601710796356201
+      },
+      {
+        "workflow": "slides",
+        "passed": true,
+        "latency_seconds": 4.2377119064331055
+      },
+      {
+        "workflow": "image",
+        "passed": true,
+        "latency_seconds": 2.7532176971435547
+      }
+    ]
+  },
+  "factory": {
+    "source_unchanged": true,
+    "model_profile_unchanged": true,
+    "new_factory_benchmark": false,
+    "prior_latency_gate_still_failed": true,
+    "existing_user_build_not_interrupted": true
+  },
+  "limits": [
+    "The exact user-reported failure was not reproduced. The fix isolates observed coupling and tests explicit failure modes.",
+    "Failure injection and workflow checks cannot prove immunity to all future faults.",
+    "No new Factory generation or performance qualification was run; the original failed latency gate remains open.",
+    "Whole-document View Transitions were cut for reliability; explicit Apply uses a color-only CSS fade.",
+    "Browsers were local Chromium and Firefox, not an external station or WebKit."
+  ]
+}

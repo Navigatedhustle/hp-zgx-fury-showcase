@@ -1,5 +1,13 @@
 # Source ownership and third-party notices
 
+## V3 qualification runtime additions
+
+Wan2.2-TI2V-5B uses its publisher's Apache-2.0 Diffusers serialization; pinned revisions and reviewed model-card links are in `docs/ASSET-MANIFEST.md` and `config/creative-models.json`. Downloaded weights are not redistributed in Git or source archives.
+
+ImageIO-FFmpeg 0.8.1's Python wrapper is BSD-2-Clause. Its separately executed ARM64 FFmpeg binary reports GPL-3.0-or-later; commercial use is permitted without an annual-revenue threshold. The wheel and binary are installed into local environments, not bundled in Git or release ZIPs. Exact download/binary hashes and version are in `config/creative-tools.json`; upstream source and terms: https://github.com/imageio/imageio-ffmpeg and https://ffmpeg.org/legal.html.
+
+Wan text normalization additionally uses ftfy 6.3.1 (Apache-2.0) and wcwidth 0.2.13 (MIT), pinned in the model environment lock. The creative worker calls the host's existing libnuma interface for its own CPU allocation policy; no host policy or library is redistributed or changed.
+
 The source distribution follows the existing Atlas MIT license. The preserved ownership record states that first-party ownership across the discovered projects was confirmed by the owner on 2026-10-10; the owner explicitly authorized public distribution on 2026-10-30. This license covers project-authored integration, examples, prompts and generated demonstration code. It does not license third-party names, marks, weights or dependencies beyond their own terms.
 
 HP, NVIDIA, GB300, DeepSeek, Qwen and other names identify their respective products/owners. This community demonstration does not imply support, endorsement or a trademark license. Product photos and vendor logos with no recorded redistribution permission were excluded and replaced by neutral original diagrams. Historical source comments may mention brand styling; included neutral assets govern this public build.
@@ -21,3 +29,32 @@ The fictional Mediterranean hero is original AI-created supplied artwork, genera
 ## HP identity in V2
 
 The official HP Electric Blue logo with white keyline is an unchanged asset supplied by the owner for this HP demonstration. HP trademarks remain HP property; the source MIT license does not cover the mark or confer general trademark permissions. No licensed HP fonts are distributed.
+
+## V3 selected adapters, narrator and documents
+
+The selected LongLive-Plug few-step and CFG adapters are Apache-2.0 at the immutable revisions in config/creative-models.json. They are fused only into the matching Wan2.2 TI2V 5B backbone. Both model cards and their licenses were directly reviewed; no annual-revenue restriction applies.
+
+Kokoro's added am_michael voice uses the existing Apache-2.0 revision; its exact checksum and reviewed card are in docs/ASSET-MANIFEST.md. Atlas's af_heart voice is retained. pypdf is BSD-3-Clause, python-docx is MIT and ReportLab uses a BSD-style license. Installed Noto fonts retain their upstream SIL OFL terms; no additional licensed HP font is included. The original synthesized trailer soundtrack is created locally from oscillator tones, without a sampled recording. No weights, visitor media or downloaded FFmpeg/browser binaries are redistributed.
+
+## Customer Skin dependencies and trademarks
+
+The operator environment pins CairoSVG 2.9.1 (LGPL-3.0-or-later), cairocffi 1.7.1 (BSD-3-Clause), cssselect2 0.10.1 (BSD-3-Clause), tinycss2 1.5.1 (BSD-3-Clause) and webencodings 0.6.1 (BSD-3-Clause). SVG parsing uses defusedxml 0.7.1 (PSF-2.0), the owner's explicitly approved exception to the new-dependency license allowlist. Original dependency licenses are retained in `licenses/customer-skin/`; installed libraries and the host Cairo library are not bundled in source archives. Sources: https://github.com/Kozea/CairoSVG, https://github.com/Kozea/cairocffi, https://github.com/Kozea/cssselect2, https://github.com/Kozea/tinycss2, https://github.com/Kozea/webencodings, https://github.com/tiran/defusedxml.
+
+Customer marks remain their owners' trademarks. Public-source availability does not grant general trademark rights. Use a customer logo only in a demo for that customer, next to the visible HP ZGX Fury identity, on screen only. Customer logos, names and palettes stay under ignored `state/skin/` and are excluded from source archives, documentation screenshots and downloaded application outputs. The original Northwind Beverages fixture mark is fictional project artwork and may appear in tests and documentation.
+
+
+## Export font assets (v3.1.0)
+
+`showcase_app/assets/export-fonts/` includes unchanged Noto Sans and script fonts,
+the Noto Sans CJK regular collection, and DejaVu Sans from the tested Ubuntu
+font packages. Noto fonts are SIL Open Font License 1.1; DejaVu uses the
+Bitstream Vera font license with DejaVu changes in the public domain. Full
+upstream/package copyright and license notices accompany the fonts, together
+with exact file hashes/package versions in `PROVENANCE.json`. Debian packaging
+license sections in those notices describe packaging code, which is not bundled.
+The browser's export-only fontconfig uses these local files; no system font
+configuration is installed or modified. Existing UI fonts and notices remain.
+
+## v3.1.0 locked dependency inventory
+
+Release assets include schema-validated CycloneDX1.5 SBOMs for all three active Python locks, the retained legacy Atlas lock and the presentation frontend npm lock. They include optional/platform entries and CUDA local build versions; inventory does not imply runtime reachability or an additional supported platform. Locked dependencies retain their upstream terms. The bundled export fonts and their complete unmodified copyright/license texts are listed above and in the asset manifest.
