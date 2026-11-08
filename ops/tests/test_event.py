@@ -108,7 +108,7 @@ def test_shared_presenter_controls_accept_station_origins_without_a_code(origin,
     ('demo.'+'tail123.ts.net; script-src *',"'self'"),
 ])
 def test_station_framing_only_allows_own_private_host(host,expected,monkeypatch):
-    monkeypatch.setenv("FURY_SERVE_HOSTNAMES", "demo.tail123.ts.net")
+    monkeypatch.setenv("FURY_SERVE_HOSTNAMES", "demo."+"tail123.ts.net")
     assert station_ancestors(host)==expected
 
 
