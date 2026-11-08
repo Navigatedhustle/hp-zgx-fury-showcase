@@ -849,7 +849,7 @@ async def version_preview(vid: str, embed: bool = True):
         return HTMLResponse("<body style='font:14px system-ui;color:#888;display:grid;place-items:center;height:100vh'>Not ready</body>")
     deck = DeckInput(title="Preview", slides=[DeckSlide(id=v.slide_id, spec=SlideSpec.model_validate(v.spec))], storage_key=f"preview-{v.slide_id}",
                      assets=db.asset_files(v.project_id))
-    html = assembler.assemble(deck, embed=embed, asset_base=f"/api/projects/{v.project_id}/assets/")
+    html = assembler.assemble(deck, embed=embed)
     return HTMLResponse(html, headers={"Cache-Control": "no-store"})
 
 
@@ -1193,7 +1193,7 @@ def _safe_name(p: Project) -> str:
 @app.get("/api/projects/{pid}/deck")
 async def deck_preview(pid: str, fill: bool = True):
     _project(pid)
-    html, _ = runner.build_deck(pid, fill_unapproved=fill, asset_base=f"/api/projects/{pid}/assets/", embed=True)
+    html, _ = runner.build_deck(pid, fill_unapproved=fill, embed=True)
     return HTMLResponse(html, headers={"Cache-Control": "no-store"})
 
 
@@ -1308,5 +1308,7 @@ else:
 
 # Apply after route/application middleware registration so Host validation is outermost.
 from showcase_app.security import HostGuard, RequestGuard
+from showcase_app.security import GeneratedDocumentGuard
+app.add_middleware(GeneratedDocumentGuard)
 app.add_middleware(RequestGuard)
 app.add_middleware(HostGuard)

@@ -168,3 +168,26 @@ class RequestGuard:
                 if not valid:
                     return await reject(scope, send, 415, 'Use JSON or the station request token')
         return await self.app(scope, receive, send)
+
+
+# Model-authored slide scripts are deliberately supported, inside an opaque origin.
+DOCUMENT_CSP = ("default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; "
+                "img-src data: blob:; font-src data:; media-src data: blob:; connect-src 'none'; "
+                "object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'none'; "
+                "form-action 'none'; sandbox allow-scripts allow-modals")
+
+
+class GeneratedDocumentGuard:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        async def protected(message):
+            if message['type'] == 'http.response.start' and scope.get('path', '').startswith('/api/'):
+                headers = list(message.get('headers', []))
+                if any(k.lower() == b'content-type' and b'text/html' in v for k, v in headers):
+                    headers = [(k, v) for k, v in headers if k.lower() not in (b'content-security-policy', b'cache-control')]
+                    headers += [(b'content-security-policy', DOCUMENT_CSP.encode()), (b'cache-control', b'no-store')]
+                    message = {**message, 'headers': headers}
+            await send(message)
+        return await self.app(scope, receive, protected)

@@ -834,6 +834,7 @@
   "ops/tests/test_frontier_cost.js",
   "ops/tests/test_legacy_model_entrypoints.py",
   "ops/tests/test_model_manifest_security.py",
+  "ops/tests/test_presentation_isolation.py",
   "ops/tests/test_request_security.py",
   "ops/tests/test_setup_stamp.py",
   "ops/tests/test_skin.py",

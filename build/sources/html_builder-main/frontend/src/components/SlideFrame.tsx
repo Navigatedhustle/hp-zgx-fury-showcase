@@ -100,9 +100,8 @@ export function SlideFrame({ src, className, controls = true, dark = true, onSta
 
   useEffect(() => {
     const onMsg = (e: MessageEvent) => {
-      // The preview is served by this backend, so a message that matters comes from this frame's
-      // window and this origin. Anything else posting at us is ignored outright.
-      if (e.source !== frame.current?.contentWindow || e.origin !== window.location.origin) return;
+      // The exact child window has an opaque sandbox origin.
+      if (e.source !== frame.current?.contentWindow || e.origin !== "null") return;
       const d = e.data as Record<string, unknown> | null;
       if (!d || d.type !== "hpdeck") return;
       if (d.event === "state") {
@@ -141,9 +140,8 @@ export function SlideFrame({ src, className, controls = true, dark = true, onSta
     setReady(0);
   }
 
-  // Same-origin by construction (the preview comes from this backend), so the commands are
-  // addressed to it rather than to "*".
-  const send = useCallback((msg: object) => frame.current?.contentWindow?.postMessage({ type: "hpdeck", ...msg }, window.location.origin), []);
+  // An opaque destination requires "*"; the exact child validates this parent origin.
+  const send = useCallback((msg: object) => frame.current?.contentWindow?.postMessage({ type: "hpdeck", ...msg }, "*"), []);
 
   const editOn = !!edit?.on;
   const locks = edit?.locks;
@@ -180,7 +178,7 @@ export function SlideFrame({ src, className, controls = true, dark = true, onSta
         {scale > 0 && (
           <iframe ref={frame} src={src} title={title} onLoad={() => { setLoaded(true); send(startAtEnd ? { cmd: "goto", index: 0, step: "end" } : { cmd: "state" }); if (autoFocus) frame.current?.focus(); }}
             className={cn("absolute left-0 top-0 origin-top-left border-0 bg-white transition-opacity", loaded ? "opacity-100" : "opacity-0")}
-            style={{ width: 1600, height: 900, transform: `scale(${scale})` }} sandbox="allow-scripts allow-popups allow-same-origin allow-modals" />
+            style={{ width: 1600, height: 900, transform: `scale(${scale})` }} sandbox="allow-scripts allow-modals" />
         )}
         {editOn && sel && scale > 0 && edit?.overlay && (
           <div className="pointer-events-none absolute inset-0">
