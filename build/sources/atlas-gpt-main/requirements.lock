@@ -115,8 +115,8 @@ termcolor==3.3.0
 thinc==8.3.13
 threadpoolctl==3.7.0
 tokenizers==0.23.2
-torch==2.8.0+cu129
-torchvision==0.23.0
+torch==2.13.0+cu132
+torchvision==0.28.0+cu132
 tqdm==4.70.1
 transformers==5.19.0
 triton==3.4.0
