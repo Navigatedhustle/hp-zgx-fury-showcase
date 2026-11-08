@@ -826,6 +826,7 @@
   "ops/tests/fixtures/skin/navy.svg",
   "ops/tests/fixtures/skin/northwind.svg",
   "ops/tests/fixtures/skin/red.svg",
+  "ops/tests/test_browser_headers.py",
   "ops/tests/test_compiler_identity.py",
   "ops/tests/test_control.py",
   "ops/tests/test_creative_inputs.py",

@@ -79,7 +79,7 @@ async def reject(scope, send, status, detail):
 
 class HostGuard:
     def __init__(self, app):
-        self.app = app
+        self.app = BrowserHeaders(app)
         self.hosts = configured_hosts()
 
     async def __call__(self, scope, receive, send):
@@ -189,5 +189,46 @@ class GeneratedDocumentGuard:
                     headers = [(k, v) for k, v in headers if k.lower() not in (b'content-security-policy', b'cache-control')]
                     headers += [(b'content-security-policy', DOCUMENT_CSP.encode()), (b'cache-control', b'no-store')]
                     message = {**message, 'headers': headers}
+            await send(message)
+        return await self.app(scope, receive, protected)
+
+
+class BrowserHeaders:
+    """Apply browser defaults without relaxing any application-specific CSP."""
+    def __init__(self, app):
+        self.app = app
+        self.hosts = configured_hosts()
+
+    async def __call__(self, scope, receive, send):
+        if scope['type'] != 'http':
+            return await self.app(scope, receive, send)
+        target = authority(next((v.decode('latin1') for k,v in scope['headers'] if k.lower()==b'host'), ''))
+        host = target[0] if target else 'localhost'
+        port = target[1] if target and target[1] else scope.get('server', ('',80))[1]
+        path = scope.get('path','/')
+        from showcase_app.frame_policy import station_ancestors
+        origins = [f'http://{name}:{p}' for name in ('localhost','127.0.0.1') for p in WEB_PORTS if p != 443]
+        origins += [f'https://{name}' + (f':{p}' if p != 443 else '') for name in sorted(self.hosts-LOOPBACK) for p in WEB_PORTS]
+        policy = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+                  "img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; "
+                  "connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; "
+                  "frame-src 'self' " + ' '.join(origins) + "; frame-ancestors " + station_ancestors(host))
+        camera = 'self' if port == 8080 and path in ('/experience/trailer','/experience/vision','/','/demos') else ''
+        microphone = 'self' if port == 8200 else ''
+        if port == 8080 and path in ('/','/demos'):
+            microphone = ' '.join('"'+o+'"' for o in origins if o.endswith(':8200'))
+        permissions = f'camera=({camera}), microphone=({microphone}), geolocation=(), payment=(), usb=(), serial=(), bluetooth=()'
+        async def protected(message):
+            if message['type'] == 'http.response.start':
+                headers = list(message.get('headers', []))
+                present = {k.lower() for k,v in headers}
+                defaults = {b'x-content-type-options': b'nosniff', b'referrer-policy': b'no-referrer',
+                            b'permissions-policy': permissions.encode(), b'content-security-policy': policy.encode()}
+                headers += [(k,v) for k,v in defaults.items() if k not in present]
+                # Shared/customer/visitor responses never enter a browser disk cache.
+                if not path.startswith(('/showcase-assets/','/assets/','/static/')):
+                    headers = [(k,v) for k,v in headers if k.lower()!=b'cache-control']
+                    headers.append((b'cache-control', b'no-store'))
+                message = {**message, 'headers': headers}
             await send(message)
         return await self.app(scope, receive, protected)
