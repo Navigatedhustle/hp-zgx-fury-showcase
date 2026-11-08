@@ -3,7 +3,7 @@ import asyncio,json,sys,uuid
 from pathlib import Path
 from datetime import date,timedelta
 from playwright.async_api import async_playwright
-root=Path(__file__).resolve().parents[2];sys.path.insert(0,str(root/'build/sources/fury_agent_factory'))
+root=Path(__file__).resolve().parents[2];sys.path.insert(0,str(root));sys.path.insert(0,str(root/'build/sources/fury_agent_factory'))
 from travel_checks import check_product
 result=check_product(root/'examples/reference-travel/app',root/'state/reference-checks');assert result['passed'],result.get('log');print('Reference backend: all checks passed',flush=True)
 async def main():

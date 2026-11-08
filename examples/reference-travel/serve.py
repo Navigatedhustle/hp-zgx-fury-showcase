@@ -3,6 +3,7 @@
 import sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2];CODE=Path(__file__).resolve().parent/'app'
+sys.path.insert(0,str(ROOT))
 sys.path.insert(0,str(ROOT/'build/sources/fury_agent_factory'))
 from devteam_sandbox import execute
 from fastapi import FastAPI,Request
