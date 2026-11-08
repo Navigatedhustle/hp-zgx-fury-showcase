@@ -262,7 +262,8 @@ async def transcribe(request:Request):
     start=time.perf_counter()
     try:
         async with httpx.AsyncClient(timeout=15,trust_env=False) as c:
-            r=await c.post(SPEECH+'/v1/audio/transcriptions',files={'file':('question.wav',audio,'audio/wav')},data={'language':'en'});r.raise_for_status();d=r.json()
+            from showcase_app.security import csrf_headers
+            r=await c.post(SPEECH+'/v1/audio/transcriptions',headers=csrf_headers(),files={'file':('question.wav',audio,'audio/wav')},data={'language':'en'});r.raise_for_status();d=r.json()
     except httpx.HTTPError as e:raise HTTPException(503,'Local speech recognition is unavailable. Use the question box.') from e
     stage_metrics['asr_ms']=(time.perf_counter()-start)*1000
     return {**d,'asr_ms':stage_metrics['asr_ms']}
@@ -347,5 +348,6 @@ async def detect(request:Request):
     except (httpx.HTTPError,ValueError) as e:raise HTTPException(503,'Person detection is loading. The live camera feed is available.') from e
 
 # Apply after route/application middleware registration so Host validation is outermost.
-from showcase_app.security import HostGuard
+from showcase_app.security import HostGuard, RequestGuard
+app.add_middleware(RequestGuard)
 app.add_middleware(HostGuard)

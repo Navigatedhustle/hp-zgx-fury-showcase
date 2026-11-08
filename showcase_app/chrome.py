@@ -15,7 +15,7 @@ class TelemetryProxy:
             async for chunk in request.stream():
                 raw.extend(chunk)
                 if len(raw)>2*1024*1024:return await Response('Maximum upload is two megabytes',413)(scope,receive,send)
-            headers={k:v for k,v in request.headers.items() if k in ('content-type','cookie','origin','x-skin-name')}
+            headers={k:v for k,v in request.headers.items() if k in ('content-type','cookie','origin','x-skin-name','x-fury-csrf')}
             headers['host']=request.headers.get('host','localhost')
             async with httpx.AsyncClient(trust_env=False,timeout=12) as client:
                 try:

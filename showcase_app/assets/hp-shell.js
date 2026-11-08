@@ -1,3 +1,16 @@
+/* Add request protection to same-origin binary/multipart controls. No UI changes. */
+(() => {
+ const nativeFetch=window.fetch.bind(window);let pendingToken;
+ const token=()=>pendingToken||(pendingToken=nativeFetch('/api/security/csrf-token',{cache:'no-store',credentials:'same-origin'}).then(async r=>{if(!r.ok)throw Error('Station request protection is unavailable');const value=await r.json();if(!/^[a-f0-9]{64}$/.test(value.token))throw Error('Invalid station request protection');return value.token}).catch(error=>{pendingToken=null;throw error}));
+ window.fetch=async(input,options)=>{
+  const request=new Request(input,options),url=new URL(request.url);
+  if(url.origin!==location.origin||['GET','HEAD','OPTIONS'].includes(request.method))return nativeFetch(request);
+  const headers=new Headers(request.headers),kind=(headers.get('Content-Type')||'').split(';')[0].trim().toLowerCase();
+  if(kind!=='application/json'&&!(kind.startsWith('application/')&&kind.endsWith('+json')))headers.set('X-Fury-CSRF',await token());
+  return nativeFetch(new Request(request,{headers}));
+ };
+})();
+
 /* One shared shell; view preferences belong to this browser, never the server. */
 (() => {
  const html=document.documentElement;

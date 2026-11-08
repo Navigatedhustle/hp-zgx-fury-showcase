@@ -1308,5 +1308,6 @@ else:
         return JSONResponse({"message": "Frontend not built. Run: cd frontend && npm install && npm run build"})
 
 # Apply after route/application middleware registration so Host validation is outermost.
-from showcase_app.security import HostGuard
+from showcase_app.security import HostGuard, RequestGuard
+app.add_middleware(RequestGuard)
 app.add_middleware(HostGuard)

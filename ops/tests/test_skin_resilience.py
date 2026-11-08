@@ -138,7 +138,7 @@ def test_independent_reset_does_not_need_skin_service(tmp_path,monkeypatch):
  client=TestClient(operator.app,base_url="http://localhost")
  assert client.post('/api/appearance/reset',headers={'origin':'https://evil.invalid'}).status_code==403
  assert path.exists()
- assert client.post('/api/appearance/reset').status_code==200
+ assert client.post('/api/appearance/reset',json={}).status_code==200
  assert not path.exists()
 
 

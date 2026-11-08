@@ -25,7 +25,8 @@ async def api(request:Request):
  return await asyncio.to_thread(execute,CODE,ROOT/'state/reference-travel','api',payload)
 
 # Apply after route/application middleware registration so Host validation is outermost.
-from showcase_app.security import HostGuard
+from showcase_app.security import HostGuard, RequestGuard
+app.add_middleware(RequestGuard)
 app.add_middleware(HostGuard)
 
 if __name__=='__main__':uvicorn.run(app,host='127.0.0.1',port=8510)

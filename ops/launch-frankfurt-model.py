@@ -20,5 +20,5 @@ selected=([rows.splitlines()[int(gpu)].split(',')] if gpu.isdigit() and int(gpu)
 if len(selected)!=1:raise SystemExit('Planned GPU is missing')
 total,free=map(float,selected[0][1:])
 if free/1024 < total/1024*fraction+plan['reserve_gib']:raise SystemExit('Insufficient free HBM for planned engine plus reserve. Stop only verified showcase services using their controller.')
-args=[str(binary),'serve',str(model),'--served-model-name',alias,'--host','127.0.0.1','--middleware','showcase_app.security.HostGuard','--port',port,'--tensor-parallel-size','1','--max-model-len',str(context),'--max-num-seqs',str(seq),'--gpu-memory-utilization',str(fraction),*extra]
+args=[str(binary),'serve',str(model),'--served-model-name',alias,'--host','127.0.0.1','--allowed-origins','[]','--middleware','showcase_app.security.RequestGuard','--middleware','showcase_app.security.HostGuard','--port',port,'--tensor-parallel-size','1','--max-model-len',str(context),'--max-num-seqs',str(seq),'--gpu-memory-utilization',str(fraction),*extra]
 os.execv(str(binary),args)

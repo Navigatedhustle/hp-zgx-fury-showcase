@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from typing import Literal
 from showcase_app.visitor_store import VisitorStore
 from showcase_app.creative_auth import private_key
+from showcase_app.security import csrf_headers
 from showcase_app.creative import reference_image
 from showcase_app.workloads import JOBS, create, public, stage, llm
 
@@ -35,7 +36,7 @@ def session(request,touch=False):
 async def erase(sid):
     old=visitors.delete(sid)
     if old:
-        async with httpx.AsyncClient(trust_env=False,timeout=3,headers={'x-fury-creative-key':private_key()}) as client:
+        async with httpx.AsyncClient(trust_env=False,timeout=3,headers={'x-fury-creative-key':private_key(),**csrf_headers()}) as client:
             for cid in old.get('creative_ids',[]):
                 try:await client.post('http://127.0.0.1:8800/api/jobs/'+cid+'/cancel')
                 except httpx.HTTPError:pass
@@ -90,10 +91,10 @@ def validate_script(text):
 
 
 async def creative(job,s,kind,slot,prompt):
-    async with httpx.AsyncClient(trust_env=False,timeout=30,headers={'x-fury-creative-key':private_key()}) as client:
+    async with httpx.AsyncClient(trust_env=False,timeout=30,headers={'x-fury-creative-key':private_key(),**csrf_headers()}) as client:
         while True:
             if s['deleted'] or not s['path'].is_dir():raise asyncio.CancelledError()
-            result=await client.post('http://127.0.0.1:8800/api/private/creative',headers={'x-fury-creative-key':private_key()},json={'session':s['id'],'kind':kind,'slot':slot,'prompt':prompt[:1500]})
+            result=await client.post('http://127.0.0.1:8800/api/private/creative',headers={'x-fury-creative-key':private_key(),**csrf_headers()},json={'session':s['id'],'kind':kind,'slot':slot,'prompt':prompt[:1500]})
             if result.status_code!=429:break
             job['stage']='Queued in shared creative lane';await asyncio.sleep(1)
         result.raise_for_status();cid=result.json()['id'];s.setdefault('creative_ids',[]).append(cid)

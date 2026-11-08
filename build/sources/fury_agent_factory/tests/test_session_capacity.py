@@ -12,7 +12,7 @@ class SessionTests(unittest.TestCase):
    fake=__import__('types').SimpleNamespace(id='fixture',root=routes.ROOT,state='running',thread=__import__('types').SimpleNamespace(is_alive=lambda:True))
    routes.runs[a.cookies.get('fury_factory_session')]=fake
    self.assertEqual(b.get('/api/devteam/run').json()['state'],'ready')
-   self.assertEqual(b.post('/api/devteam/stop').status_code,404)
+   self.assertEqual(b.post('/api/devteam/stop',json={}).status_code,404)
    self.assertEqual(b.post('/api/devteam/runs',json={'automatic':True}).status_code,429)
    self.assertEqual(len(routes.runs),1)
 

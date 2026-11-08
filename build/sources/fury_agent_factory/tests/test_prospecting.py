@@ -66,7 +66,7 @@ class ProspectingTests(unittest.TestCase):
             for path in ['/prospecting','/research','/sales','/static/prospecting.html']:
                 response=client.get(path,follow_redirects=False);self.assertEqual(response.status_code,307);self.assertEqual(response.headers['location'],'/devteam')
             for path in ['/api/prospecting/config','/api/prospecting/inbox']:self.assertEqual(client.get(path).status_code,410)
-            self.assertEqual(client.post('/api/prospecting/send').status_code,410)
+            self.assertEqual(client.post('/api/prospecting/send',json={}).status_code,410)
             self.assertEqual(client.get('/static/prospecting.js').status_code,410)
             self.assertEqual(client.get('/devteam').status_code,200)
 

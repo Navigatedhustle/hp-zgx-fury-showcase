@@ -782,6 +782,7 @@
   "ops/acceptance/editor.py",
   "ops/acceptance/hp-ui.py",
   "ops/acceptance/reference.py",
+  "ops/acceptance/security-origin.py",
   "ops/acceptance/showcase.py",
   "ops/acceptance/skin-lifecycle.py",
   "ops/acceptance/skin-resilience.py",

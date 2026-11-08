@@ -76,5 +76,6 @@ async def speech(q:Speech):
  return Response(data,media_type='application/octet-stream',headers={'X-Audio-Voice':q.voice,'X-Audio-Sample-Rate':'24000','X-Synthesis-Ms':f'{last_ms:.3f}'})
 
 # Apply after route/application middleware registration so Host validation is outermost.
-from showcase_app.security import HostGuard
+from showcase_app.security import HostGuard, RequestGuard
+app.add_middleware(RequestGuard)
 app.add_middleware(HostGuard)
