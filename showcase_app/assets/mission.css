@@ -59,3 +59,39 @@ body:is(.mission-layout,.mission-embedded)[data-workflow=atlas]>footer button,bo
 .frontier-row{padding:6px 0}.frontier-label strong{line-height:1.25}.frontier-label small{line-height:1.25;margin-top:3px}.frontier-caveat{line-height:1.5!important}
 .frontier-asof{margin-left:auto;font-family:Plex,monospace}
 .frontier-energy{border-top:1px solid var(--mc-line);margin-top:26px;padding-top:24px}.frontier-energy-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0 22px}.frontier-energy-inputs label{font-size:11px}.frontier-energy-inputs input{margin-top:7px}.frontier-energy .frontier-value{font-size:12px}@media(max-width:700px){.frontier-energy-inputs{grid-template-columns:1fr}}
+
+/* Keep the first action reachable on short conference screens. */
+@media(min-width:1000px){
+ body.mission-layout[data-station-page=setup] .conference-main{padding:12px 20px;gap:8px}
+ body[data-station-page=setup] #station-form{display:flex;flex-wrap:wrap;gap:10px;align-content:start}
+ body[data-station-page=setup] .station-grid{flex-basis:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+ body[data-station-page=setup] .station-choice{padding:12px 16px}
+ body[data-station-page=setup] .station-choice strong{font-size:19px;margin:4px 0}
+ body[data-station-page=setup] .station-choice p{font-size:13px;line-height:1.4;margin:6px 0}
+ body[data-station-page=setup] .station-choice span{font-size:11px}
+}
+@media(min-width:1000px) and (max-height:800px){
+ .mc-experience .mc-page-heading{margin-bottom:12px}
+ .mc-experience-grid>.mc-panel{padding:14px}
+ .mc-experience-grid .mc-form label{margin-bottom:8px;gap:4px}
+ .mc-experience-grid .mc-form input,.mc-experience-grid .mc-form select{min-height:36px!important;padding:8px}
+ .mc-experience-grid .mc-form textarea{min-height:70px!important;height:70px;padding:8px}
+ .mc-experience-grid .mc-drop{min-height:88px!important;padding:10px!important}
+ .mc-experience-grid .mc-samples{margin:8px 0}
+ .mc-experience-grid .mc-tabs{margin-bottom:10px}
+}
+@media(min-width:1000px) and (max-height:680px){
+ .mc-hero{margin-bottom:8px;gap:16px}
+ .mc-hero h1{font-size:30px}
+ .mc-hardware{min-height:110px;padding:10px;grid-template-columns:65px 1fr}
+ .mc-hardware img{width:65px;height:85px}
+ .mc-facts{margin-bottom:10px}
+ .mc-launch-card{padding:10px}
+ .mc-card-top{margin-bottom:5px}
+ .mc-launch-grid{margin-bottom:10px}
+ body:is(.mission-layout,.mission-embedded)[data-workflow=atlas] .orb-hero{height:100px!important}
+ body:is(.mission-layout,.mission-embedded)[data-workflow=atlas] .orb-button,body:is(.mission-layout,.mission-embedded)[data-workflow=atlas] #voice-orb{width:96px!important;height:96px!important}
+ body:is(.mission-layout,.mission-embedded)[data-workflow=atlas] .headline-wrap{height:56px}
+ body:is(.mission-layout,.mission-embedded)[data-workflow=atlas] .headline-wrap #headline{font-size:38px}
+ body:is(.mission-layout,.mission-embedded)[data-workflow=image] .stage{min-height:100px}
+}
