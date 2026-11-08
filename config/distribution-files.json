@@ -188,6 +188,7 @@
   "build/sources/fury_agent_factory/tests/test_guided_run.py",
   "build/sources/fury_agent_factory/tests/test_logout_contract.py",
   "build/sources/fury_agent_factory/tests/test_presenter_versions.py",
+  "build/sources/fury_agent_factory/tests/test_preview_parent_origin.py",
   "build/sources/fury_agent_factory/tests/test_prospecting.py",
   "build/sources/fury_agent_factory/tests/test_python_syntax.py",
   "build/sources/fury_agent_factory/tests/test_qa_contract.py",
