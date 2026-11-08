@@ -34,3 +34,21 @@ class ControlTests(unittest.TestCase):
  def test_gpu_unknown_is_distinct_from_free(self):
   with patch.object(control.subprocess,'run',side_effect=FileNotFoundError):self.assertFalse(control.gpu_status()['verified'])
 if __name__=='__main__':unittest.main()
+
+
+def test_stop_uses_pinned_process_descriptors_instead_of_group_signals():
+ row=ControlTests().row();registry={}
+ with patch.object(control,'discover',return_value=row),patch.object(control,'processes',return_value=[row]),patch.object(control,'process',return_value=row),patch.object(control,'unchanged',side_effect=[True]+[False]*30),patch.object(control,'save'),patch.object(control,'port_open',return_value=False),patch.object(control.os,'killpg') as group,patch.object(control.os,'kill') as single,patch.object(control.os,'pidfd_open',return_value=123) as opened,patch.object(control.signal,'pidfd_send_signal') as sent,patch.object(control.os,'close'):
+  control.stop_one('agent',registry)
+  group.assert_not_called();single.assert_not_called()
+  opened.assert_called_once_with(row['pid'],0)
+  sent.assert_called_once_with(123,control.signal.SIGTERM,None,0)
+
+
+
+def test_identity_change_while_opening_pidfd_fails_before_any_signal():
+ row=ControlTests().row();saved=control.fingerprint(row)
+ with patch.object(control.os,'pidfd_open',return_value=123),patch.object(control.os,'close') as close,patch.object(control,'process',return_value={**row,'start':'9999'}),patch.object(control.signal,'pidfd_send_signal') as sent:
+  import pytest
+  with pytest.raises(RuntimeError,match='identity changed'):control.signal_saved([saved])
+  sent.assert_not_called();close.assert_called_once_with(123)

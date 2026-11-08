@@ -136,29 +136,47 @@ def session_member_verified(member,leader,members,name):
   current=parent
  return True
 
+def signal_saved(records, sig=signal.SIGTERM):
+ """Pin kernel process identities, then revalidate every snapshot before signalling."""
+ if not hasattr(os,'pidfd_open') or not hasattr(signal,'pidfd_send_signal'):
+  raise RuntimeError('Safe process control requires Linux pidfds; no PID signal fallback.')
+ descriptors=[]
+ try:
+  for saved in records:
+   try:descriptor=os.pidfd_open(saved['pid'],0)
+   except ProcessLookupError:continue
+   descriptors.append((descriptor,saved))
+   now=process(saved['pid'])
+   if now is None:continue  # The pinned process exited; its descriptor cannot target a replacement.
+   if fingerprint(now)!=saved:raise RuntimeError('Process identity changed while pinning stop targets.')
+  for descriptor,saved in descriptors:
+   try:signal.pidfd_send_signal(descriptor,sig,None,0)
+   except ProcessLookupError:pass
+ finally:
+  for descriptor,_ in descriptors:os.close(descriptor)
+
+
 def stop_one(name,registry):
  row=discover(name);saved=registry.get(name,{})
  if row:
   members=[r for r in processes() if same_session(r,row)]
   if not all(session_member_verified(r,row,members,name) for r in members):raise RuntimeError('Unrecognised process in '+name+' session; refusing signals.')
   saved={'leader':fingerprint(row),'members':[fingerprint(r) for r in members]};registry[name]=saved;save(registry)
-  # Recheck the exact leader and every member immediately before the group signal.
+  # Pin each exact kernel identity; never send to a process group that can gain members.
   if not identity(process(row['pid']),name) or not all(unchanged(m) for m in saved['members']):raise RuntimeError('Process identity changed before stop.')
-  os.killpg(row['pgid'],signal.SIGTERM)
+  signal_saved(saved['members'])
   deadline=time.monotonic()+45
   while any(unchanged(m) for m in saved['members']) and time.monotonic()<deadline:time.sleep(.15)
   remaining=[m for m in saved['members'] if unchanged(m)]
   # A hung verified descendant may outlive its leader; signal only the recorded PID identity.
-  for m in remaining:
-   if unchanged(m):os.kill(m['pid'],signal.SIGTERM)
+  signal_saved(remaining)
   deadline=time.monotonic()+10
   while any(unchanged(m) for m in remaining) and time.monotonic()<deadline:time.sleep(.15)
   if any(unchanged(m) for m in remaining):raise RuntimeError(name+' did not stop gracefully; surviving verified PIDs: '+str([m['pid'] for m in remaining if unchanged(m)]))
  elif saved:
   remaining=[m for m in saved.get('members',[]) if unchanged(m)]
   if remaining:
-   for m in remaining:
-    if unchanged(m):os.kill(m['pid'],signal.SIGTERM)
+   signal_saved(remaining)
    deadline=time.monotonic()+30
    while any(unchanged(m) for m in remaining) and time.monotonic()<deadline:time.sleep(.15)
    if any(unchanged(m) for m in remaining):raise RuntimeError('Recorded orphan remains for '+name)
