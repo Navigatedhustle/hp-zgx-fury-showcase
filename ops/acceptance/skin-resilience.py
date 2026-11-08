@@ -72,7 +72,7 @@ async def main(output):
      await context.route('**/skin/state',lambda route:route.fulfill(json={'active':None,'public_web_lookups':None,'revision':'unknown-counter'}))
      await context.route('**/showcase-telemetry',lambda route:route.abort())
     if fault=='timeout':
-     await context.add_init_script("""const original=window.fetch;window.fetch=(url,options={})=>String(url).startsWith('/skin/')?new Promise((resolve,reject)=>{options.signal?.addEventListener('abort',()=>reject(new DOMException('Timed out','AbortError')),{once:true})}):original(url,options)""")
+     await context.add_init_script("""const original=window.fetch;window.fetch=(input,options={})=>{const url=typeof input==='string'?input:input.url;const signal=options.signal||input?.signal;return new URL(url,location.href).pathname.startsWith('/skin/')?new Promise((resolve,reject)=>{if(signal?.aborted){reject(signal.reason);return}signal?.addEventListener('abort',()=>reject(new DOMException('Timed out','AbortError')),{once:true})}):original(input,options)}""")
     pending=asyncio.Event();release=asyncio.Event()
     base={'id':'fictional','name':'Northwind Beverages','status':'researching','steps':[],'routing':{'model':'Qwen','reason':'Fictional response'},'elapsed':0}
     if fault in ('late_poll','late_start'):
