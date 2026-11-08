@@ -155,7 +155,7 @@ outlines-core==0.2.14
 packaging==26.3
 partial-json-parser==0.2.1.1.post7
 phonemizer-fork==3.3.2
-pillow==12.3.0
+pillow==13.0.0
 preshed==3.0.13
 prometheus-client==0.26.0
 prometheus-fastapi-instrumentator==8.1.0
