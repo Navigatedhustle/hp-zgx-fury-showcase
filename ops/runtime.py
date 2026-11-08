@@ -19,7 +19,13 @@ COMPONENTS=dict([('text',COMPONENTS['text']),('lead',_lead)]+[(k,v) for k,v in C
 for spec in COMPONENTS.values():
  if 'uvicorn' in spec['command']:spec['command']+=['--timeout-graceful-shutdown','15']
 SERVE={443:8080,8200:8200,8501:8501,8765:8765,8800:8800}
+if os.getenv('FURY_PROFILE')=='gb10':
+ from gb10_runtime import components
+ COMPONENTS=components();SERVE={}
 def environment():
+ if os.getenv('FURY_PROFILE')=='gb10':
+  from gb10_runtime import environment as gb10_environment
+  return gb10_environment()
  r=ROOT
  import json
  plan=json.loads((ROOT/'config/gb300.json').read_text())

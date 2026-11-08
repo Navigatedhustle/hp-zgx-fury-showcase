@@ -7,6 +7,7 @@ import ctypes
 import ctypes.util
 import json
 import hashlib
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -121,8 +122,16 @@ class CreativeLane:
         self.flux = None
         self.wan = None
         self.wan_text = None
+        self.gb10 = os.getenv('FURY_PROFILE') == 'gb10'
 
     def load(self):
+        if self.gb10:
+            import torch
+            from diffusers import Flux2KleinPipeline
+            torch.set_num_threads(8)
+            self.grace_node = None
+            self.flux = Flux2KleinPipeline.from_pretrained(str(ROOT / 'models/FLUX.2-klein-4B'), torch_dtype=torch.bfloat16, local_files_only=True).to('cuda')
+            return
         self.grace_node = bind_grace()
         import torch
         torch.set_num_threads(8)
@@ -139,6 +148,8 @@ class CreativeLane:
             raise RuntimeError('Selected video assets are missing; run ./launch.sh setup')
 
     def load_video(self):
+        if self.gb10:
+            raise RuntimeError('Video is not included in the GB10 profile')
         if self.wan is not None:
             return
         import torch
@@ -153,7 +164,10 @@ class CreativeLane:
         self.wan.enable_model_cpu_offload()
 
     def run(self, kind, prompt, path, stop, options, job):
-        bind_grace()
+        if not self.gb10:
+            bind_grace()
+        elif kind != 'image':
+            raise ValueError('Only image generation is enabled on GB10')
         import torch
         if kind == 'video':
             began = time.monotonic()
@@ -163,6 +177,8 @@ class CreativeLane:
         # Existing text engines and their fractions/contexts/slots are untouched.
         torch.cuda.empty_cache()
         free, total = torch.cuda.mem_get_info()
+        if self.gb10:
+            free = unified_available()
         budget = torch.cuda.memory_reserved() + free - 14 * 1024 ** 3
         if budget <= 0:
             raise RuntimeError('Insufficient measured HBM above the creative reserve guard')
@@ -178,7 +194,7 @@ class CreativeLane:
         def checkpoint(pipe, step, timestep, kwargs):
             if stop.is_set():
                 raise InterruptedError('Creative job cancelled')
-            free_now, _ = torch.cuda.mem_get_info()
+            free_now = unified_available() if self.gb10 else torch.cuda.mem_get_info()[0]
             if free_now < 11 * 1024 ** 3:
                 raise InterruptedError('Creative guard stopped the job before the 10 GiB reserve')
             job['steps_done'] = step + 1
@@ -220,4 +236,10 @@ class CreativeLane:
     def placement(self):
         def device(module):
             return str(next(module.parameters()).device) if module is not None else 'not loaded'
+        if self.gb10:
+            return {'flux_loaded': self.flux is not None, 'video_loaded': False, 'flux_transformer': device(self.flux.transformer) if self.flux else 'not loaded', 'memory_kind': 'unified', 'policy': 'FLUX resident in GB10 unified memory; one active image job'}
         return {'flux_loaded': self.flux is not None, 'video_loaded': self.wan is not None, 'video_profile': VIDEO_PROFILE, 'video_model': VIDEO_MODEL, 'flux_transformer': device(self.flux.transformer) if self.flux else 'not loaded', 'video_transformer': device(self.wan.transformer) if self.wan else 'not loaded', 'grace_cpu_node': self.grace_node, 'policy': 'Resident CPU-offloaded models bound to Grace; one active GPU job across images and video'}
+
+
+def unified_available():
+    return next(int(line.split()[1]) * 1024 for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:'))

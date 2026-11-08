@@ -18,6 +18,8 @@ def processes():
 def identity(row,name):
  if not row or row['uid']!=os.getuid() or row['cwd']!=str(ROOT):return False
  args=row['args'];cmd=COMPONENTS[name]['command']
+ if COMPONENTS[name].get('engine')=='llama.cpp':
+  return args==cmd and row['exe']==str((ROOT/cmd[0]).resolve())
  if name=='lead':
   if args==['bash','ops/serve-lead.sh']:return True
   if len(args)>2 and args[-2:]==['ops/launch-frankfurt-model.py','lead']:return Path(args[0]).resolve()==(ROOT/'.venv/bin/python').resolve()
@@ -55,6 +57,10 @@ def ready(name):
    if name in ('text','lead'):
     with opener.open(f'http://127.0.0.1:{COMPONENTS[name]["port"]}/v1/models',timeout=2) as model_response:
      models=json.load(model_response).get('data',[])
+    if COMPONENTS[name].get('engine')=='llama.cpp':
+     with opener.open(f'http://127.0.0.1:{COMPONENTS[name]["port"]}/props',timeout=2) as props_response:
+      props=json.load(props_response)
+     return any(m.get('id')==COMPONENTS[name]['model'] for m in models) and Path(props.get('model_path','')).resolve()==Path(COMPONENTS[name]['model_path']).resolve()
     folder='DeepSeek-V4-Flash-NVFP4' if name=='lead' else 'Qwen3.6-27B-NVFP4'
     return any(m.get('id')==COMPONENTS[name]['model'] and Path(m.get('root','')).resolve()==(ROOT/'models'/folder).resolve() for m in models)
    return True
@@ -184,9 +190,12 @@ def _start_one(name,registry):
  deadline=time.monotonic()+COMPONENTS[name].get('startup_timeout',600)
  while not ready(name):
   if STOP_REQUEST.exists():raise RuntimeError('Startup interrupted by an explicit stop request.')
+  if COMPONENTS[name].get('engine')=='llama.cpp':
+   memory={line.split(':')[0]:int(line.split()[1])*1024 for line in Path('/proc/meminfo').read_text().splitlines()}
+   if memory['MemAvailable']<12*1024**3:raise RuntimeError('GB10 loading stopped below 12 GiB MemAvailable; inspect memory plan.')
   if not identity(process(row['pid']),name):raise RuntimeError(name+' exited during startup; inspect logs/'+name+'.log')
   if time.monotonic()>deadline:raise RuntimeError(name+' readiness timed out; inspect logs/'+name+'.log')
-  print(name+' loading / waiting for readiness…',flush=True);time.sleep(5)
+  print(name+' loading / waiting for readiness…',flush=True);time.sleep(.25 if COMPONENTS[name].get('engine')=='llama.cpp' else 5)
  row=discover(name)
  registry[name]['leader']=fingerprint(row)
  registry[name]['members']=[fingerprint(r) for r in processes() if r['pgid']==row['pgid']];save(registry)
@@ -231,8 +240,11 @@ def skin_status():
  return 'default · HP ZGX Fury'
 
 def status():
- print('Customer skin:',skin_status())
- print('Presenter controls: available without a PIN')
+ if os.getenv('FURY_PROFILE')=='gb10':
+  print('HP ZGX Nano: GB10 model qualification; stage acceptance pending')
+ else:
+  print('Customer skin:',skin_status())
+  print('Presenter controls: available without a PIN')
  print(f'{"COMPONENT":12} {"PORT":6} {"PID":8} {"PROCESS / READINESS":24} MODEL')
  for name,spec in COMPONENTS.items():
   row=discover(name);healthy=ready(name) if row else False
@@ -242,7 +254,7 @@ def status():
  gpu=gpu_status();print('GPU:',gpu['summary']);print('GPU compute processes:',*gpu['processes'],sep='\n  ')
  print('GPU FREE (no compute process)' if gpu['verified'] and not gpu['processes'] else 'GPU IN USE' if gpu['verified'] else 'GPU STATE UNKNOWN')
  config=tailscale_config();print('Private Serve listeners:',', '.join(config.get('TCP',{})) or 'none (daemon and SSH remain available)')
- if discover('operator') and ready('operator'):
+ if 'operator' in COMPONENTS and discover('operator') and ready('operator'):
   print('Browser: http://127.0.0.1:8080/')
   for host,web in config.get('Web',{}).items():
    if web=={'Handlers':{'/':{'Proxy':'http://127.0.0.1:8080'}}}:

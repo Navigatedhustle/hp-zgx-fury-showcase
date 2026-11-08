@@ -1,0 +1,48 @@
+{
+  "whiteboard.png": [
+    {
+      "action": "Map the offline pilot",
+      "owner": "Alex Rowan",
+      "date": "2027-04-12"
+    },
+    {
+      "action": "Review access controls",
+      "owner": "Casey Moss",
+      "date": "2027-04-15"
+    },
+    {
+      "action": "Approve the success measures",
+      "owner": "Jordan Vale",
+      "date": "2027-04-19"
+    }
+  ],
+  "chart.png": {
+    "columns": [
+      "Quarter",
+      "Local jobs",
+      "Hours saved"
+    ],
+    "rows": [
+      [
+        "Q1",
+        12,
+        24
+      ],
+      [
+        "Q2",
+        18,
+        36
+      ],
+      [
+        "Q3",
+        24,
+        48
+      ],
+      [
+        "Q4",
+        30,
+        60
+      ]
+    ]
+  }
+}

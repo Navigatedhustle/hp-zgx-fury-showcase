@@ -63,5 +63,17 @@
       "retrieved": "2026-11-06",
       "note": "Official Gemini Developer API pricing, paid tier per second, 720p with audio. Capabilities and outputs differ from the local silent video model."
     }
+  },
+  "gb10": {
+    "retrieved": "2026-11-08",
+    "model": "openai/gpt-oss-120b",
+    "provider": "Groq",
+    "currency": "USD",
+    "unit": "one million tokens",
+    "input": 0.15,
+    "output": 0.6,
+    "source": "https://console.groq.com/docs/model/openai/gpt-oss-120b",
+    "verification": "Official model pricing page read with the browsing tool on 2026-11-08. Direct urllib access returned HTTP 403; no API call was made.",
+    "scope": "Hypothetical standard text-token API charge for observed input and output tokens at the dated gpt-oss-120b rates. Excludes images, audio, taxes and tools. Not total cost of ownership. Hosted quantization and performance differ from local MXFP4."
   }
 }
