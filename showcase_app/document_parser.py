@@ -91,7 +91,7 @@ def run_parser(mode, path, *, kind=None, hint=None, assets=None, renders=None):
     for library in ('/lib', '/lib64'):
         if Path(library).exists():
             command += ['--ro-bind', library, library]
-    command += ['--symlink', 'usr/bin', '/bin', '--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp']
+    command += ['--symlink', 'usr/bin', '/bin', '--proc', '/proc', '--dev', '/dev', '--size', '67108864', '--tmpfs', '/tmp']
     for directory in (Path(sys.prefix), ROOT / 'showcase_app', ROOT / 'build/sources/html_builder-main/backend/app', Path('/etc/fonts')):
         if directory.exists():
             command += ['--ro-bind', str(directory), str(directory)]

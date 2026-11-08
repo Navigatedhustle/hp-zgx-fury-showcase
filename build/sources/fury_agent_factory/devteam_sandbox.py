@@ -3,11 +3,19 @@ import json,os,shutil,subprocess,sys,tempfile,math
 from pathlib import Path
 RUNNER=Path(__file__).with_name('devteam_worker.py')
 
-def bounded_run(command,*,timeout,input=None):
+def bounded_run(command,*,timeout,input=None,workspace=None):
  # Child RLIMIT_FSIZE applies to these unlinked regular files. A pipe would
  # accumulate arbitrary generated output in the coordinator before inspection.
  with tempfile.TemporaryFile() as output,tempfile.TemporaryFile() as error:
-  result=subprocess.run(command,input=input,text=True,stdout=output,stderr=error,timeout=timeout,start_new_session=True)
+  if workspace is None:
+   result=subprocess.run(command,input=input,text=True,stdout=output,stderr=error,timeout=timeout,start_new_session=True)
+  else:
+   from showcase_app.sandbox_budget import check_workspace,wait_limited
+   check_workspace(workspace)
+   with tempfile.TemporaryFile() as incoming:
+    if input is not None:incoming.write(input.encode());incoming.seek(0)
+    process=subprocess.Popen(command,stdin=incoming,stdout=output,stderr=error,start_new_session=True)
+    result=subprocess.CompletedProcess(command,wait_limited(process,workspace,timeout))
   if max(os.fstat(output.fileno()).st_size,os.fstat(error.fileno()).st_size)>200000:
    raise RuntimeError('Sandbox output exceeded limit')
   output.seek(0);error.seek(0)
@@ -30,9 +38,9 @@ def execute(code:Path,data:Path,mode:str,payload=None):
  cmd=['bwrap','--unshare-all','--die-with-parent','--new-session','--clearenv','--setenv','PATH','/usr/bin','--setenv','LANG','C.UTF-8','--ro-bind','/usr','/usr']
  for folder in ('/lib','/lib64'):
   if Path(folder).exists():cmd+=['--ro-bind',folder,folder]
- cmd+=['--symlink','usr/bin','/bin','--proc','/proc','--dev','/dev','--tmpfs','/tmp','--ro-bind',str(code.resolve()),'/workspace','--bind',str(data.resolve()),'/data','--ro-bind',str(RUNNER.resolve()),'/runner.py','--chdir','/workspace','/usr/bin/python3','-I','-S','/runner.py',mode]
+ cmd+=['--symlink','usr/bin','/bin','--proc','/proc','--dev','/dev','--size','67108864','--tmpfs','/tmp','--ro-bind',str(code.resolve()),'/workspace','--bind',str(data.resolve()),'/data','--ro-bind',str(RUNNER.resolve()),'/runner.py','--chdir','/workspace','/usr/bin/python3','-I','-S','/runner.py',mode]
  try:
-  r,output,error=bounded_run(cmd,input=json.dumps(payload or {}),timeout=12)
+  r,output,error=bounded_run(cmd,input=json.dumps(payload or {}),timeout=12,workspace=data)
  except subprocess.TimeoutExpired:raise RuntimeError('Sandbox exceeded wall time limit')
  if r.returncode:raise RuntimeError('Sandbox failed (exit '+str(r.returncode)+'): '+error[-3000:])
  return json.loads(output)
@@ -46,7 +54,7 @@ def check_javascript(code:Path):
  cmd=['bwrap','--unshare-all','--die-with-parent','--new-session','--clearenv','--setenv','PATH','/usr/bin','--setenv','LANG','C.UTF-8','--ro-bind','/usr','/usr']
  for folder in ('/lib','/lib64'):
   if Path(folder).exists():cmd+=['--ro-bind',folder,folder]
- cmd+=['--proc','/proc','--dev','/dev','--tmpfs','/tmp','--ro-bind',str(code.resolve()),'/workspace','--ro-bind',str(node),'/node','/usr/bin/prlimit','--cpu=3','--fsize=1048576','--nofile=64','/node','--max-old-space-size=64','--check','/workspace/app.js']
+ cmd+=['--proc','/proc','--dev','/dev','--size','67108864','--tmpfs','/tmp','--ro-bind',str(code.resolve()),'/workspace','--ro-bind',str(node),'/node','/usr/bin/prlimit','--cpu=3','--fsize=1048576','--nofile=64','/node','--max-old-space-size=64','--check','/workspace/app.js']
  try:r,output,error=bounded_run(cmd,timeout=8)
  except subprocess.TimeoutExpired:raise ValueError('Generated JavaScript syntax validation timed out')
  except RuntimeError:raise ValueError('Generated JavaScript parser output exceeded limit') from None

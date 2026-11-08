@@ -1,5 +1,6 @@
 """Each execution gets an ephemeral workdir and separate read-only database copy."""
 import json,os,shutil,stat,subprocess,tempfile,time,sys
+from showcase_app.sandbox_budget import check_workspace,wait_limited
 from pathlib import Path
 from atlas.config import DB,ROOT
 
@@ -10,11 +11,12 @@ def run(code,language='python',timeout=10):
         copy=Path(database)/'atlas.sqlite';shutil.copyfile(DB,copy);copy.chmod(0o444)
         job=Path(work)/'job.json';job.write_text(json.dumps({'code':code,'language':language,'database':str(copy)}))
         stdout_file=tempfile.TemporaryFile();stderr_file=tempfile.TemporaryFile()
+        check_workspace(work)
         process=subprocess.Popen([sys.executable,'-I',str(ROOT/'atlas/sandbox_worker.py'),str(job)],cwd=work,env={'PATH':'/usr/bin:/bin','PYTHONDONTWRITEBYTECODE':'1'},stdout=stdout_file,stderr=stderr_file,start_new_session=True)
         timed_out=False
-        try:process.wait(timeout=timeout)
+        try:wait_limited(process,work,timeout)
         except subprocess.TimeoutExpired:
-            timed_out=True;process.kill();process.wait()
+            timed_out=True
         stdout_file.seek(0);stderr_file.seek(0)
         stdout=stdout_file.read(100000).decode(errors='replace');stderr=stderr_file.read(20000).decode(errors='replace')
         stdout_file.close();stderr_file.close();table=[];chart=None
