@@ -41,6 +41,9 @@ class VisitorStore:
         self.sessions.clear()
 
     def consent(self):
+        self.expire()
+        if len(self.sessions) >= 64:
+            raise ValueError('Visitor session capacity is full; retry after a session ends')
         sid = secrets.token_hex(16)
         folder = self.root/('session-'+sid)
         folder.mkdir(mode=0o700)

@@ -837,6 +837,7 @@
   "ops/tests/test_model_manifest_security.py",
   "ops/tests/test_presentation_isolation.py",
   "ops/tests/test_request_security.py",
+  "ops/tests/test_resource_bounds.py",
   "ops/tests/test_setup_stamp.py",
   "ops/tests/test_skin.py",
   "ops/tests/test_skin_resilience.py",

@@ -25,6 +25,7 @@ brain=Brain();decisions=Decisions();telemetry=Telemetry();last_results={};result
 developer=Developer(brain)
 FEATURES={k:os.environ.get('ATLAS_'+k.upper(),'1')!='0' for k in ['orb','developer','graph','documents','feed']}
 traces=OrderedDict()
+query_pending=0
 def stage(trace,label):
     if not trace:return
     traces.setdefault(trace,[]).append({'label':label,'timestamp':time.time()})
@@ -99,6 +100,9 @@ def selected_result(q):
 
 @app.post('/api/query')
 async def query(q:Query,request:Request):
+    global query_pending
+    if query_pending>=8:raise HTTPException(429,'Atlas queue full; retry shortly')
+    query_pending+=1
     task=asyncio.create_task(query_work(q))
     try:
         async with asyncio.timeout(100):
@@ -109,6 +113,7 @@ async def query(q:Query,request:Request):
     except TimeoutError:raise HTTPException(504,'Atlas took too long. Please try another question.')
     finally:
         if not task.done():task.cancel();await asyncio.gather(task,return_exceptions=True)
+        query_pending-=1
 
 async def query_work(q:Query):
     if q.persona not in PERSONAS:raise HTTPException(422,'Unknown persona')

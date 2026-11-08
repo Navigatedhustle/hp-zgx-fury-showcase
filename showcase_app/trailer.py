@@ -57,7 +57,9 @@ class Consent(BaseModel):agreed:Literal[True]
 @router.post('/api/trailer/consent')
 async def consent(body:Consent,request:Request):
     if request.cookies.get(COOKIE):await erase(request.cookies[COOKIE])
-    s=visitors.consent();result=JSONResponse({'consented':True,'retention_idle_seconds':900})
+    try:s=visitors.consent()
+    except ValueError as error:raise HTTPException(429,str(error)) from error
+    result=JSONResponse({'consented':True,'retention_idle_seconds':900})
     secure=request.url.scheme=='https' or request.headers.get('x-forwarded-proto')=='https'
     result.set_cookie(COOKIE,s['id'],httponly=True,samesite='strict',secure=secure)
     result.headers['Cache-Control']='no-store'

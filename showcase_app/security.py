@@ -1,5 +1,7 @@
 """Local HTTP boundaries shared by the demo applications and model servers."""
 import json
+import asyncio
+import time
 import functools
 import hmac
 import os
@@ -79,7 +81,7 @@ async def reject(scope, send, status, detail):
 
 class HostGuard:
     def __init__(self, app):
-        self.app = BrowserHeaders(app)
+        self.app = ResourceGuard(BrowserHeaders(app))
         self.hosts = configured_hosts()
 
     async def __call__(self, scope, receive, send):
@@ -232,3 +234,66 @@ class BrowserHeaders:
                 message = {**message, 'headers': headers}
             await send(message)
         return await self.app(scope, receive, protected)
+
+
+class ResourceGuard:
+    """Bound request parsing and held connections before framework allocation."""
+    def __init__(self, app):
+        self.app=app
+        self.http=0; self.streams=0; self.websockets=0; self.uploads=0
+        self.upload_rates={}
+
+    async def __call__(self, scope, receive, send):
+        kind=scope['type']
+        if kind not in ('http','websocket'):
+            return await self.app(scope,receive,send)
+        headers={k.lower():v.decode('latin1') for k,v in scope['headers']}
+        path=scope.get('path','')
+        streaming=kind=='http' and (any(x in path for x in ('/events','/stream','/stages/','telemetry')) or 'text/event-stream' in headers.get(b'accept',''))
+        upload=kind=='http' and scope.get('method') in ('POST','PUT','PATCH') and headers.get(b'content-type','').startswith(('multipart/','application/octet-stream','image/'))
+        maximum=320*1024**2 if path in ('/api/projects','/api/library/upload') else 16*1024**2
+        if path.startswith('/skin/'):maximum=2*1024**2
+        if path=='/api/translate':maximum=9*1024**2
+        if path.startswith('/api/projects/') and path.endswith('/docs'):maximum=52*1024**2
+        if kind=='http':
+            try:
+                values=[v for k,v in scope['headers'] if k.lower()==b'content-length']
+                if len(values)>1:raise ValueError()
+                length=int(values[0]) if values else 0
+                if length<0:raise ValueError()
+            except ValueError:
+                return await reject(scope,send,400,'Invalid request length')
+            if length>maximum:return await reject(scope,send,413,'Request exceeds the supported size')
+        if self.http>=64 or (streaming and self.streams>=24) or (kind=='websocket' and self.websockets>=8) or (upload and self.uploads>=4):
+            return await reject(scope,send,429,'This station is busy; retry shortly')
+        if upload:
+            peer=(scope.get('client') or ('local',0))[0];now=time.monotonic()
+            tokens,at=self.upload_rates.get(peer,(12,now));tokens=min(12,tokens+(now-at)*.5)
+            if tokens<1:return await reject(scope,send,429,'Upload rate limit reached; retry shortly')
+            if peer not in self.upload_rates and len(self.upload_rates)>=128:self.upload_rates.pop(next(iter(self.upload_rates)))
+            self.upload_rates[peer]=(tokens-1,now)
+        self.http+=kind=='http';self.websockets+=kind=='websocket';self.streams+=streaming;self.uploads+=upload
+        size=0;deadline=time.monotonic()+120;body_done=False
+        async def bounded_receive():
+            nonlocal size,body_done
+            from starlette.exceptions import HTTPException
+            if kind=='http' and body_done:return await receive()
+            timeout=min(30,max(.01,deadline-time.monotonic())) if kind=='http' else 60
+            try:message=await asyncio.wait_for(receive(),timeout)
+            except TimeoutError:
+                if kind=='websocket':return {'type':'websocket.disconnect','code':1008}
+                raise HTTPException(408,'Request upload timed out')
+            if message['type']=='http.request':
+                body_done=not message.get('more_body',False)
+                size+=len(message.get('body',b''))
+                if size>maximum:raise HTTPException(413,'Request exceeds the supported size')
+            if message['type']=='websocket.receive' and (len(message.get('bytes') or b'')>2000000 or len(message.get('text') or '')>8192):
+                await send({'type':'websocket.close','code':1009})
+                return {'type':'websocket.disconnect','code':1009}
+            return message
+        async def bounded_send(message):
+            await asyncio.wait_for(send(message),15)
+        try:
+            return await self.app(scope,bounded_receive,bounded_send)
+        finally:
+            self.http-=kind=='http';self.websockets-=kind=='websocket';self.streams-=streaming;self.uploads-=upload

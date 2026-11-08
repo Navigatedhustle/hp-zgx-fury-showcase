@@ -60,6 +60,7 @@ async def speech(q:Speech):
  global last_ms,active,queued,last_request
  if q.voice not in voices:raise HTTPException(422,'Unknown local voice; no substitution was made')
  if q.language not in ['en','en-US']:raise HTTPException(422,'The local fallback voice supports English.')
+ if queued>=8:raise HTTPException(429,'Local speech queue full; retry shortly')
  queued+=1;entered=False
  try:
   async with lock:
