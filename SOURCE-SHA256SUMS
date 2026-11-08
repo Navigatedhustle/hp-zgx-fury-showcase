@@ -48,7 +48,7 @@ b93a8d358ed5bd57543c722c014a1ff190f856c914f7575f1e3de7d07912d564  build/sources/
 18cfb48df070476a1c8a15ac316d592b2d5cd82c081e11451ec3d5879197bb54  build/sources/atlas-gpt-main/config/model-manifests/kokoro.example.json
 674a5a8f0648702df787667366f979469a715e5e4060afe48be6a0f7a6f188dc  build/sources/atlas-gpt-main/config/model-manifests/tts.example.json
 d3aea29f8ad2b635cf572762738b7f59e0e78eebe38878e27d4760b5ee7ed54c  build/sources/atlas-gpt-main/docs/LICENSE-STATUS.md
-7a71b8d949883ad52f98256003ae0422845934b40eb77a96594b2ba7c7df74d4  build/sources/atlas-gpt-main/requirements.lock
+a4518a071bf0943c389a9ebfe4604619bf61e7d86a05c9db1060f07f0ceb2b08  build/sources/atlas-gpt-main/requirements.lock
 be78d6dde0a197f8ab087195f0754ea0313cf00b85a06b4128e5e1e75ff18a5a  build/sources/atlas-gpt-main/scripts/acceptance.py
 a10bab187a17882005ffa715912adcef466245e0ddde429eafc691d0e65a822f  build/sources/atlas-gpt-main/scripts/brain_visual.py
 72aee128a331bb84d40143a247d18f57c73e3a6ad012f5936afc9a4b06cf6efa  build/sources/atlas-gpt-main/scripts/browser_qa.py
