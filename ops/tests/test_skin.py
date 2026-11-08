@@ -5,6 +5,7 @@ import json
 import shutil
 import socket
 import subprocess
+import sys
 import tarfile
 import zipfile
 from pathlib import Path
@@ -316,9 +317,9 @@ def test_skin_excluded_from_git_and_real_packager(tmp_path):
  import hashlib
  (tmp_path/'SOURCE-SHA256SUMS').write_text(hashlib.sha256((tmp_path/'README.md').read_bytes()).hexdigest()+'  README.md\n')
  (tmp_path/'config/distribution-files.json').write_text('["README.md"]')
- subprocess.run([str(ROOT/'.venv/bin/python'),str(tmp_path/'ops/package-release.py'),'--version','v3.0.0-skin-test','--output',str(tmp_path/'out')],check=True,capture_output=True)
+ subprocess.run([sys.executable,str(tmp_path/'ops/package-release.py'),'--version','v3.0.0-skin-test','--output',str(tmp_path/'out')],check=True,capture_output=True)
  with zipfile.ZipFile(next((tmp_path/'out').glob('*.zip'))) as z:assert all('/state/' not in n for n in z.namelist())
  with tarfile.open(next((tmp_path/'out').glob('*.tar.gz'))) as z:assert all('/state/' not in n for n in z.getnames())
  (tmp_path/'config/distribution-files.json').write_text('["README.md","state/skin/private-customer.json"]')
- refused=subprocess.run([str(ROOT/'.venv/bin/python'),str(tmp_path/'ops/package-release.py'),'--version','v3.0.0-skin-test','--output',str(tmp_path/'refused')],capture_output=True)
+ refused=subprocess.run([sys.executable,str(tmp_path/'ops/package-release.py'),'--version','v3.0.0-skin-test','--output',str(tmp_path/'refused')],capture_output=True)
  assert refused.returncode!=0;assert not list((tmp_path/'refused').glob('*.zip'))

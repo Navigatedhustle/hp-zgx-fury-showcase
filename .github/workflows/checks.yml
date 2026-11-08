@@ -19,7 +19,13 @@ jobs:
       - name: Install isolated parser and browser test prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y bubblewrap libsndfile1
+          sudo apt-get install -y bubblewrap libsndfile1 apparmor-profiles apparmor-utils
+          # Ubuntu's packaged bwrap policy permits namespace setup and strips
+          # capabilities from its children. Keep the global userns restriction.
+          # https://discourse.ubuntu.com/t/understanding-apparmor-user-namespace-restriction/58007
+          sudo install -m 0644 /usr/share/apparmor/extra-profiles/bwrap-userns-restrict /etc/apparmor.d/bwrap-userns-restrict
+          sudo apparmor_parser -r /etc/apparmor.d/bwrap-userns-restrict
+          bwrap --unshare-all --ro-bind / / /bin/true
           python -m playwright install --with-deps chromium
       - name: Controller, API, isolated parser and browser boundary regressions
         run: python -m pytest -q ops/tests ops/acceptance/test_gateway.py ops/acceptance/test_booth.py
