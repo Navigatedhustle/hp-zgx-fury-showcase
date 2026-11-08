@@ -1,0 +1,28 @@
+{
+  "llama_cpp": {
+    "repo": "https://github.com/ggml-org/llama.cpp.git",
+    "revision": "7d7f0287530bc8981690f361d8c1627dbae1c99a",
+    "license": "MIT",
+    "license_sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "cuda_architectures": "121",
+    "build_parallel": 6,
+    "source_tar_sha256": "96b30678d8996513b4b041e8c7cdde1dea86d23bbbf94a40d04d37b6e157ebd8",
+    "no_mmap_cli": [
+      "--load-mode",
+      "none"
+    ],
+    "load_mode_note": "Pinned upstream removed --no-mmap; --load-mode none is its documented non-mmap equivalent. Default comparison uses auto. Lazy loading and automatic fit are disabled to keep measured residency and contexts explicit."
+  },
+  "model_profile": "gb10",
+  "qualification_quant_order": [
+    "Q8_0",
+    "Q6_K",
+    "Q4_K_XL"
+  ],
+  "offline_environment": {
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "DO_NOT_TRACK": "1",
+    "HF_HUB_DISABLE_TELEMETRY": "1"
+  }
+}
