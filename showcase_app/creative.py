@@ -110,7 +110,12 @@ def reference_image(data):
     raw = base64.b64decode(data.split(',', 1)[1], validate=True)
     if len(raw) > 8 * 1024 ** 2:
         raise ValueError('Reference image exceeds 8 MiB')
-    with Image.open(io.BytesIO(raw)) as source:
+    try:source=Image.open(io.BytesIO(raw),formats=['PNG','JPEG','WEBP'])
+    except Image.DecompressionBombError:raise ValueError('Reference image exceeds its pixel bound') from None
+    with source:
+        expected={'data:image/png;base64,':'PNG','data:image/jpeg;base64,':'JPEG','data:image/webp;base64,':'WEBP'}
+        if source.format!=next(kind for prefix,kind in expected.items() if data.startswith(prefix)):
+            raise ValueError('Reference content does not match its image type')
         if source.width * source.height > 4 * 1024 ** 2:
             raise ValueError('Reference image exceeds four megapixels')
         return source.convert('RGB')

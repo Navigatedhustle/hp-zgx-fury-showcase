@@ -1045,10 +1045,9 @@ async def _store_doc(pid: str, file: UploadFile) -> ProjectDoc:
                     raise HTTPException(413, f"File too large (max {docs.MAX_BYTES // (1024 * 1024)} MB)")
                 f.write(chunk)
         try:
-            text = await asyncio.to_thread(docs.extract, raw)
+            text, figures = await asyncio.to_thread(docs.safe_extract, raw)
         except docs.DocRefused as e:
             raise HTTPException(400, str(e)) from e
-        figures = await asyncio.to_thread(docs.pictures, raw)
     finally:
         shutil.rmtree(work, ignore_errors=True)
     d = db.save(ProjectDoc(project_id=pid, name=name, pages=len(text.pages), chars=len(text.text), truncated=text.truncated))

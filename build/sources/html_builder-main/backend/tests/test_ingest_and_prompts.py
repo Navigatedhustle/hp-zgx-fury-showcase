@@ -61,7 +61,7 @@ def _group_deck(path):
     # slide 2: a small picture inside a group scaled 8x — tiny in child space, a hero image on the stage
     s = prs.slides.add_slide(prs.slide_layouts[6])
     g2 = s.shapes.add_group_shape()
-    g2.shapes.add_picture(str(IMG), Emu(0), Emu(0), Emu(381000), Emu(190500))
+    g2.shapes.add_picture(io.BytesIO(__import__("cairosvg").svg2png(url=str(IMG))), Emu(0), Emu(0), Emu(381000), Emu(190500))
     _set_group_xfrm(g2, off=(1524000, 1524000), ext=(3048000, 1524000), ch_off=(0, 0), ch_ext=(381000, 190500))
 
     # slide 3: a group inside a group, each with its own scale
@@ -87,6 +87,8 @@ def _block(sc, text):
 
 # ------------------------------------------------------------------ existing coverage
 def test_parse_workstation_deck(tmp_path):
+    if not (DECKS / "hp_z_workstations_genai.pptx").exists():
+        pytest.skip("Supplier evaluation deck is excluded from the public distribution")
     d = parse_pptx(DECKS / "hp_z_workstations_genai.pptx", tmp_path)
     assert len(d.slides) == 10
     s3, s4, s5, s6 = d.slides[2], d.slides[3], d.slides[4], d.slides[5]
@@ -116,6 +118,8 @@ def test_system_prompt_has_no_unfilled_placeholders():
 
 def test_every_task_prompt_fills_every_placeholder(tmp_path):
     """Every {{PLACEHOLDER}} in skill/*.md must be filled by whoever builds that prompt."""
+    if not (DECKS / "hp_wolf_print_security.pptx").exists():
+        pytest.skip("Supplier evaluation deck is excluded from the public distribution")
     d = parse_pptx(DECKS / "hp_wolf_print_security.pptx", tmp_path)
     items = [{"index": s.index, "content": s.for_prompt()} for s in d.slides]
     plan = mock.plan(items)
@@ -378,6 +382,8 @@ def test_missing_asset_file_is_resaved(tmp_path):
 
 # ------------------------------------------------------------------ theme (item 5)
 def test_theme_is_extracted(tmp_path):
+    if not (DECKS / "hp_wolf_print_security.pptx").exists():
+        pytest.skip("Supplier evaluation deck is excluded from the public distribution")
     d = parse_pptx(DECKS / "hp_wolf_print_security.pptx", tmp_path)
     t = d.theme
     assert t.name and t.major_font and t.minor_font

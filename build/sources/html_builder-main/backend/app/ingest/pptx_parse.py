@@ -461,6 +461,13 @@ def _apply_title(sc: SlideContent) -> None:
 
 
 def parse_pptx(path: Path, assets_dir: Path, renders_dir: Path | None = None) -> ParsedDeck:
+    from showcase_app.document_parser import run_parser
+    if renders_dir is None:
+        renders_dir = assets_dir.parent / 'renders'
+    return ParsedDeck.model_validate(run_parser('pptx', path, assets=assets_dir, renders=renders_dir))
+
+
+def _parse_pptx(path: Path, assets_dir: Path, renders_dir: Path | None = None) -> ParsedDeck:
     """Parse `path` into per-slide content.
 
     `renders_dir` holds the reference renders (`{index:03d}.png`, 1-based over visible slides). When it

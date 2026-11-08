@@ -36,7 +36,8 @@ _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 def visible_slide_count(pptx: Path) -> int | None:
     try:
-        return sum(1 for s in Presentation(str(pptx)).slides if not is_hidden(s))
+        from showcase_app.document_parser import run_parser
+        return run_parser('pptx-count', pptx)['count']
     except Exception as e:  # noqa: BLE001
         log.warning("could not count slides in %s: %s", pptx.name, e)
         return None

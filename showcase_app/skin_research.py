@@ -138,7 +138,7 @@ def sanitize_svg(raw):
                     node.attrib[declaration.lower_name]=tinycss2.serialize(declaration.value).strip()
         for key,value in list(node.attrib.items()):
             local=key.split('}')[-1]
-            safe=(local in ATTRS and len(value)<100000 and not re.search(r'(?:javascript:|data:|https?:|@|expression\s*\()',value,re.I))
+            safe=(local in ATTRS and len(value)<100000 and '\\' not in value and not re.search(r'(?:javascript:|data:|https?:|@|expression\s*\()',value,re.I))
             if local=='href':safe=safe and bool(re.fullmatch(r'#[A-Za-z_][\w.-]*',value))
             if 'url(' in value.lower():safe=safe and bool(re.fullmatch(r'url\(#[A-Za-z_][\w.-]*\)',value))
             if local=='font-family':safe=safe and value in ('sans-serif','serif','monospace')
@@ -151,6 +151,17 @@ def sanitize_svg(raw):
 
 
 def logo_asset(raw,kind,hint=None):
+    import base64
+    from showcase_app.document_parser import parse_bytes
+    try:
+        result=parse_bytes(raw,'.svg' if kind=='image/svg+xml' else '.bin','skin-logo',kind=kind,hint=hint)
+        result['data']=base64.b64decode(result['data'],validate=True)
+        result['png']=base64.b64decode(result['png'],validate=True)
+        return result
+    except (ValueError,KeyError,OSError):raise LookupError('Logo could not be safely decoded within its limits') from None
+
+
+def _logo_asset(raw,kind,hint=None):
     import io
     import cairosvg
     from PIL import Image
@@ -171,7 +182,10 @@ def logo_asset(raw,kind,hint=None):
         except Exception:raise LookupError('SVG could not be rasterized safely') from None
     else:
         try:
-            image=Image.open(io.BytesIO(raw))
+            formats={'image/png':'PNG','image/webp':'WEBP','image/jpeg':'JPEG','image/x-icon':'ICO','image/vnd.microsoft.icon':'ICO'}
+            if kind not in formats:raise ValueError()
+            image=Image.open(io.BytesIO(raw),formats=[formats[kind]])
+            if image.format!=formats[kind]:raise ValueError()
             if image.width*image.height>16_000_000:raise ValueError()
             image=image.convert('RGBA');image.thumbnail((512,512));colors=raster_colors(image)
         except Exception:raise LookupError('Raster logo could not be decoded safely') from None

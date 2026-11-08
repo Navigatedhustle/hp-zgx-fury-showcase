@@ -104,20 +104,8 @@ async def vision(body:VisionInput):
 
 
 def read_document(raw,name):
-    suffix=Path(name).suffix.lower()
-    if suffix=='.pdf':
-        from pypdf import PdfReader
-        reader=PdfReader(io.BytesIO(raw));pages=[p.extract_text() or '' for p in reader.pages]
-    elif suffix=='.docx':
-        from docx import Document
-        doc=Document(io.BytesIO(raw));paragraphs=[p.text for p in doc.paragraphs if p.text.strip()]
-        pages=['\n\n'.join(paragraphs[i:i+8]) for i in range(0,len(paragraphs),8)]
-    elif suffix=='.txt':
-        text=raw.decode('utf-8-sig');pages=text.split('\f') if '\f' in text else [text[i:i+5000] for i in range(0,len(text),5000)]
-    else:raise ValueError('Use PDF, DOCX or UTF-8 TXT')
-    if not pages or len(pages)>25 or sum(map(len,pages))>100000 or any(len(p)>12000 for p in pages):raise ValueError('Use up to 25 text pages and 100,000 characters')
-    if any(not p.strip() for p in pages):raise ValueError('A page has no extractable text. Scanned PDFs need OCR; use Vision Lab for a fictional document image.')
-    return pages
+    from showcase_app.document_parser import parse_bytes
+    return parse_bytes(raw,Path(name).suffix.lower())
 
 
 async def export_document(folder,pages,target):
