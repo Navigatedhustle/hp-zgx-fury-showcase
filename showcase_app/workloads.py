@@ -93,7 +93,7 @@ async def analyze(job,image,task):
     stage(job,'Visual extraction','unsloth/Qwen3.6-27B-NVFP4')
     result=await llm(job,'vision',[{'role':'system','content':'Analyze only the supplied fictional demonstration image. Never infer age, ethnicity, gender identity or other sensitive attributes. Be accurate and state uncertainty.'},{'role':'user','content':[{'type':'text','text':VISION_TASKS[task]},{'type':'image_url','image_url':{'url':image}}]}],max_tokens=1000)
     job['output']=result;stage(job,'Executive brief','fury-lead')
-    job['brief']=await llm(job,'vision',[{'role':'system','content':'Write a concise executive brief grounded only in the supplied visual extraction. State uncertainty. Do not invent facts.'},{'role':'user','content':result[:7000]}],lead=True,max_tokens=250)
+    job['brief']=await llm(job,'vision',[{'role':'system','content':'Write an executive brief in at most 80 words, grounded only in the supplied visual extraction. State uncertainty. Do not invent facts. Return the brief only, without a preamble or repeating the table.'},{'role':'user','content':result[:7000]}],lead=True,max_tokens=250)
 
 
 @router.post('/api/vision')
