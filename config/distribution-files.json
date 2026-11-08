@@ -193,6 +193,7 @@
   "build/sources/fury_agent_factory/tests/test_qa_contract.py",
   "build/sources/fury_agent_factory/tests/test_retention_repair.py",
   "build/sources/fury_agent_factory/tests/test_routing.py",
+  "build/sources/fury_agent_factory/tests/test_sandbox_output_bounds.py",
   "build/sources/fury_agent_factory/tests/test_session_capacity.py",
   "build/sources/fury_agent_factory/tests/test_travel_click_diagnostics.py",
   "build/sources/fury_agent_factory/tests/test_travel_continuation.py",

@@ -2,6 +2,17 @@
 import json,os,shutil,subprocess,sys,tempfile,math
 from pathlib import Path
 RUNNER=Path(__file__).with_name('devteam_worker.py')
+
+def bounded_run(command,*,timeout,input=None):
+ # Child RLIMIT_FSIZE applies to these unlinked regular files. A pipe would
+ # accumulate arbitrary generated output in the coordinator before inspection.
+ with tempfile.TemporaryFile() as output,tempfile.TemporaryFile() as error:
+  result=subprocess.run(command,input=input,text=True,stdout=output,stderr=error,timeout=timeout,start_new_session=True)
+  if max(os.fstat(output.fileno()).st_size,os.fstat(error.fileno()).st_size)>200000:
+   raise RuntimeError('Sandbox output exceeded limit')
+  output.seek(0);error.seek(0)
+  return result,output.read().decode('utf-8',errors='replace'),error.read().decode('utf-8',errors='replace')
+
 def available():
  if sys.platform!='linux' or not shutil.which('bwrap'):return False
  try:
@@ -21,11 +32,10 @@ def execute(code:Path,data:Path,mode:str,payload=None):
   if Path(folder).exists():cmd+=['--ro-bind',folder,folder]
  cmd+=['--symlink','usr/bin','/bin','--proc','/proc','--dev','/dev','--tmpfs','/tmp','--ro-bind',str(code.resolve()),'/workspace','--bind',str(data.resolve()),'/data','--ro-bind',str(RUNNER.resolve()),'/runner.py','--chdir','/workspace','/usr/bin/python3','-I','-S','/runner.py',mode]
  try:
-  r=subprocess.run(cmd,input=json.dumps(payload or {}),text=True,capture_output=True,timeout=12,start_new_session=True)
+  r,output,error=bounded_run(cmd,input=json.dumps(payload or {}),timeout=12)
  except subprocess.TimeoutExpired:raise RuntimeError('Sandbox exceeded wall time limit')
- if len(r.stdout)>200000 or len(r.stderr)>200000:raise RuntimeError('Sandbox output exceeded limit')
- if r.returncode:raise RuntimeError('Sandbox failed (exit '+str(r.returncode)+'): '+r.stderr[-3000:])
- return json.loads(r.stdout)
+ if r.returncode:raise RuntimeError('Sandbox failed (exit '+str(r.returncode)+'): '+error[-3000:])
+ return json.loads(output)
 
 def check_javascript(code:Path):
  """Parse generated JS without executing it, inside the same networkless namespace."""
@@ -37,9 +47,10 @@ def check_javascript(code:Path):
  for folder in ('/lib','/lib64'):
   if Path(folder).exists():cmd+=['--ro-bind',folder,folder]
  cmd+=['--proc','/proc','--dev','/dev','--tmpfs','/tmp','--ro-bind',str(code.resolve()),'/workspace','--ro-bind',str(node),'/node','/usr/bin/prlimit','--cpu=3','--fsize=1048576','--nofile=64','/node','--max-old-space-size=64','--check','/workspace/app.js']
- try:r=subprocess.run(cmd,capture_output=True,text=True,timeout=8,start_new_session=True)
+ try:r,output,error=bounded_run(cmd,timeout=8)
  except subprocess.TimeoutExpired:raise ValueError('Generated JavaScript syntax validation timed out')
- if r.returncode:raise ValueError('Generated app.js has invalid JavaScript syntax: '+r.stderr[-1800:])
+ except RuntimeError:raise ValueError('Generated JavaScript parser output exceeded limit') from None
+ if r.returncode:raise ValueError('Generated app.js has invalid JavaScript syntax: '+error[-1800:])
 
 def check_backend_contract(code:Path,data:Path):
  """Exercise exact public statuses on the real generated backend before merge."""
