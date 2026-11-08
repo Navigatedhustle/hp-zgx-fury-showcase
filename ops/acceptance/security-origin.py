@@ -53,7 +53,7 @@ async def main(output):
             report['same_origin_upload_status'] = response.status
             await page.locator('#skin-apply').wait_for()
             await page.click('#skin-apply')
-            await page.wait_for_function("document.getElementById('skin-prepared').textContent.includes('Northwind Beverages')")
+            await page.wait_for_function("()=>document.getElementById('skin-prepared').textContent.includes('Northwind Beverages')")
             foreign = await browser.new_context()
             attack = await foreign.new_page()
             await attack.goto('http://127.0.0.1:' + str(server.server_port) + '/')

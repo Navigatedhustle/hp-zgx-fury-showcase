@@ -95,3 +95,7 @@ body:is(.mission-layout,.mission-embedded)[data-workflow=atlas]>footer button,bo
  body:is(.mission-layout,.mission-embedded)[data-workflow=atlas] .headline-wrap #headline{font-size:38px}
  body:is(.mission-layout,.mission-embedded)[data-workflow=image] .stage{min-height:100px}
 }
+@media(min-width:1000px) and (max-height:680px){
+ body.mission-layout .skin-room{padding:4px 12px;margin-bottom:8px}
+ .mc-image-studio .mc-placeholder{min-height:260px}
+}
