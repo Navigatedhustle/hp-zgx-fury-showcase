@@ -2,6 +2,9 @@
 import json,os,sys,subprocess
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
+from showcase_app.runtime_privacy import service_policy
+service_policy(ROOT)
 kind=sys.argv[1];plan=json.loads((ROOT/'config/gb300.json').read_text())
 if kind not in ('lead','qwen'):raise SystemExit('Unknown model role')
 os.environ.update(CUDA_VISIBLE_DEVICES=os.getenv('FURY_GPU','0'),HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',DO_NOT_TRACK='1')

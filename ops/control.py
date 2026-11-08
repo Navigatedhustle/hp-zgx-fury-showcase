@@ -270,7 +270,9 @@ def status():
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('action',choices=['status','start','stop','restart']);parser.add_argument('components',nargs='*');args=parser.parse_args()
  if any(name not in COMPONENTS for name in args.components):parser.error('Unknown component; choose '+', '.join(COMPONENTS))
- STATE.mkdir(exist_ok=True);(ROOT/'logs').mkdir(exist_ok=True)
+ sys.path.insert(0,str(ROOT))
+ from showcase_app.runtime_privacy import service_policy,rotate_logs
+ service_policy(ROOT);rotate_logs(ROOT/'logs')
  requested=time.time()
  if args.action=='status':status();return
  if args.action=='stop' and not args.components:STOP_REQUEST.write_text(str(requested))

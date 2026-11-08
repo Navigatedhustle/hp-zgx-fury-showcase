@@ -17,11 +17,13 @@ async def lifespan(app):
  trailer.visitors.start();private_key();skin.initialize()
  task=asyncio.create_task(monitor.run(collect_live))
  privacy=asyncio.create_task(trailer.sweep())
+ from showcase_app.runtime_privacy import log_maintenance
+ logs=asyncio.create_task(log_maintenance(ROOT/'logs'))
  try:yield
  finally:
   await skin.shutdown()
   for sid in list(trailer.visitors.sessions):await trailer.erase(sid)
-  tasks=[task,privacy,*[j['_task'] for j in workloads.JOBS.values() if not j['_task'].done()]]
+  tasks=[task,privacy,logs,*[j['_task'] for j in workloads.JOBS.values() if not j['_task'].done()]]
   for pending in tasks:pending.cancel()
   await asyncio.gather(*tasks,return_exceptions=True)
 app=FastAPI(lifespan=lifespan)
