@@ -7,7 +7,7 @@ from showcase_app.runtime_privacy import service_policy
 service_policy(ROOT)
 kind=sys.argv[1];plan=json.loads((ROOT/'config/gb300.json').read_text())
 if kind not in ('lead','qwen'):raise SystemExit('Unknown model role')
-os.environ.update(CUDA_VISIBLE_DEVICES=os.getenv('FURY_GPU','0'),HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',DO_NOT_TRACK='1')
+os.environ.update(VLLM_HOST_IP='127.0.0.1',GLOO_SOCKET_IFNAME='lo',NCCL_SOCKET_IFNAME='lo',CUDA_VISIBLE_DEVICES=os.getenv('FURY_GPU','0'),HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',DO_NOT_TRACK='1')
 if kind=='lead':
  binary=ROOT/'.deepseek-venv/bin/vllm';model=ROOT/'models/DeepSeek-V4-Flash-NVFP4';alias='fury-lead';port='8100';context=plan['lead_context'];seq=plan['lead_sequences'];fraction=plan['lead_fraction']
  extra=['--tokenizer-mode','deepseek_v4','--kv-cache-dtype','fp8','--block-size','256','--reasoning-parser','deepseek_v4','--max-num-batched-tokens',str(plan.get('lead_prefill',8192))]
