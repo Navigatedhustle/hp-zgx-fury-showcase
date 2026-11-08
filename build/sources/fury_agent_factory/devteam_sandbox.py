@@ -43,7 +43,7 @@ def check_javascript(code:Path):
  if not script.exists():return
  node=Path(__file__).resolve().parents[3]/'.venv/lib/python3.12/site-packages/playwright/driver/node'
  if not node.is_file():raise RuntimeError('Local JavaScript parser is unavailable')
- cmd=['bwrap','--unshare-all','--die-with-parent','--new-session','--ro-bind','/usr','/usr']
+ cmd=['bwrap','--unshare-all','--die-with-parent','--new-session','--clearenv','--setenv','PATH','/usr/bin','--setenv','LANG','C.UTF-8','--ro-bind','/usr','/usr']
  for folder in ('/lib','/lib64'):
   if Path(folder).exists():cmd+=['--ro-bind',folder,folder]
  cmd+=['--proc','/proc','--dev','/dev','--tmpfs','/tmp','--ro-bind',str(code.resolve()),'/workspace','--ro-bind',str(node),'/node','/usr/bin/prlimit','--cpu=3','--fsize=1048576','--nofile=64','/node','--max-old-space-size=64','--check','/workspace/app.js']

@@ -28,3 +28,11 @@ with tempfile.TemporaryDirectory() as folder:
     # A fresh stdlib coordinator is small. Capturing a 64 MiB text pipe exceeded
     # this bound before the fix; file-limited capture stays well below it.
     assert 0 < measured['peak_rss_kib'] < 96 * 1024, measured
+
+
+def test_js_parser_does_not_inherit_host_node_options(monkeypatch, tmp_path):
+    from devteam_sandbox import check_javascript
+    (tmp_path / 'app.js').write_text('throw new Error("THIS MUST ONLY BE PARSED");')
+    monkeypatch.setenv('NODE_OPTIONS', '--require=/fury-host-only-do-not-load.js')
+    monkeypatch.setenv('FURY_FICTIONAL_CREDENTIAL', 'fictional environment canary')
+    check_javascript(tmp_path)
