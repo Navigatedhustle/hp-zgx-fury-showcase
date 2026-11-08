@@ -5,7 +5,7 @@ import api,devteam_routes as routes
 class SessionTests(unittest.TestCase):
  def test_separate_clients_cannot_control_each_others_run(self):
   with patch.object(routes,'runs',{}):
-   a=TestClient(api.app);b=TestClient(api.app)
+   a=TestClient(api.app,base_url="http://localhost");b=TestClient(api.app,base_url="http://localhost")
    self.assertEqual(a.get('/api/devteam/run').json()['state'],'ready')
    self.assertEqual(b.get('/api/devteam/run').json()['state'],'ready')
    self.assertNotEqual(a.cookies.get('fury_factory_session'),b.cookies.get('fury_factory_session'))

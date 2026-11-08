@@ -1,5 +1,9 @@
 """Verified live component definitions; all paths are relative to the clone."""
 import os
+import functools
+import json
+import re
+import subprocess
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 COMPONENTS={
@@ -19,10 +23,27 @@ COMPONENTS=dict([('text',COMPONENTS['text']),('lead',_lead)]+[(k,v) for k,v in C
 for spec in COMPONENTS.values():
  if 'uvicorn' in spec['command']:spec['command']+=['--timeout-graceful-shutdown','15']
 SERVE={443:8080,8200:8200,8501:8501,8765:8765,8800:8800}
+
+@functools.lru_cache(maxsize=1)
+def serve_hostnames():
+ # Read only: use existing, explicitly configured demo proxies as the hostname allowlist.
+ # Operators without Tailscale can provide their private proxy hosts through the environment.
+ if os.getenv('FURY_SERVE_HOSTNAMES') is not None:return os.environ['FURY_SERVE_HOSTNAMES']
+ try:
+  result=subprocess.run(['tailscale','serve','status','--json'],capture_output=True,text=True,timeout=5)
+  if result.returncode:return ''
+  config=json.loads(result.stdout);hosts=set()
+  targets={f'http://127.0.0.1:{port}' for port in SERVE.values()}
+  for authority,web in config.get('Web',{}).items():
+   host=authority.rsplit(':',1)[0].lower()
+   if re.fullmatch(r'[a-z0-9][a-z0-9.-]*[a-z0-9]',host) and any(h.get('Proxy') in targets for h in web.get('Handlers',{}).values()):hosts.add(host)
+  return ','.join(sorted(hosts))
+ except (OSError,ValueError,AttributeError,TypeError,subprocess.TimeoutExpired):return ''
+
 def environment():
  r=ROOT
  import json
  plan=json.loads((ROOT/'config/gb300.json').read_text())
  os.environ['CUDA_VISIBLE_DEVICES']=os.getenv('FURY_GPU','0')
  os.environ['FURY_DEV_LEAD_CONTEXT']=str(plan['lead_context'])
- return {**os.environ,'C_INCLUDE_PATH':str(r/'.local-debs/extracted/usr/include')+':'+str(r/'.local-debs/extracted/usr/include/python3.12'),'LLM_BASE_URL':'http://127.0.0.1:8001/slides/v1','LLM_MODEL':'unsloth/Qwen3.6-27B-NVFP4','LLM_MOCK':'false','VISION':'off','THINKING_PLAN':'false','GUIDED_JSON':'false','DATA_DIR':str(r/'state/slides'),'LLM_MAX_CONCURRENCY':'2','QA_MAX_REPAIRS':'0','ATLAS_LLM_BASE':'http://127.0.0.1:8001/atlas','FURY_BASE_URL':'http://127.0.0.1:8001/agent/v1','FURY_MODEL':'unsloth/Qwen3.6-27B-NVFP4','FURY_LOCATION':'Fury host','FURY_MAX_WORKFLOWS':'1','FURY_MAX_INFLIGHT':'3','FURY_MAX_OUTPUT':'1200','HF_HUB_OFFLINE':'1','TRANSFORMERS_OFFLINE':'1','DO_NOT_TRACK':'1','PYTHONUNBUFFERED':'1','LOGURU_LEVEL':'WARNING','ATLAS_DOCUMENTS':'0','ATLAS_FEED':'0'}
+ return {**os.environ,'FURY_SERVE_HOSTNAMES':serve_hostnames(),'C_INCLUDE_PATH':str(r/'.local-debs/extracted/usr/include')+':'+str(r/'.local-debs/extracted/usr/include/python3.12'),'LLM_BASE_URL':'http://127.0.0.1:8001/slides/v1','LLM_MODEL':'unsloth/Qwen3.6-27B-NVFP4','LLM_MOCK':'false','VISION':'off','THINKING_PLAN':'false','GUIDED_JSON':'false','DATA_DIR':str(r/'state/slides'),'LLM_MAX_CONCURRENCY':'2','QA_MAX_REPAIRS':'0','ATLAS_LLM_BASE':'http://127.0.0.1:8001/atlas','FURY_BASE_URL':'http://127.0.0.1:8001/agent/v1','FURY_MODEL':'unsloth/Qwen3.6-27B-NVFP4','FURY_LOCATION':'Fury host','FURY_MAX_WORKFLOWS':'1','FURY_MAX_INFLIGHT':'3','FURY_MAX_OUTPUT':'1200','HF_HUB_OFFLINE':'1','TRANSFORMERS_OFFLINE':'1','DO_NOT_TRACK':'1','PYTHONUNBUFFERED':'1','LOGURU_LEVEL':'WARNING','ATLAS_DOCUMENTS':'0','ATLAS_FEED':'0'}

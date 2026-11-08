@@ -196,7 +196,7 @@ def test_presenter_api_needs_no_pin_role_or_cookie_and_keeps_names_private(state
  app=FastAPI();app.include_router(skin.router)
  async def changed():pass
  monkeypatch.setattr(skin,'changed',changed)
- with TestClient(app) as c:
+ with TestClient(app,base_url="http://localhost") as c:
   access=c.get('/skin/state').json();assert access['presenter'];assert access['pin_required'] is False
   compatibility=c.post('/skin/unlock');assert compatibility.status_code==200;assert 'set-cookie' not in compatibility.headers
   assert not c.cookies
@@ -273,7 +273,7 @@ def test_booth_palette_is_opt_in_css_only_without_customer_identity(state,monkey
  app=FastAPI();app.include_router(skin.router)
  asset=research.logo_asset((FIXTURES/'northwind.svg').read_bytes(),'image/svg+xml');value=skin.cache_candidate('Northwind Beverages',{'source':'fictional fixture'},asset);skin.apply_skin(value['id'])
  before=skin.snapshot()['revision']
- with TestClient(app) as c:
+ with TestClient(app,base_url="http://localhost") as c:
   assert c.get('/skin/booth.css').text==''
   monkeypatch.setattr(skin,'settings',lambda:{'idle_hours':8,'presentations_booth_palette':True})
   assert skin.snapshot()['revision']!=before
@@ -291,7 +291,7 @@ def test_actual_skin_gateway_route_records_zero_external_calls(state,tmp_path,mo
   assert request.url.host in ('127.0.0.1','localhost')
   return httpx.Response(200,json={'choices':[{'message':{'content':'{"entities":[0],"logos":[]}'}}],'usage':{'prompt_tokens':20,'completion_tokens':8}})
  def client(**kw):return real(transport=httpx.MockTransport(upstream),**kw)
- with TestClient(g.app) as c,monkeypatch.context() as patch:
+ with TestClient(g.app,base_url="http://localhost") as c,monkeypatch.context() as patch:
   patch.setattr(g.httpx,'AsyncClient',client)
   if busy:g.active['fictional-busy']={'demo':'agent','model':g.LEAD}
   try:

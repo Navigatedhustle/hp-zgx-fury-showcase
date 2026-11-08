@@ -75,3 +75,7 @@ app.include_router(devteam_routes.router)
 async def retired_api(retired:str):
     if retired=='devteam' or retired.startswith('devteam/'):raise HTTPException(404,'Unknown development API route')
     return JSONResponse({'detail':'The supplier and research/sales Agent Factory versions are retired. Use the development team.','entry':'/devteam'},status_code=410)
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard
+app.add_middleware(HostGuard)

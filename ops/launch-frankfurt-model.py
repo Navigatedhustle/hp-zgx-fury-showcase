@@ -13,11 +13,12 @@ else:
  extra=['--enable-prefix-caching','--limit-mm-per-prompt','{"image":16}','--reasoning-parser','qwen3','--max-num-batched-tokens',str(plan.get('qwen_prefill',16384))]
 # Kernel JIT helpers (including ninja) must come from the selected isolated runtime.
 os.environ['PATH']=str(binary.parent)+os.pathsep+os.environ.get('PATH','')
+os.environ['PYTHONPATH']=str(ROOT)
 rows=subprocess.check_output(['nvidia-smi','--query-gpu=uuid,memory.total,memory.free','--format=csv,noheader,nounits'],text=True)
 gpu=os.getenv('FURY_GPU','0')
 selected=([rows.splitlines()[int(gpu)].split(',')] if gpu.isdigit() and int(gpu)<len(rows.splitlines()) else [s.split(',') for s in rows.splitlines() if s.split(',')[0].strip()==gpu])
 if len(selected)!=1:raise SystemExit('Planned GPU is missing')
 total,free=map(float,selected[0][1:])
 if free/1024 < total/1024*fraction+plan['reserve_gib']:raise SystemExit('Insufficient free HBM for planned engine plus reserve. Stop only verified showcase services using their controller.')
-args=[str(binary),'serve',str(model),'--served-model-name',alias,'--host','127.0.0.1','--port',port,'--tensor-parallel-size','1','--max-model-len',str(context),'--max-num-seqs',str(seq),'--gpu-memory-utilization',str(fraction),*extra]
+args=[str(binary),'serve',str(model),'--served-model-name',alias,'--host','127.0.0.1','--middleware','showcase_app.security.HostGuard','--port',port,'--tensor-parallel-size','1','--max-model-len',str(context),'--max-num-seqs',str(seq),'--gpu-memory-utilization',str(fraction),*extra]
 os.execv(str(binary),args)

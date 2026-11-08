@@ -202,3 +202,7 @@ async def why_hp():return FileResponse(ROOT/'showcase_app/why-hp.html')
 
 @app.get('/presenter')
 async def presenter():return FileResponse(ROOT/'showcase_app/presenter.html')
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard
+app.add_middleware(HostGuard)

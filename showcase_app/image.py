@@ -138,3 +138,7 @@ async def image(name:str):
  return FileResponse(OUT/name)
 @app.get('/')
 async def index():return FileResponse(ROOT/'showcase_app/image.html')
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard
+app.add_middleware(HostGuard)

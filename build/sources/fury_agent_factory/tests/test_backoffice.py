@@ -61,7 +61,7 @@ class BackOfficeTests(unittest.TestCase):
         with self.assertRaises(ValueError):run.validate_output(text,['DOC:S1'],approved_evidence={'documents':run.evidence['documents'],'scenario':run.evidence['scenario']})
     def test_retired_supplier_api_cannot_start_work(self):
         import api
-        with TestClient(api.app) as client:
+        with TestClient(api.app,base_url="http://localhost") as client:
             for body in [{'scenario_id':'urgent-order'},{'request':'Send a real purchase order'},{'workflows':12}]:self.assertEqual(client.post('/api/runs',json=body).status_code,410)
             for path in ['/api/config','/api/run','/api/events','/api/runs/123/export.json']:self.assertEqual(client.get(path).status_code,410)
             self.assertEqual(client.get('/',follow_redirects=False).headers['location'],'/devteam')

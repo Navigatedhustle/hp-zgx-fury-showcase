@@ -345,3 +345,7 @@ async def detect(request:Request):
             r=await c.post('http://127.0.0.1:8205/detect',content=image,headers={'Content-Type':'image/jpeg'});r.raise_for_status()
         result=r.json();stage_metrics['vision_ms']=result['latency_ms'];return result
     except (httpx.HTTPError,ValueError) as e:raise HTTPException(503,'Person detection is loading. The live camera feed is available.') from e
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard
+app.add_middleware(HostGuard)

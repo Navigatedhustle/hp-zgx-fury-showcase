@@ -185,3 +185,7 @@ async def recover_interrupted():
  with connect() as c:
   c.execute("UPDATE execution_intervals SET ended=?,status='interrupted' WHERE ended IS NULL AND demo!='image'",(time.time(),))
   c.execute("UPDATE events SET status='failed',error='Gateway restarted during request' WHERE status IN ('queued','active') AND demo!='image'")
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard
+app.add_middleware(HostGuard)

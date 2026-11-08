@@ -25,13 +25,13 @@ class RetentionTests(unittest.TestCase):
   from fastapi.testclient import TestClient
   app=FastAPI();app.include_router(devteam_routes.router)
   with patch.object(devteam_routes,'get_current',return_value=None),patch.object(devteam_routes,'DevRun',side_effect=RetentionError('Review retained audits')):
-   response=TestClient(app).post('/api/devteam/runs',json={})
+   response=TestClient(app,base_url="http://localhost").post('/api/devteam/runs',json={})
   self.assertEqual(response.status_code,409);self.assertEqual(response.json()['detail'],'Review retained audits')
  def test_unexpected_error_is_sanitized_json(self):
   import api,devteam_routes
   from fastapi.testclient import TestClient
   with patch.object(devteam_routes,'get_current',return_value=None),patch.object(devteam_routes,'DevRun',side_effect=RuntimeError('sensitive-internal-detail')):
-   response=TestClient(api.app,raise_server_exceptions=False).post('/api/devteam/runs',json={})
+   response=TestClient(api.app,raise_server_exceptions=False,base_url="http://localhost").post('/api/devteam/runs',json={})
   self.assertEqual(response.status_code,500);self.assertIn('application/json',response.headers['content-type']);self.assertIn('reference',response.json());self.assertNotIn('sensitive-internal-detail',response.text)
  def test_tuple_qa_protocol_is_rejected_before_merge(self):
   from devteam import validate_ticket_patch

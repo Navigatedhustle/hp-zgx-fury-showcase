@@ -50,3 +50,7 @@ async def realtime(ws:WebSocket):
     if d.get('type')=='input_audio_buffer.commit':
      text=await run_decode(stream,np.zeros(0,dtype=np.float32),rate,True);await ws.send_json({'type':'transcription.completed','text':text});break
  except WebSocketDisconnect:pass
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard
+app.add_middleware(HostGuard)

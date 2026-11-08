@@ -1306,3 +1306,7 @@ else:
     @app.get("/", include_in_schema=False)
     async def root():
         return JSONResponse({"message": "Frontend not built. Run: cd frontend && npm install && npm run build"})
+
+# Apply after route/application middleware registration so Host validation is outermost.
+from showcase_app.security import HostGuard
+app.add_middleware(HostGuard)

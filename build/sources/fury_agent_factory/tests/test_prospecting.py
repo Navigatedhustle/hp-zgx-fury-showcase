@@ -62,7 +62,7 @@ class ProspectingTests(unittest.TestCase):
         self.assertEqual(len(box.snapshot()['items']),20)
     def test_retired_prospecting_pages_and_api(self):
         import api
-        with TestClient(api.app) as client:
+        with TestClient(api.app,base_url="http://localhost") as client:
             for path in ['/prospecting','/research','/sales','/static/prospecting.html']:
                 response=client.get(path,follow_redirects=False);self.assertEqual(response.status_code,307);self.assertEqual(response.headers['location'],'/devteam')
             for path in ['/api/prospecting/config','/api/prospecting/inbox']:self.assertEqual(client.get(path).status_code,410)

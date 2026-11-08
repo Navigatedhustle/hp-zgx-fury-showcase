@@ -135,7 +135,7 @@ def test_independent_reset_does_not_need_skin_service(tmp_path,monkeypatch):
  monkeypatch.setattr(operator,'ROOT',tmp_path)
  path=tmp_path/'state/skin/active.json';path.parent.mkdir(parents=True);path.write_text('broken')
  monkeypatch.setattr(skin_runtime,'service',None)
- client=TestClient(operator.app)
+ client=TestClient(operator.app,base_url="http://localhost")
  assert client.post('/api/appearance/reset',headers={'origin':'https://evil.invalid'}).status_code==403
  assert path.exists()
  assert client.post('/api/appearance/reset').status_code==200

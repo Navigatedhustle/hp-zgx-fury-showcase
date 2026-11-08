@@ -12,12 +12,12 @@ class GatewayTests(unittest.TestCase):
   def client(**kwargs):return real(transport=httpx.MockTransport(handler),**kwargs)
   with tempfile.TemporaryDirectory() as folder,patch.object(g,'DB',Path(folder)/'ledger.db'):
    g.connect().close()
-   with TestClient(g.app) as c,patch.object(g.httpx,'AsyncClient',side_effect=client):
+   with TestClient(g.app,base_url="http://localhost") as c,patch.object(g.httpx,'AsyncClient',side_effect=client):
     r=c.post('/slides/v1/chat/completions',json={'messages':[{'role':'user','content':'Fixture'}],'stream':stream,'max_tokens':4})
    self.assertFalse(g.active);self.assertFalse(g.waiting);self.assertEqual(g.total._value,4);self.assertEqual(g.normal._value,3)
    return r
  def test_malformed_input_is_a_structured_client_error(self):
-  with tempfile.TemporaryDirectory() as folder,patch.object(g,'DB',Path(folder)/'ledger.db'),TestClient(g.app) as c:
+  with tempfile.TemporaryDirectory() as folder,patch.object(g,'DB',Path(folder)/'ledger.db'),TestClient(g.app,base_url="http://localhost") as c:
    for body,status in [('Internal error',400),('[]',422),('{"messages":[],"model":{}}',422)]:
     r=c.post('/slides/v1/chat/completions',content=body,headers={'content-type':'application/json'})
     self.assertEqual(r.status_code,status);self.assertIn('detail',r.json())
@@ -40,7 +40,7 @@ class GatewayTests(unittest.TestCase):
   def client(**kwargs):return real(transport=httpx.MockTransport(handler),**kwargs)
   with tempfile.TemporaryDirectory() as folder,patch.object(g,'DB',Path(folder)/'ledger.db'):
    g.connect().close()
-   with TestClient(g.app) as c,patch.object(g.httpx,'AsyncClient',side_effect=client):
+   with TestClient(g.app,base_url="http://localhost") as c,patch.object(g.httpx,'AsyncClient',side_effect=client):
     g.active['factory-fixture']={'demo':'agent','model':g.LEAD}
     try:r=c.post('/lead/vision/v1/chat/completions',json={'messages':[{'role':'user','content':'Fixture brief'}],'max_tokens':50})
     finally:g.active.pop('factory-fixture',None)
