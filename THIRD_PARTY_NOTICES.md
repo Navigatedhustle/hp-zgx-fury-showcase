@@ -41,3 +41,16 @@ Kokoro's added am_michael voice uses the existing Apache-2.0 revision; its exact
 The operator environment pins CairoSVG 2.9.1 (LGPL-3.0-or-later), cairocffi 1.7.1 (BSD-3-Clause), cssselect2 0.10.1 (BSD-3-Clause), tinycss2 1.5.1 (BSD-3-Clause) and webencodings 0.6.1 (BSD-3-Clause). SVG parsing uses defusedxml 0.7.1 (PSF-2.0), the owner's explicitly approved exception to the new-dependency license allowlist. Original dependency licenses are retained in `licenses/customer-skin/`; installed libraries and the host Cairo library are not bundled in source archives. Sources: https://github.com/Kozea/CairoSVG, https://github.com/Kozea/cairocffi, https://github.com/Kozea/cssselect2, https://github.com/Kozea/tinycss2, https://github.com/Kozea/webencodings, https://github.com/tiran/defusedxml.
 
 Customer marks remain their owners' trademarks. Public-source availability does not grant general trademark rights. Use a customer logo only in a demo for that customer, next to the visible HP ZGX Fury identity, on screen only. Customer logos, names and palettes stay under ignored `state/skin/` and are excluded from source archives, documentation screenshots and downloaded application outputs. The original Northwind Beverages fixture mark is fictional project artwork and may appear in tests and documentation.
+
+
+## Export font assets (v3.1.0)
+
+`showcase_app/assets/export-fonts/` includes unchanged Noto Sans and script fonts,
+the Noto Sans CJK regular collection, and DejaVu Sans from the tested Ubuntu
+font packages. Noto fonts are SIL Open Font License 1.1; DejaVu uses the
+Bitstream Vera font license with DejaVu changes in the public domain. Full
+upstream/package copyright and license notices accompany the fonts, together
+with exact file hashes/package versions in `PROVENANCE.json`. Debian packaging
+license sections in those notices describe packaging code, which is not bundled.
+The browser's export-only fontconfig uses these local files; no system font
+configuration is installed or modified. Existing UI fonts and notices remain.

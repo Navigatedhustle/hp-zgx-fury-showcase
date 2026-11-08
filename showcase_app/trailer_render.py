@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from imageio_ffmpeg import get_ffmpeg_exe
 
-FONT='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+FONT=str(Path(__file__).parent/'assets/export-fonts/DejaVuSans.ttf')
 
 
 def title_card(path,text,index):

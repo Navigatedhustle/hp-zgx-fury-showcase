@@ -55,3 +55,13 @@ After the owner authorized continuation and simplification, the two pinned Apach
 The existing [Kokoro card](https://huggingface.co/hexgrad/Kokoro-82M/blob/f3ff3571791e39611d31c381e3a41a3af07b4987/README.md) was directly rechecked on 2026-11-06 and declares Apache-2.0, including commercial use without an annual-revenue ceiling. The added `voices/am_michael.pt` is 523435 bytes, SHA-256 `9a443b79a4b22489a5b0ab7c651a0bcd1a30bef675c28333f06971abbd47bd37`, at that same pinned revision. Atlas retains af_heart. Unknown voices are rejected; no silent voice substitution is used.
 
 Document parsing uses pypdf (BSD-3-Clause) and python-docx (MIT); sample PDFs use ReportLab (BSD-style). Exports use local Chromium and installed Noto Unicode fonts for script shaping; font availability/translation quality may differ on another host. No PyMuPDF dependency is used. Samples are original fictional source described in assets/PROVENANCE.md. All these software licenses permit commercial use without an annual-revenue threshold.
+
+
+## Self-contained export fonts in v3.1.0
+
+The unchanged licensed font files, complete notices, package provenance and
+SHA256 hashes in `showcase_app/assets/export-fonts/` cover the existing 34-language
+export choices and Action Trailer title cards. PDF rendering uses a process-local
+fontconfig file; it does not depend on fonts installed on the recipient's host.
+The CJK collection retains all of its original regional faces. Source/release
+inclusion and `SOURCE-SHA256SUMS` cover every bundled file.

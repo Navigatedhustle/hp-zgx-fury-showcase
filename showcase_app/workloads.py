@@ -3,6 +3,7 @@ import asyncio
 import base64
 import html
 import io
+import os
 import json
 import re
 from collections import Counter
@@ -116,13 +117,16 @@ async def export_document(folder,pages,target):
         if index:doc.add_page_break()
         for paragraph in page.split('\n'):doc.add_paragraph(paragraph)
     await asyncio.to_thread(doc.save,folder/'translated.docx')
-    # Chromium uses the host's installed Noto Unicode fonts and script shaping.
+    # Chromium uses the shipped, unchanged Noto fonts with local script shaping.
     from playwright.async_api import async_playwright
-    content='<!doctype html><meta charset="utf-8"><style>@page{size:A4;margin:20mm}body{font:11pt "Noto Sans","Noto Sans CJK SC","Noto Sans Devanagari","Noto Naskh Arabic",sans-serif;line-height:1.55}section{break-after:page;white-space:pre-wrap;overflow-wrap:anywhere}section:last-child{break-after:auto}</style>'
+    regional={'Japanese':'Noto Sans CJK JP','Korean':'Noto Sans CJK KR','Chinese (Simplified)':'Noto Sans CJK SC','Chinese (Traditional)':'Noto Sans CJK TC'}
+    families=[regional.get(target,'Noto Sans'),'Noto Sans','Noto Sans CJK SC','Noto Sans Devanagari','Noto Naskh Arabic','Noto Sans Hebrew','Noto Sans Bengali','Noto Sans Tamil','Noto Sans Telugu','Noto Sans Thai']
+    font_css=','.join('"'+name+'"' for name in dict.fromkeys(families))+',sans-serif'
+    content='<!doctype html><meta charset="utf-8"><style>@page{size:A4;margin:20mm}body{font:11pt '+font_css+';line-height:1.55}section{break-after:page;white-space:pre-wrap;overflow-wrap:anywhere}section:last-child{break-after:auto}</style>' 
     direction='rtl' if target in ('Arabic','Hebrew','Urdu') else 'auto'
     content+=''.join('<section dir="'+direction+'">'+html.escape(page)+'</section>' for page in pages)
     async with async_playwright() as p:
-        browser=await p.chromium.launch(args=['--no-sandbox','--disable-gpu'])
+        browser=await p.chromium.launch(args=['--disable-gpu'],env={**os.environ,'FONTCONFIG_FILE':str(Path(__file__).parent/'assets/export-fonts/fonts.conf')})
         try:
             page=await browser.new_page();await page.route('**/*',lambda route:route.abort());await page.set_content(content)
             await page.pdf(path=str(folder/'translated.pdf'),format='A4',print_background=True)
