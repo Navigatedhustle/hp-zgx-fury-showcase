@@ -26,7 +26,7 @@
   if(full)bottom.append(full);if(theme)bottom.append(theme);nav.append(bottom);
   if(['8200','8501','8765','8800'].includes(location.port))nav.querySelectorAll('a').forEach(a=>{a.target='_blank';a.rel='noopener'});
   const bar=document.createElement('div');bar.className='mc-telemetry mc-stale';bar.setAttribute('aria-label','Live machine telemetry');
-  bar.innerHTML='<div class="mc-signal"><i class="mc-dot"></i><span id="mc-signal-text">CONNECTING</span></div>'+[['gpu','GPU'],['hbm','HBM / total'],['grace','Grace used'],['power','GPU power'],['tps','Output tok/s'],['active','Active jobs'],['queued','Queued jobs'],['external','External AI APIs']].map(([key,label])=>'<div class="mc-readout"><span>'+label+'</span><strong id="mc-'+key+'">—</strong></div>').join('');document.body.prepend(bar);
+  bar.innerHTML='<div class="mc-signal"><i class="mc-dot"></i><span id="mc-signal-text">CONNECTING</span></div>'+[['gpu','GPU'],['hbm','HBM / total'],['grace','Grace used'],['power','GPU power'],['tps','Output tok/s'],['active','Active jobs'],['queued','Queued jobs'],['external','External AI APIs']].map(([key,label])=>'<div class="mc-readout"><span>'+label+'</span><strong id="mc-'+key+'">—</strong></div>').join('');const skip=document.querySelector('body>.hp-skip');if(skip)skip.after(bar);else document.body.prepend(bar);
  }
  shell();
  if(!skinOff){const skinScript=document.createElement('script');skinScript.src='/showcase-assets/skin.js';document.head.append(skinScript)}
