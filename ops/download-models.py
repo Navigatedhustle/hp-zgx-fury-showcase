@@ -50,7 +50,8 @@ def main():
  for model in records:
   folder=ROOT/'models'/model['directory']
   if not folder.resolve().is_relative_to(models):raise RuntimeError('Unsafe model directory path')
-  folder.mkdir(parents=True,exist_ok=True)
+  if args.verify_only and not folder.is_dir():raise RuntimeError('Missing pinned model directory: '+model['directory'])
+  if not args.verify_only:folder.mkdir(parents=True,exist_ok=True)
   total=sum(f['size'] for f in model['files']);print(f"{model['repo']} @ {model['revision']} — {total/1024**3:.2f} GiB",flush=True)
   def fetch(record):
    path=folder/record['path']
@@ -63,7 +64,7 @@ def main():
    # invocation authenticates the actual bytes against the pinned SHA256.
    print('Verifying '+model['directory']+'/'+record['path'],flush=True)
    if digest(path,'sha256')!=record['hash']:raise RuntimeError('Checksum failed: '+str(path)+'; remove this file and rerun setup')
-   marker.parent.mkdir(parents=True,exist_ok=True);marker.write_text(stamp)
+   if not args.verify_only:marker.parent.mkdir(parents=True,exist_ok=True);marker.write_text(stamp)
   with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:list(pool.map(fetch,model['files']))
  manifest=ROOT/'build/sources/atlas-gpt-main/models/kokoro.json';manifest.parent.mkdir(parents=True,exist_ok=True)
  pins=json.loads((ROOT/'config/model-pins.json').read_text())

@@ -14,3 +14,17 @@ Use the tested Ubuntu 24.04 ARM64 GB300 with its existing working driver and CUD
 Translate reflows text and offers advisory terminology review; it does not preserve source layout. Video/trailer model adapters and any two-shot fallback are disclosed. Guided Factory is recorded playback. Use fictional/public demonstration material outside the consented Action Trailer camera flow.
 
 [Presenter](docs/PRESENTER.md) · [V3 launch guide](docs/V3_LAUNCH_GUIDE.md) · [PDF](docs/V3_Launch_Guide_v3.0.0.pdf). Private remote access uses the recipient's existing configuration; this upgrade changes no network or Tailscale settings.
+
+
+To reuse a complete model directory you already own, run the following in a fresh checkout
+with no `models/` entry. This explicit setup option creates the local model link and rehashes
+every file against the pinned revision/SHA256 manifests without downloading or changing the
+shared weights. Missing or mismatched files fail setup; no model substitution occurs.
+
+```bash
+FURY_MODELS_DIR=/absolute/path/to/verified/models ./launch.sh setup
+./launch.sh
+```
+
+The original shared directory must remain available for later launches. Setup refuses to
+replace a different existing `models/` directory. Never run two GPU stacks at once.

@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 077
 cd "$(dirname "$0")/.."
 python3 ops/preflight.py
 mkdir -p state .cache
 exec 9>state/setup.lock
 flock 9
+if [[ -n "${FURY_MODELS_DIR:-}" ]]; then
+ python3 ops/model-directory.py "$FURY_MODELS_DIR"
+fi
 export UV_CACHE_DIR="$PWD/.cache/uv" HF_HOME="$PWD/.cache/huggingface" HF_HUB_DISABLE_IMPLICIT_TOKEN=1
 if [[ ! -x .tools/uv-aarch64-unknown-linux-gnu/uv ]]; then
  mkdir -p .tools
@@ -30,5 +34,9 @@ if [[ ! -x .tools/node-v24.22.0-linux-arm64/bin/node ]]; then
  (cd .tools; printf '%s  %s\n' fef00bb4d36e1c50104a9775a10359beee98f162b4104dd12472c75065c6a143 node-v24.22.0-linux-arm64.tar.xz | sha256sum -c -; tar -xf node-v24.22.0-linux-arm64.tar.xz)
 fi
 bash ops/build-frontend.sh
-.venv/bin/python ops/download-models.py
+if [[ -n "${FURY_MODELS_DIR:-}" ]]; then
+ .venv/bin/python ops/download-models.py --verify-only
+else
+ .venv/bin/python ops/download-models.py
+fi
 .venv/bin/python ops/setup-stamp.py

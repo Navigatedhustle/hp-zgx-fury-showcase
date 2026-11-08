@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 077
 cd "$(dirname "$0")"
 export HF_HOME="$PWD/.cache/huggingface" HF_HUB_DISABLE_IMPLICIT_TOKEN=1 PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright"
 export XDG_CACHE_HOME="$PWD/.cache" FURY_PROFILE=frankfurt
