@@ -65,3 +65,7 @@ export choices and Action Trailer title cards. PDF rendering uses a process-loca
 fontconfig file; it does not depend on fonts installed on the recipient's host.
 The CJK collection retains all of its original regional faces. Source/release
 inclusion and `SOURCE-SHA256SUMS` cover every bundled file.
+
+## v3.1.0 release documentation
+
+The fresh installation guide Markdown/PDF is original repository documentation. Its two screenshots show only the fictional Northwind Beverages fixture, with no visitor media or real customer branding. The release source inventory and SOURCE-SHA256SUMS cover the guide, fictional sample assets, fonts/icons and notices. Model bytes and generated visitor/output/runtime files remain excluded. CycloneDX SBOMs accompany the release as separate JSON assets.

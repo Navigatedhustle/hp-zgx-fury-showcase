@@ -1,11 +1,11 @@
-# HP ZGX Fury — V3 Mission Control
+# HP ZGX Fury — V3.1.0 Mission Control
 
-Eight local AI experiences share one GB300 workstation, with real model routing, visible queues and measured hardware telemetry. V3 is a review branch; no V3 tag or release is published. Existing releases remain immutable.
+Eight local AI experiences share one GB300 workstation, with real model routing, visible queues and measured hardware telemetry. v3.1.0 combines V3, Customer Skin and the verified hardening changes. Existing release tags remain immutable. [Fresh Fury guide](docs/FRESH_FURY_GUIDE_v3.1.0.md) · [PDF](docs/FRESH_FURY_GUIDE_v3.1.0.pdf) · [Security policy](SECURITY.md).
 
 This community demonstration uses fictional business data. HP and NVIDIA names identify the tested hardware; this project is not an officially supported or endorsed HP or NVIDIA product. Their marks remain their owners' property.
 
 ```bash
-git clone --branch v3 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
+git clone --branch v3.1.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
 cd hp-zgx-fury-showcase
 ./launch.sh
 ```
@@ -52,24 +52,24 @@ Conference stations remain at `/stations`; assignments belong to each browser. U
 
 **Default appearance** in the left navigation opens the demo with customization bypassed. You can also open `/demos?skin=off`; that browser loads no skin script, styles or API requests, including inside retained workspaces. Optional appearance failures fall back to the native shell without stopping core telemetry.
 
-For the unmerged Customer Skin review build, clone with `git clone --branch customer_skin https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git`. Open Mission Control and use **Customize for customer**, **Presenter guide** or **Assumptions & presenter controls** directly.
+Customer Skin is included in v3.1.0. Open Mission Control and use **Customize for customer**, **Presenter guide** or **Assumptions & presenter controls** directly.
 
-Customer Skin remains a draft: its fixed Factory latency acceptance gate did not pass. [Measured results and retained failures](docs/verification/customer_skin.json).
+Historical Customer Skin timing failures remain documented in [the original record](docs/verification/customer_skin.json). v3.1.0 has its own frozen pre-hardening baseline, standalone comparison and actual concurrency/privacy/soak checks; see [current verification](docs/verification/v3.1.0.json) and [security review](docs/SECURITY_REVIEW_v3.1.0.md).
 
 Cloud vs Local separates **USD costs** from **kWh electricity**. Enter sourced, same-workload cloud energy estimates to see how many times more or less electricity they use than one Fury. Missing model-specific energy stays unknown; API prices do not establish energy use.
 
-[Quickstart](QUICKSTART.md) · [Presenter script](docs/PRESENTER.md) · [V3 launch guide](docs/V3_LAUNCH_GUIDE.md) · [Launch PDF](docs/V3_Launch_Guide_v3.0.0.pdf) · [Models and licenses](docs/ASSET-MANIFEST.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Remote access](docs/REMOTE-ACCESS.md) · [MIT source license](LICENSE)
+[Quickstart](QUICKSTART.md) · [Presenter script](docs/PRESENTER.md) · [Fresh Fury guide](docs/FRESH_FURY_GUIDE_v3.1.0.md) · [Guide PDF](docs/FRESH_FURY_GUIDE_v3.1.0.pdf) · [Models and licenses](docs/ASSET-MANIFEST.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Remote access](docs/REMOTE-ACCESS.md) · [MIT source license](LICENSE)
 
 ## Upgrade and rollback
 
-Prior releases v2.2.0, v2.1.1, v2.1.0 and v2.0.0 remain available and immutable. V1 also remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
+The approved V3 baseline is retained as v3.0.0. Prior releases v2.3.0, v2.2.0, v2.1.1, v2.1.0 and v2.0.0 remain available and immutable. V1 also remains available as v1.0.0 (commit e98c85ee26169a6d745de775feea049ae7a3dc63). Preserve runtime outputs and wait until all users/jobs are idle before switching a release. Never start two model stacks on this GPU.
 
 For a Git checkout with clean tracked source:
 
 ```bash
 ./launch.sh stop
 git fetch --tags origin
-git switch --detach v2.3.0
+git switch --detach v3.1.0
 ./launch.sh
 ```
 
@@ -77,11 +77,17 @@ To roll back:
 
 ```bash
 ./launch.sh stop
-git switch --detach v2.2.0
-./launch.sh setup  # restore the preceding conference release
+git switch --detach v3.0.0
+./launch.sh setup  # restore the approved V3 snapshot
 ./launch.sh
 ```
 
 For archive installs, keep the previous release directory and its own environments/output. Stop the current installation through its own launcher, then launch the previous one. Do not copy process registries between directories. Back up outputs first; this UI release changes no application database schema.
 
 V2.0 predates Guided demonstration. Use a fresh browser profile when presenting a prior release; retained recorded artifacts remain recorded and must not be described as newly generated.
+
+## Hardened deployment
+
+Application and model services bind to loopback. Use approved SSH or private Tailscale access; presenter controls intentionally have no PIN. Exact Host/Origin and JSON/CSRF checks, isolated generated documents/parsers/workers, private runtime files and bounded resources strengthen that trusted-operator boundary. Do not expose the demo directly to the internet. [Security policy](SECURITY.md) describes reporting and residual assumptions.
+
+Setup can reuse an owner-controlled complete model directory with `FURY_MODELS_DIR=/absolute/path/to/verified/models ./launch.sh setup` in a fresh checkout. Every immutable pinned file is rehashed with SHA256. [Installation, measured timings and disk planning](docs/FRESH_FURY_GUIDE_v3.1.0.md).

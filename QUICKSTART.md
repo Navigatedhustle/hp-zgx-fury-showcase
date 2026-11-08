@@ -1,8 +1,8 @@
-# Fury V3 quickstart
+# Fury v3.1.0 quickstart
 
 Use the tested Ubuntu 24.04 ARM64 GB300 with its existing working driver and CUDA toolkit. Physical Grace memory is 494.15 GiB; the approximately 743.65 GiB Linux aggregate includes HBM. Reserve 350 GiB initially free disk; model files are about 227.566 GiB. See [prerequisites](docs/PREREQUISITES.md).
 
-1. Clone branch `v3` and enter the checkout. V3 is an unmerged review branch, not a published tag or release.
+1. Clone tag `v3.1.0` with `git clone --branch v3.1.0 https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git` and enter the checkout. For a checked release ZIP, measured setup times and complete partner instructions, use the [fresh Fury guide](docs/FRESH_FURY_GUIDE_v3.1.0.md).
 2. Run `./launch.sh`. Keep setup progress visible; cold compilation may take tens of minutes.
 3. Open **http://localhost:8080**. Eight cards open retained local workspaces.
 4. Try Atlas, a three-slide presentation, an image or the included Vision/Translate samples. Video uses a fixed five-second preset.
@@ -13,7 +13,7 @@ Use the tested Ubuntu 24.04 ARM64 GB300 with its existing working driver and CUD
 
 Translate reflows text and offers advisory terminology review; it does not preserve source layout. Video/trailer model adapters and any two-shot fallback are disclosed. Guided Factory is recorded playback. Use fictional/public demonstration material outside the consented Action Trailer camera flow.
 
-[Presenter](docs/PRESENTER.md) · [V3 launch guide](docs/V3_LAUNCH_GUIDE.md) · [PDF](docs/V3_Launch_Guide_v3.0.0.pdf). Private remote access uses the recipient's existing configuration; this upgrade changes no network or Tailscale settings.
+[Presenter](docs/PRESENTER.md) · [Fresh guide](docs/FRESH_FURY_GUIDE_v3.1.0.md) · [PDF](docs/FRESH_FURY_GUIDE_v3.1.0.pdf) · [Security policy](SECURITY.md). Private remote access uses the recipient's existing configuration; this upgrade changes no network or Tailscale settings.
 
 
 To reuse a complete model directory you already own, run the following in a fresh checkout
@@ -28,3 +28,5 @@ FURY_MODELS_DIR=/absolute/path/to/verified/models ./launch.sh setup
 
 The original shared directory must remain available for later launches. Setup refuses to
 replace a different existing `models/` directory. Never run two GPU stacks at once.
+
+Use localhost or your approved private HTTPS hostname. Presenter controls deliberately have no PIN; the workstation account and SSH/private-network policies are the access boundary. Never expose the demo directly to the public internet or bypass parser/generated-code isolation.

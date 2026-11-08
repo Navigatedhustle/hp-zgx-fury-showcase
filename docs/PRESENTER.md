@@ -1,4 +1,4 @@
-# V3 presenter script
+# V3.1.0 presenter script
 
 ## The customer skin moment — 20 seconds
 
@@ -81,3 +81,9 @@ Before a session, run ./launch.sh status; confirm all ten ready and no prior act
 Recovery: ./launch.sh diagnostics, then guarded ./launch.sh recover agent once idle. Do not restart the entire model stack to recover a tab. Health alone does not prove successful generation. Keep access private. Physical microphone/speaker and remote browser permissions depend on the presenting device.
 
 Expected timing varies with input, caches and queues. Allow several minutes for short development; complete travel takes longer. See VERIFICATION.md and V2-VERIFICATION.md for observed results and scope.
+
+## Hardened release operations
+
+Use the [fresh Fury guide](FRESH_FURY_GUIDE_v3.1.0.md) and its [PDF](FRESH_FURY_GUIDE_v3.1.0.pdf) for installation and site validation. Keep approved users on localhost, SSH or the organization’s private HTTPS network. Presenter controls remain directly available without a PIN. Host/Origin rejections indicate a mismatched deployment hostname; configure its exact approved name rather than weakening guards. Queues, upload/parser/connection limits and isolated previews can reject unsafe or oversized work with a visible error. Review the result and wait for available capacity.
+
+Only fictional Northwind screenshots are distributed. Check actual cameras, microphones, speakers and remote devices at your site; same-host automated browser tests do not certify them. For security reports use [private vulnerability reporting](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/security/advisories/new), with visitor data and credentials removed.

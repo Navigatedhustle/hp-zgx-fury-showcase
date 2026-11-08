@@ -54,3 +54,7 @@ with exact file hashes/package versions in `PROVENANCE.json`. Debian packaging
 license sections in those notices describe packaging code, which is not bundled.
 The browser's export-only fontconfig uses these local files; no system font
 configuration is installed or modified. Existing UI fonts and notices remain.
+
+## v3.1.0 locked dependency inventory
+
+Release assets include schema-validated CycloneDX1.5 SBOMs for all three active Python locks, the retained legacy Atlas lock and the presentation frontend npm lock. They include optional/platform entries and CUDA local build versions; inventory does not imply runtime reachability or an additional supported platform. Locked dependencies retain their upstream terms. The bundled export fonts and their complete unmodified copyright/license texts are listed above and in the asset manifest.

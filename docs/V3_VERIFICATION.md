@@ -1,5 +1,6 @@
 # V3 hardware and browser verification
 
+> Historical V3 review record. Its original authorization and measurements are retained below. For the current v3.1.0 release, use the [fresh Fury guide](FRESH_FURY_GUIDE_v3.1.0.md), [security review](SECURITY_REVIEW_v3.1.0.md) and [current verification](verification/v3.1.0.json).
 Verification date: 6 November 2026. This record covers the tested Ubuntu ARM64 GB300 workstation. Raw logs, cookies, model responses, camera fixture media and generated output remain in private evidence outside Git. Public screenshots show initial UI and original fictional samples only.
 
 Required hardware/browser gates passed within the scope below, with the slow Factory trial retained as a latency failure. The real fifteen-minute idle-retention check and three independent twenty-minute browser observations passed.

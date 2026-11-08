@@ -1,0 +1,294 @@
+<!doctype html><html><head><meta charset="utf-8"><base href="./"><title>HP ZGX Fury v3.1.0 fresh installation guide</title><style>@page{size:A4;margin:18mm 17mm 20mm} @font-face{font-family:Archivo;src:url("../showcase_app/assets/Archivo-400.woff2")}@font-face{font-family:Archivo;src:url("../showcase_app/assets/Archivo-700.woff2");font-weight:700}body{font:10.5pt/1.48 Archivo,Arial,sans-serif;color:#152334;margin:0}h1{font-size:25pt;line-height:1.15;color:#0755a3;margin:0 0 10mm}h2{font-size:15pt;color:#0755a3;margin:6mm 0 3mm;break-after:avoid}h3{font-size:12pt;break-after:avoid}p{margin:0 0 2.5mm;orphans:3;widows:3}a{color:#0755a3;text-decoration:underline;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;font-size:9pt;margin:4mm 0 6mm;table-layout:fixed}th,td{border:1px solid #c5d2df;padding:1.6mm 2.5mm;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#eaf2fb;font-weight:700}thead{display:table-header-group}tr{break-inside:avoid}td:first-child,th:first-child{width:29%}pre{font:8.6pt/1.5 "DejaVu Sans Mono",monospace;background:#eff3f7;border-left:3px solid #0755a3;padding:3mm;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-all;break-inside:avoid}code{font:8.6pt "DejaVu Sans Mono",monospace;overflow-wrap:anywhere}img{display:block;max-width:100%;height:auto;max-height:110mm;object-fit:contain;margin:4mm auto;border:1px solid #ccd7e3;break-inside:avoid}p:has(img){break-inside:avoid}em{color:#42576e}strong{font-weight:700}ul,ol{padding-left:6mm}li{margin:1mm 0}</style></head><body><h1>HP ZGX Fury: fresh installation and demo guide</h1>
+<p><strong>v3.1.0 · Customers and partners · November 2026</strong></p>
+<p>This is community demonstration software for the tested HP ZGX Fury GB300 configuration. It uses fictional business data and is provided <strong>as is under the repository’s MIT license</strong>. It is not a supported or endorsed HP product. HP, NVIDIA and model publishers retain their respective marks and licenses.</p>
+<h2>1. What runs on this workstation</h2>
+<p>Eight experiences share the same local model services. Model inference, speech, document processing and visitor media generation run on the Fury. Setup needs outbound internet access. Optional Customer Skin research fetches public information; it is distinct from external model inference.</p>
+<table>
+<thead>
+<tr>
+<th>Experience</th>
+<th>A useful first demonstration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atlas</td>
+<td>Ask an executive question about the synthetic business, inspect grounding, then hear the answer. Its developer tools explicitly run generated Python or SQL inside an isolated read-only synthetic-data workflow.</td>
+</tr>
+<tr>
+<td>Presentations</td>
+<td>Enter a brief, generate three slides and download editable PowerPoint. The full editor remains available.</td>
+</tr>
+<tr>
+<td>Agent Factory</td>
+<td>Start a short automatic Live build and inspect actual development, tests and functional preview. Guided mode is labeled recorded playback.</td>
+</tr>
+<tr>
+<td>Image Studio</td>
+<td>Select style, ratio, seed and batch size; generate an original image, download it or send it to Video Studio.</td>
+</tr>
+<tr>
+<td>Vision Lab</td>
+<td>Choose a fictional chart, document, whiteboard, scene or defect sample; inspect extraction and an executive brief.</td>
+</tr>
+<tr>
+<td>Translate Desk</td>
+<td>Translate the included text document into a chosen language; inspect pages and download PDF, DOCX or TXT.</td>
+</tr>
+<tr>
+<td>Video Studio</td>
+<td>Generate a five-second text-to-video or image-to-video clip through the shared creative lane.</td>
+</tr>
+<tr>
+<td>Action Trailer</td>
+<td>Read consent, capture a camera image, generate an original PG trailer, play it, then delete the session.</td>
+</tr>
+</tbody>
+</table>
+<p>Translation uses clean text reflow, not preservation of the source document layout. Scanned PDFs need OCR and are rejected. Language quality and model-generated facts require human review. Video uses the disclosed five-second preset. A trailer may visibly use the disclosed two-shot fallback when its time budget is exceeded.</p>
+<p><img src="screenshots/v3/skin/northwind-shell.png" alt="Mission Control with the fictional Northwind Beverages fixture" /></p>
+<p><em>Illustrative V3 screenshot. Northwind Beverages and its artwork are fictional. Hardware readings show the captured session, not a promised capacity or throughput.</em></p>
+<h2>2. Requirements and disk planning</h2>
+<p>Use the existing working operating system, GPU driver and CUDA toolkit approved by your workstation administrator. This installer does not replace them or change the kernel, firewall, network access policy or boot services.</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Tested configuration or installation requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Platform</td>
+<td>Ubuntu 24.04 ARM64, Python 3.12, one NVIDIA GB300. Other platforms and smaller GPUs are unverified.</td>
+</tr>
+<tr>
+<td>GPU memory</td>
+<td>256703 MiB HBM on the tested host. Keep the configured 10 GiB reserve and existing model/concurrency budgets.</td>
+</tr>
+<tr>
+<td>Physical CPU memory</td>
+<td>494.15 GiB usable Grace memory; preflight requires at least 480 GiB. Linux’s approximately 743.65 GiB aggregate includes GPU memory and is not the physical Grace capacity.</td>
+</tr>
+<tr>
+<td>Driver and toolkit</td>
+<td>Tested existing driver 595.99.02 and CUDA compilation toolkit 13.3.33. Your administrator must assess any different combination.</td>
+</tr>
+<tr>
+<td>Free disk</td>
+<td>Start with at least 350 GiB free. Pinned model files total approximately 227.566 GiB. Environments, browsers, compiler caches and generated output require additional space. The fresh candidate checkout, tools, environments and caches measured 14.775 GiB excluding shared weights; allow approximately 242.4 GiB combined plus operating headroom and growing outputs.</td>
+</tr>
+<tr>
+<td>Ordinary system tools</td>
+<td>curl, CA certificates, tar/xz, unzip for ZIP installation, gcc/g++, make, bubblewrap, util-linux, apt-get/dpkg-deb, libsndfile1 and libnuma. A working <code>/usr/local/cuda/bin/nvcc</code> is required.</td>
+</tr>
+<tr>
+<td>Browser</td>
+<td>Current Chromium or Firefox with JavaScript enabled. Use the real CSS viewport at 100% zoom. Camera/microphone access needs localhost or your approved private HTTPS origin and the browser’s permission.</td>
+</tr>
+</tbody>
+</table>
+<p>Preflight exercises an actual networkless bubblewrap namespace. If site policy blocks it, ask the administrator for scoped support. Do not disable host security controls or bypass the sandbox. The supported launcher fails closed.</p>
+<p>Setup needs HTTPS access to GitHub and its release assets, the Python package index and wheel hosts, PyTorch’s wheel index, Hugging Face and its artifact/CDN hosts, Node.js, the npm registry, Playwright’s browser download hosts, your configured Ubuntu package repository, and NVIDIA kernel artifact hosts including <code>edge.urm.nvidia.com</code>. First-use GPU compilation can retrieve publisher kernel artifacts. No model API subscription is required for the pinned public models. Optional Customer Skin public research also needs Wikidata/Wikipedia and vetted public logo sources. Offline logo upload does not need that research access.</p>
+<p>See <a href="https://github.com/Navigatedhustle/hp-zgx-fury-showcase/blob/v3.1.0/docs/PREREQUISITES.md">tested prerequisites</a> for administrator details.</p>
+<h2>3. Download a release</h2>
+<p>Choose a new directory owned by the account that will run the demo. Never start two model stacks on the same GPU.</p>
+<p><strong>Using Git:</strong></p>
+<pre><code class="language-bash">git clone --branch v3.1.0 \
+  https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git
+cd hp-zgx-fury-showcase
+</code></pre>
+<p><strong>Using the release ZIP:</strong> download the ZIP and its published checksum list from the <a href="https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.1.0">v3.1.0 release</a>.</p>
+<pre><code class="language-bash">release=https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.1.0
+curl -fLO &quot;$release/hp-zgx-fury-showcase-v3.1.0.zip&quot;
+curl -fLO &quot;$release/SHA256SUMS&quot;
+sha256sum --check --ignore-missing SHA256SUMS
+unzip hp-zgx-fury-showcase-v3.1.0.zip
+cd hp-zgx-fury-showcase-v3.1.0
+chmod +x launch.sh showcase
+</code></pre>
+<p>Require an <code>OK</code> checksum result for the ZIP before extracting it. The separately published <code>SOURCE-SHA256SUMS</code> authenticates the listed source files inside the extracted release. You can check them from the extracted directory:</p>
+<pre><code class="language-bash">sha256sum --check SOURCE-SHA256SUMS
+python3 ops/check-source.py
+</code></pre>
+<h2>4. Install and launch</h2>
+<p>Run the pinned setup and keep the terminal visible:</p>
+<pre><code class="language-bash">./launch.sh setup
+./launch.sh
+</code></pre>
+<p>Setup creates three local Python environments, installs locked packages, builds the editor, downloads immutable model revisions and verifies every model file’s size and SHA256. The first launch loads both language models, speech and the shared creative process. Wait for the terminal to report dashboard readiness. Detailed progress is in private <code>logs/</code> files.</p>
+<p><strong>Reusing complete weights:</strong> in a fresh checkout with no <code>models/</code> entry, the supported option below links an existing model directory you own. It verifies every pinned checksum without modifying or downloading shared weights. Missing, corrupt or mismatched files stop setup; an existing different <code>models/</code> directory is never replaced.</p>
+<pre><code class="language-bash">FURY_MODELS_DIR=/absolute/path/to/verified/models ./launch.sh setup
+./launch.sh
+</code></pre>
+<p>Keep that shared directory available for subsequent launches. The variable is a setup option; the resulting local link persists. Stop the original installation before launching this one. Reusing weights does not prove an empty-cache download or an alternative hardware configuration.</p>
+<table>
+<thead>
+<tr>
+<th>Measurement on the tested Fury</th>
+<th>Observed time and conditions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model bytes reverified</td>
+<td>41 seconds for all pinned files already present, using SHA256. This is a verification measurement, not a full network download.</td>
+</tr>
+<tr>
+<td>Patched Qwen first start</td>
+<td>216.106 seconds, including new vLLM 0.32 kernel compilation on this host.</td>
+</tr>
+<tr>
+<td>Complete cold start</td>
+<td>1655.133 seconds (about 27.59 minutes) from first component start to final service readiness, existing weights and new serving-runtime compilation; no reboot or full weight download.</td>
+</tr>
+<tr>
+<td>Download/setup</td>
+<td>84.141 seconds for fresh candidate tools/dependency/browser downloads, new environments, editor build and verified reuse of existing weights. Complete uncached 227.566 GiB model transfer was not benchmarked; time depends on the connection.</td>
+</tr>
+</tbody>
+</table>
+<p>Network speed, existing caches and first-use compiler work strongly affect setup. Allow tens of minutes for a new compiler cache. The lead readiness deadline is 60 minutes; do not restart an actively compiling verified process merely because its terminal says “waiting for readiness”. Warm-cache restarts are a separate measurement.</p>
+<p>Open <strong>http://localhost:8080</strong> on the Fury. If it does not open automatically, paste that address into your browser. Run <code>./launch.sh status</code> to inspect readiness and <code>./launch.sh diagnostics</code> for local operational details. Review diagnostics before sharing them because they contain installation paths and process information.</p>
+<h2>5. Local and private remote access</h2>
+<p>The application and model HTTP listeners bind to loopback. The intended access boundary is the workstation account and your organization’s approved SSH or private network policy. Presenter controls intentionally have no PIN. Never expose this demonstration directly to the public internet or use public Funnel hosting.</p>
+<p>For a browser on another machine, use your own approved SSH account and host:</p>
+<pre><code class="language-bash">ssh -N -o ExitOnForwardFailure=yes \
+  -L 8080:127.0.0.1:8080 -L 8200:127.0.0.1:8200 \
+  -L 8501:127.0.0.1:8501 -L 8765:127.0.0.1:8765 \
+  -L 8800:127.0.0.1:8800 YOUR_USER@YOUR_HOST
+</code></pre>
+<p>Open <strong>http://localhost:8080</strong> on the browser machine while the tunnel is active. Do not forward model ports. Localhost also provides the secure browser context needed for voice and camera permissions.</p>
+<p>Alternatively, your administrator can configure the organization’s own private Tailscale Serve routes for the dashboard and four app ports. Keep network authentication and device approvals under that organization’s control. The launcher reads matching existing demo proxy hostnames for its exact Host/Origin allowlist. For another approved private HTTPS proxy, provide its exact hostname explicitly:</p>
+<pre><code class="language-bash">FURY_SERVE_HOSTNAMES=demo.private.example ./launch.sh
+</code></pre>
+<p>Replace the example with the actual approved hostname; do not use a wildcard. Browser device permissions and remote camera/audio quality still need validation at the destination. This guide does not grant network access or enroll devices. <a href="https://github.com/Navigatedhustle/hp-zgx-fury-showcase/blob/v3.1.0/docs/REMOTE-ACCESS.md">Private access details</a>.</p>
+<h2>6. Run a demo</h2>
+<p>At <strong>Station setup</strong>, assign each browser to an interactive demo, Economics, Why HP or Presenter view. The assignment belongs to that browser profile; assigning one station does not change the others. Reopening Home restores its assignment. <strong>Clear this browser’s assignment</strong> resets only that browser’s choice.</p>
+<p>Use a Quick Demo Launcher tile to open a retained workspace. Return to Mission Control to switch experiences. Use <strong>Present fullscreen</strong> when useful; Escape exits. The supported main conference viewports are 1280×720, 1366×768, 1440×900 and 1920×1080. Smaller content areas use contained scrolling.</p>
+<p>For simultaneous work, press <strong>Launch Fury Rush</strong> once. It submits six real workflows through the original controls: Factory, Atlas, Presentations, Vision, Translate and Image Studio. Watch each state rather than repeatedly pressing Go. Queues are intentionally bounded; a full lane returns a readable busy state. Four gateway slots include one reserved for Atlas, and creative work shares one active GPU slot.</p>
+<p>For <strong>Customer Skin</strong>, choose <strong>Customize for customer</strong>. Enter a name and either research public identity candidates or choose <strong>Use a logo offline</strong>. Upload a permitted PNG/SVG under 2 MB, inspect accessible colors and the fictional sample pack, then apply. Branding synchronizes across shells and stays out of generated applications and downloads. <strong>Skins</strong> provides cached choices and reset. <strong>Default appearance</strong>, or <code>/demos?skin=off</code>, bypasses customization if appearance services fail. No presenter code, PIN or account is required. For a fictional offline rehearsal, the release includes <code>ops/tests/fixtures/skin/northwind.svg</code>.</p>
+<p><img src="screenshots/v3/skin/northwind-preview.png" alt="Fictional Northwind customization preview" /></p>
+<p>Use only fictional/public demonstration material in Vision, document and ordinary image uploads. <strong>Action Trailer is the sole real visitor-photo workflow.</strong> Read the consent statement and tap “I am 18 or older, or my guardian approved, and I agree” before camera access. Without consent the camera stays off. Choose a PG genre, capture once and wait for the local stages. Play the final cut with a user tap to enable sound/fullscreen. Final download stays restricted to localhost on that station.</p>
+<p>Press <strong>Done</strong>, <strong>New visitor</strong> or <strong>Delete my photo and video now</strong> after each visit. Confirm the visible deletion message. Photos, appearance descriptions and generated visitor media stay local, outside the source checkout, and are removed on those actions, after 15 minutes idle and on service startup. Polling does not extend retention. Do not put visitor media in screenshots, logs, bug reports, source archives or presentation material.</p>
+<h2>7. Daily operations</h2>
+<pre><code class="language-bash">./launch.sh status
+./launch.sh diagnostics
+./launch.sh stop
+./launch.sh
+./launch.sh recover agent
+</code></pre>
+<p>Wait for jobs to finish before normal stop/recovery. The controller verifies process identities and uses pidfds; it refuses ambiguous processes or a port owned by another installation. <code>recover COMPONENT</code> first checks that workflows are idle. Supported component names are <code>text</code>, <code>lead</code>, <code>gateway</code>, <code>asr</code>, <code>tts</code>, <code>atlas</code>, <code>slides</code>, <code>agent</code>, <code>image</code> and <code>operator</code>. Use the owning installation’s controller, never an arbitrary kill command.</p>
+<p>For a new event, open the Economics/Cloud vs Local presenter controls and use their event reset after checking the displayed scope. Event counters, browser station assignments, active jobs and customer appearance are separate controls. Resetting counters does not cancel jobs. Optional desktop shortcut installation is explicit: <code>./launch.sh desktop</code>; setup does not install an autostart service.</p>
+<p>Logs are private, rotate with size limits and are operational evidence rather than a visitor record. Keep disk headroom; large generated exports and ordinary demo output remain until the operator clears them. The Action Trailer deletion rules apply independently.</p>
+<h2>8. Update and roll back</h2>
+<p>Wait for users/jobs to finish, back up any ordinary demo outputs you need, and stop the stack. Do not back up visitor media. Keep the previous checkout and pinned weights until the new version passes your own smoke check.</p>
+<p>For a clean Git checkout:</p>
+<pre><code class="language-bash">./launch.sh stop
+git fetch --tags origin
+git switch --detach v3.1.0
+./launch.sh setup
+./launch.sh
+</code></pre>
+<p>For rollback, stop first and substitute the previously approved immutable tag, for example <code>v3.0.0</code>. Then run setup and launch from that tag so its own locks/editor/profile are used. Older releases do not contain this release’s security fixes; restrict access accordingly. Never move a tag or run two installations together. A separate checkout is the safest way to preserve each release’s runtime data without overwriting source changes.</p>
+<p>For ZIP installations, extract into a new directory and follow the checksum, setup and smoke steps again. Reuse weights only through the documented option and only when they pass that release’s manifest verification.</p>
+<h2>9. Troubleshooting from actual verification</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Committer identity unknown</code> during maintainer Git work</td>
+<td>Configure the correct repository-local identity before creating a commit/tag. Ordinary ZIP installation needs no Git identity.</td>
+</tr>
+<tr>
+<td>Python reports missing ensurepip</td>
+<td>Use <code>./launch.sh setup</code>; the pinned local uv tool creates environments without host ensurepip.</td>
+</tr>
+<tr>
+<td>Port occupied by an unverified process</td>
+<td>Inspect status/diagnostics and use that installation’s manager. The launcher will not adopt or signal the foreign process.</td>
+</tr>
+<tr>
+<td>Cold lead start appears slow</td>
+<td>Watch <code>logs/lead.log</code> for active compilation/download progress. First-use C++ compilation can be lengthy. Preserve the 60-minute readiness deadline and existing profile.</td>
+</tr>
+<tr>
+<td>Model checksum mismatch</td>
+<td>Stop, identify the exact named corrupt file, remove only that file from a normal managed model directory and rerun setup. A shared reuse directory must be repaired separately before verification.</td>
+</tr>
+<tr>
+<td>Host/Origin rejected</td>
+<td>Use localhost or the exact approved private hostname. For a custom proxy, configure <code>FURY_SERVE_HOSTNAMES</code>. Do not add wildcards or disable the guards.</td>
+</tr>
+<tr>
+<td>Upload rejected or local queue full</td>
+<td>Respect type/size/session caps and retry after a job finishes. PDF/DOCX parsing requires working bubblewrap; scanned PDFs need OCR.</td>
+</tr>
+<tr>
+<td>Optional customization unavailable</td>
+<td>Choose Default appearance or open <code>/demos?skin=off</code>. Core demos retain their native shell. Use offline logo upload when public research is unavailable.</td>
+</tr>
+<tr>
+<td>No camera or microphone</td>
+<td>Check consent, the secure browser context, per-site browser permission and device selection. Validate real remote device quality locally; do not change network access rules to bypass a browser permission.</td>
+</tr>
+<tr>
+<td><code>uv pip check</code> flags the NVIDIA SBSA wheel tag</td>
+<td>This vendor Arm64 tag has a known metadata-check warning on the tested Ubuntu host. The release’s native/GPU acceptance is separate. Do not edit vendor metadata or force a different platform/model.</td>
+</tr>
+<tr>
+<td>Factory rejects a generated navigation target</td>
+<td>A model-generated accessibility edit removed a required target in one real trial; unchanged QA correctly failed the build. Retain that failed result, inspect diagnostics and start a new build if appropriate. Do not disable checks or present a failed build as complete.</td>
+</tr>
+<tr>
+<td>A generated result fails</td>
+<td>Keep the failed state and inspect reviewed diagnostics. A health check or prerecorded Guided playback does not establish successful live generation.</td>
+</tr>
+</tbody>
+</table>
+<h2>10. Uninstall and cleanup</h2>
+<p>Run <code>./launch.sh stop</code> from every installation you started. Verify its processes and demo/model ports are free. Do not stop unrelated GPU or network processes. Remove only the private Serve routes your administrator created for this demo; keep exact restore commands if you may need them later.</p>
+<p>Archive operational logs privately if required, then remove that installation’s <code>state/</code>, <code>logs/</code>, generated downloads/reports and temporary demo output. Verify the owner’s <code>.cache/fury-showcase/visitors</code> directory is empty. If a desktop shortcut was explicitly installed, remove that shortcut. Do not enable or disable unrelated user services.</p>
+<p>To retain a fast next launch, keep the pinned model directory and three Python environments. For complete removal, delete only the checkout and its documented generated install locations after confirming that no process uses them. An external <code>FURY_MODELS_DIR</code> is shared and is not removed by deleting the checkout’s local link. Do not delete another installation’s shared weights or general account data.</p>
+<h2>11. Security and issue reporting</h2>
+<p>This is private/local demonstration software, not a public multi-tenant service. Exact Host/Origin checks, JSON/CSRF protection, browser policies, opaque generated-document frames, parser/process limits, private files and isolated generated-code execution add layers within that access boundary. Model text is untrusted and must be reviewed. The same OS account and approved network users remain trusted operators; presenter controls deliberately have no PIN.</p>
+<p>Report ordinary reproducible bugs through <a href="https://github.com/Navigatedhustle/hp-zgx-fury-showcase/issues">GitHub Issues</a>. Report a suspected vulnerability through <a href="https://github.com/Navigatedhustle/hp-zgx-fury-showcase/security/advisories/new">GitHub private vulnerability reporting</a>, not a public issue. Remove credentials, customer identity, private hostnames and visitor data from reports. <a href="https://github.com/Navigatedhustle/hp-zgx-fury-showcase/blob/v3.1.0/SECURITY.md">Security policy</a>.</p>
+<h2>12. Licenses and models</h2>
+<p>The repository source is MIT licensed. Model weights, libraries, fonts and icons retain their own licenses. Setup downloads weights separately; they are not bundled in the source ZIP. Immutable revisions, SHA256 manifests and notices are shipped with the release.</p>
+<table>
+<thead>
+<tr>
+<th>Model/workload</th>
+<th>Declared license in the pinned manifest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NVIDIA DeepSeek-V4-Flash-NVFP4</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>Unsloth Qwen3.6-27B-NVFP4</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>FLUX.2 klein 4B</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>Wan2.2 TI2V 5B and selected LongLive-Plug adapters</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>Zipformer ASR and Kokoro speech</td>
+<td>Apache-2.0</td>
+</tr>
+</tbody>
+</table>
+<p>Read <a href="https://github.com/Navigatedhustle/hp-zgx-fury-showcase/blob/v3.1.0/THIRD_PARTY_NOTICES.md">third-party notices</a> and the <a href="https://github.com/Navigatedhustle/hp-zgx-fury-showcase/blob/v3.1.0/docs/ASSET-MANIFEST.md">asset/model manifest</a> before redistribution. They identify font/icon provenance and publisher terms. A demonstration result is not a guarantee of accuracy, fitness, noninfringement or production support.</p>
+</body></html>

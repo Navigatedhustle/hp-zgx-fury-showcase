@@ -1,5 +1,6 @@
 # Fury V3 launch guide
 
+> Historical V3 review record. Its original authorization and measurements are retained below. For the current v3.1.0 release, use the [fresh Fury guide](FRESH_FURY_GUIDE_v3.1.0.md), [security review](SECURITY_REVIEW_v3.1.0.md) and [current verification](verification/v3.1.0.json).
 V3.0.0 Mission Control is an unmerged review branch. No V3 tag or release is published. The owner reviews the PR before any release decision. Existing tags and main remain immutable.
 
 ## Prepare and launch

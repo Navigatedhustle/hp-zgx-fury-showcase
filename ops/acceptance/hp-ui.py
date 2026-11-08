@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Real browser checks for HP shell, routes, theme, keyboard and responsive layout.
-No inference is submitted. Evidence remains local under reports/. Optional axe audit
+No generation controls are submitted; Atlas initialization may issue persona routing
+calls. Evidence remains local under reports/. Optional axe audit
 uses an explicitly supplied local axe.min.js; no third-party runtime/CDN dependency.
 """
 import argparse,asyncio,json,time
