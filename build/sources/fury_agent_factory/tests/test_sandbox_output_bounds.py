@@ -9,7 +9,7 @@ import sys
 def test_oversized_sandbox_output_does_not_fill_coordinator_memory():
     factory = Path(__file__).resolve().parents[1]
     probe = r'''
-import json,resource,tempfile
+import json,tempfile
 from pathlib import Path
 from devteam_sandbox import execute
 with tempfile.TemporaryDirectory() as folder:
@@ -18,7 +18,8 @@ with tempfile.TemporaryDirectory() as folder:
     rejected=False
     try:execute(code,root/'data','api')
     except RuntimeError:rejected=True
-    print(json.dumps({'rejected':rejected,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}))
+    peak=next(int(line.split()[1]) for line in Path('/proc/self/status').read_text().splitlines() if line.startswith('VmHWM:'))
+    print(json.dumps({'rejected':rejected,'peak_rss_kib':peak}))
 '''
     result = subprocess.run([sys.executable, '-c', probe], env={**os.environ, 'PYTHONPATH': str(factory)},
                             capture_output=True, text=True, timeout=20, check=True)
@@ -26,4 +27,4 @@ with tempfile.TemporaryDirectory() as folder:
     assert measured['rejected']
     # A fresh stdlib coordinator is small. Capturing a 64 MiB text pipe exceeded
     # this bound before the fix; file-limited capture stays well below it.
-    assert measured['peak_rss_kib'] < 96 * 1024, measured
+    assert 0 < measured['peak_rss_kib'] < 96 * 1024, measured
