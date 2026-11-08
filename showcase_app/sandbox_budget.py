@@ -10,7 +10,7 @@ MAX_BYTES=64*1024**2
 MAX_ENTRIES=256
 
 
-def check_workspace(path):
+def check_workspace(path,max_bytes=MAX_BYTES,max_entries=MAX_ENTRIES):
     total=0;count=0
     def inspect(directory):
         nonlocal total,count
@@ -19,7 +19,7 @@ def check_workspace(path):
             except FileNotFoundError:continue
             count+=1
             if stat.S_ISREG(metadata.st_mode):total+=metadata.st_size
-            if count>MAX_ENTRIES or total>MAX_BYTES:
+            if count>max_entries or total>max_bytes:
                 raise RuntimeError('Sandbox workspace storage limit reached')
             if stat.S_ISDIR(metadata.st_mode):
                 try:child=os.open(entry.name,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW,dir_fd=directory)
@@ -33,17 +33,17 @@ def check_workspace(path):
         raise RuntimeError('Sandbox workspace needs at least 2 GiB free temporary space')
 
 
-def wait_limited(process,path,timeout):
+def wait_limited(process,path,timeout,**limits):
     deadline=time.monotonic()+timeout
     try:
         while True:
-            check_workspace(path)
+            check_workspace(path,**limits)
             if process.poll() is not None:return process.returncode
             remaining=deadline-time.monotonic()
             if remaining<=0:raise subprocess.TimeoutExpired(process.args,timeout)
             try:
                 result=process.wait(timeout=min(.01,remaining))
-                check_workspace(path)
+                check_workspace(path,**limits)
                 return result
             except subprocess.TimeoutExpired:pass
     except BaseException:

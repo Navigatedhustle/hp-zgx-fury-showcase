@@ -71,3 +71,18 @@ def test_svg_css_escape_cannot_hide_an_external_paint_url():
     raw = b'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0L1 1" fill="u\\72l(\\68ttps://127.0.0.1/image)"/></svg>'
     _, root = sanitize_svg(raw)
     assert 'fill' not in list(root)[0].attrib
+
+
+
+def test_parser_assets_are_staged_and_links_never_published(tmp_path):
+    from showcase_app.document_parser import publish_assets
+    staged=tmp_path/'staged';staged.mkdir();destination=tmp_path/'assets';destination.mkdir()
+    canary=tmp_path/'private.txt';canary.write_text('fictional private value')
+    (staged/'img1.png').symlink_to(canary)
+    with pytest.raises(ValueError,match='Unsafe'):publish_assets(staged,destination,{'slides':[]})
+    assert not list(destination.iterdir())
+    (staged/'img1.png').unlink();(staged/'img1.png').write_bytes(b'fictional image bytes')
+    with pytest.raises(ValueError,match='reference'):publish_assets(staged,destination,{'slides':[{'images':[{'key':'../../private'}]}]})
+    assert not list(destination.iterdir())
+    publish_assets(staged,destination,{'slides':[{'images':[{'key':'img1'}]}]})
+    assert (destination/'img1.png').read_bytes()==b'fictional image bytes'

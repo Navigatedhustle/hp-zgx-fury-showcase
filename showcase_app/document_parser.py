@@ -2,6 +2,8 @@
 import io
 import json
 import os
+import re
+import stat
 from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
@@ -96,10 +98,12 @@ def run_parser(mode, path, *, kind=None, hint=None, assets=None, renders=None):
         if directory.exists():
             command += ['--ro-bind', str(directory), str(directory)]
     command += ['--ro-bind', str(WORKER), str(WORKER), '--ro-bind', str(path), '/input/document' + path.suffix.lower()]
+    staged_assets = None
     if assets is not None:
+        staged_assets = tempfile.TemporaryDirectory(prefix='fury-parser-assets-')
         assets = Path(assets).resolve()
         assets.mkdir(parents=True, exist_ok=True, mode=0o700)
-        command += ['--bind', str(assets), '/output/assets']
+        command += ['--bind', staged_assets.name, '/output/assets']
         options['assets'] = '/output/assets'
     if renders is not None and Path(renders).is_dir():
         command += ['--ro-bind', str(Path(renders).resolve()), '/input/renders']
@@ -107,13 +111,48 @@ def run_parser(mode, path, *, kind=None, hint=None, assets=None, renders=None):
     command += [sys.executable, '-I', str(WORKER), mode, '/input/document' + path.suffix.lower(), json.dumps(options)]
     try:
         with tempfile.TemporaryFile() as output:
-            result = subprocess.run(command, stdout=output, stderr=subprocess.DEVNULL, timeout=45 if mode.startswith('pptx') else 15)
+            if staged_assets is None:
+                result = subprocess.run(command, stdout=output, stderr=subprocess.DEVNULL, timeout=45 if mode.startswith('pptx') else 15)
+            else:
+                from showcase_app.sandbox_budget import check_workspace,wait_limited
+                check_workspace(staged_assets.name)
+                process = subprocess.Popen(command, stdout=output, stderr=subprocess.DEVNULL, start_new_session=True)
+                result = subprocess.CompletedProcess(command,wait_limited(process,staged_assets.name,45,max_bytes=256*1024**2,max_entries=2048))
             if result.returncode or os.fstat(output.fileno()).st_size > 64 * 1024**2:
                 raise ValueError('Document could not be safely parsed within its resource limits')
             output.seek(0)
-            return json.load(output)
-    except (OSError, subprocess.TimeoutExpired, json.JSONDecodeError) as error:
+            result = json.load(output)
+            if staged_assets is not None:publish_assets(Path(staged_assets.name),assets,result)
+            return result
+    except (OSError, RuntimeError, subprocess.TimeoutExpired, json.JSONDecodeError) as error:
         raise ValueError('Document could not be safely parsed within its resource limits') from error
+    finally:
+        if staged_assets is not None:staged_assets.cleanup()
+
+
+def publish_assets(staged,destination,result):
+    """Never expose parser-writable files or follow worker-created links."""
+    paths=list(staged.iterdir());total=0
+    if len(paths)>2048:raise ValueError('Too many parsed image assets')
+    for path in paths:
+        metadata=path.lstat();total+=metadata.st_size
+        if (not re.fullmatch(r'img[0-9]+\.(?:png|jpg|jpeg|svg)',path.name)
+                or not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink!=1
+                or metadata.st_size>32*1024**2 or total>256*1024**2):
+            raise ValueError('Unsafe parsed image asset')
+    for slide in result.get('slides',[]):
+        for reference in slide.get('images',[]):
+            if not re.fullmatch(r'img[0-9]+',reference.get('key','')):
+                raise ValueError('Unsafe parsed image reference')
+    for path in paths:
+        descriptor=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+        temporary=None
+        try:
+            with os.fdopen(descriptor,'rb') as source, tempfile.NamedTemporaryFile(dir=destination,delete=False) as target:
+                temporary=Path(target.name);shutil.copyfileobj(source,target,65536)
+            temporary.replace(destination/path.name)
+        finally:
+            if temporary is not None:temporary.unlink(missing_ok=True)
 
 
 def parse_bytes(raw, suffix, mode='translate', **options):
