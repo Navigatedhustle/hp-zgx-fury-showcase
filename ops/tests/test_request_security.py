@@ -139,3 +139,17 @@ def test_cross_site_websocket_is_closed_before_accept():
     assert rejected.value.code == 1008
     with client.websocket_connect('ws://localhost:8080/ws', headers={'Origin': 'http://localhost:8080'}) as accepted:
         assert accepted.receive_text() == 'accepted'
+
+
+def test_model_lifespan_bounds_native_http_shutdown():
+    import asyncio
+    from types import SimpleNamespace
+    from showcase_app.security import ModelLifecycleGuard
+    config=SimpleNamespace(timeout_graceful_shutdown=None)
+    app=SimpleNamespace(state=SimpleNamespace(server=SimpleNamespace(config=config)))
+    called=[]
+    async def inner(scope,receive,send):called.append(scope['type'])
+    async def receive():return {'type':'lifespan.startup'}
+    async def send(message):pass
+    asyncio.run(ModelLifecycleGuard(inner)({'type':'lifespan','app':app},receive,send))
+    assert called==['lifespan'] and config.timeout_graceful_shutdown==15

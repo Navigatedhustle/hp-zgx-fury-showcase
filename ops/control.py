@@ -164,7 +164,7 @@ def stop_one(name,registry):
   saved={'leader':fingerprint(row),'members':[fingerprint(r) for r in members]};registry[name]=saved;save(registry)
   # Pin each exact kernel identity; never send to a process group that can gain members.
   if not identity(process(row['pid']),name) or not all(unchanged(m) for m in saved['members']):raise RuntimeError('Process identity changed before stop.')
-  signal_saved(saved['members'])
+  signal_saved([saved['leader']])
   deadline=time.monotonic()+45
   while any(unchanged(m) for m in saved['members']) and time.monotonic()<deadline:time.sleep(.15)
   remaining=[m for m in saved['members'] if unchanged(m)]

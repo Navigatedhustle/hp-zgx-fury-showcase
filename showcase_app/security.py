@@ -297,3 +297,17 @@ class ResourceGuard:
             return await self.app(scope,bounded_receive,bounded_send)
         finally:
             self.http-=kind=='http';self.websockets-=kind=='websocket';self.streams-=streaming;self.uploads-=upload
+
+
+class ModelLifecycleGuard:
+    """Bound vLLM's native Uvicorn connection drain using its published app state."""
+    def __init__(self,app):self.app=app
+
+    async def __call__(self,scope,receive,send):
+        if scope['type']=='lifespan':
+            application=scope.get('app')
+            server=getattr(getattr(application,'state',None),'server',None)
+            if server is None or not hasattr(server,'config'):
+                raise RuntimeError('Model HTTP shutdown configuration is unavailable')
+            server.config.timeout_graceful_shutdown=15
+        return await self.app(scope,receive,send)
