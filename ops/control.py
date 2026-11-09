@@ -253,6 +253,7 @@ def status():
   row=discover(name);healthy=ready(name) if row else False
   state=('running / ready' if healthy else 'running / loading') if row else 'UNVERIFIED PORT OWNER' if port_open(spec['port']) else 'stopped'
   model=(('loaded' if healthy else 'loading / not ready' if row else 'unloaded')+' · '+spec['model']) if spec.get('model') else 'DeepSeek + Qwen via gateway' if name in ('agent','gateway') else 'shared Qwen via gateway' if name in ('atlas','slides') else 'no resident model (dashboard)'
+  if os.getenv('FURY_PROFILE')=='gb10' and name=='gateway':model='gpt-oss-120b + Qwen3.6 via gateway'
   print(f'{name:12} {spec["port"]:<6} {str(row["pid"]) if row else "—":8} {state:24} {model}')
  gpu=gpu_status();print('GPU:',gpu['summary']);print('GPU compute processes:',*gpu['processes'],sep='\n  ')
  print('GPU FREE (no compute process)' if gpu['verified'] and not gpu['processes'] else 'GPU IN USE' if gpu['verified'] else 'GPU STATE UNKNOWN')

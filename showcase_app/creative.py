@@ -135,11 +135,29 @@ class CreativeLane:
             torch.set_num_threads(8)
             self.grace_node = None
             began = time.monotonic()
-            self.flux = Flux2KleinPipeline.from_pretrained(str(ROOT / 'models/FLUX.2-klein-4B'), torch_dtype=torch.bfloat16, local_files_only=True)
+            self.flux = Flux2KleinPipeline.from_pretrained(str(ROOT / 'models/FLUX.2-klein-4B'), torch_dtype=torch.bfloat16,
+                                                        local_files_only=True)
             self.load_timings['read_weights_seconds'] = time.monotonic() - began
+            self.encoder_quant = os.getenv('FURY_GB10_FLUX_ENCODER', 'bf16')
+            if self.encoder_quant not in ('bf16', 'fp8'):
+                raise ValueError('Unsupported FLUX text encoder quant; no substitution made')
+            if self.encoder_quant == 'fp8':
+                from torchao.quantization import Float8WeightOnlyConfig, quantize_
+                began = time.monotonic()
+                quantize_(self.flux.text_encoder, Float8WeightOnlyConfig(set_inductor_config=False))
+                self.load_timings['text_encoder_fp8_seconds'] = time.monotonic() - began
+            began = time.monotonic()
+            # Materialize mapped weights before CUDA reads them, using the existing helper.
+            copy_cpu_weights(self.flux)
+            self.load_timings['materialize_cpu_seconds'] = time.monotonic() - began
             began = time.monotonic()
             self.flux.to('cuda')
             self.load_timings['device_transfer_seconds'] = time.monotonic() - began
+            import gc
+            gc.collect()
+            torch.cuda.synchronize()
+            # Return temporary CPU materialization/quantization arenas to this process's allocator.
+            ctypes.CDLL(None).malloc_trim(0)
             self.parameter_count = sum(parameter.numel() for component in self.flux.components.values()
                                        if isinstance(component, torch.nn.Module) for parameter in component.parameters())
             return
@@ -182,13 +200,13 @@ class CreativeLane:
             began = time.monotonic()
             self.load_video()
             job['model_load_seconds'] = time.monotonic() - began
-        # Bound this process, leaving the 10 GiB reserve plus a 4 GiB guard.
+        # GB10 uses the measured 10 GiB floor plus a 1 GiB guard. Fury retains 14 GiB.
         # Existing text engines and their fractions/contexts/slots are untouched.
         torch.cuda.empty_cache()
         free, total = torch.cuda.mem_get_info()
         if self.gb10:
             free = unified_available()
-        budget = torch.cuda.memory_reserved() + free - 14 * 1024 ** 3
+        budget = torch.cuda.memory_reserved() + free - (11 if self.gb10 else 14) * 1024 ** 3
         if budget <= 0:
             raise RuntimeError('Insufficient unified memory above the creative reserve guard' if self.gb10 else 'Insufficient measured HBM above the creative reserve guard')
         torch.cuda.set_per_process_memory_fraction(min(.95, budget / total))
@@ -204,7 +222,7 @@ class CreativeLane:
             if stop.is_set():
                 raise InterruptedError('Creative job cancelled')
             free_now = unified_available() if self.gb10 else torch.cuda.mem_get_info()[0]
-            if free_now < 11 * 1024 ** 3:
+            if free_now < (10.125 if self.gb10 else 11) * 1024 ** 3:
                 raise InterruptedError('Creative guard stopped the job before the 10 GiB reserve')
             job['steps_done'] = step + 1
             return kwargs
@@ -246,7 +264,7 @@ class CreativeLane:
         def device(module):
             return str(next(module.parameters()).device) if module is not None else 'not loaded'
         if self.gb10:
-            return {'flux_loaded': self.flux is not None, 'video_loaded': False, 'flux_transformer': device(self.flux.transformer) if self.flux else 'not loaded', 'memory_kind': 'unified', 'policy': 'FLUX resident in GB10 unified memory; one active image job'}
+            return {'flux_loaded': self.flux is not None, 'video_loaded': False, 'flux_transformer': device(self.flux.transformer) if self.flux else 'not loaded', 'text_encoder_quant': getattr(self, 'encoder_quant', 'not loaded'), 'memory_kind': 'unified', 'policy': 'FLUX resident in GB10 unified memory; one active image job'}
         return {'flux_loaded': self.flux is not None, 'video_loaded': self.wan is not None, 'video_profile': VIDEO_PROFILE, 'video_model': VIDEO_MODEL, 'flux_transformer': device(self.flux.transformer) if self.flux else 'not loaded', 'video_transformer': device(self.wan.transformer) if self.wan else 'not loaded', 'grace_cpu_node': self.grace_node, 'policy': 'Resident CPU-offloaded models bound to Grace; one active GPU job across images and video'}
 
 

@@ -45,3 +45,7 @@ Customer marks remain their owners' trademarks. Public-source availability does 
 ## GB10 stage qualification
 
 The separately downloaded llama.cpp source is MIT at revision `7d7f0287530bc8981690f361d8c1627dbae1c99a`; source archive and LICENSE SHA256 are pinned in `config/gb10-build.json`. gpt-oss-120b MXFP4, Qwen3.6-35B-A3B with vision projector, FLUX.2 klein 4B, and Kokoro v1.0 use Apache-2.0 weights, pinned by file SHA256 and model-card revision in `config/model-files.json`. Directly reviewed publisher/converter sources and hashes are in `docs/ASSET-MANIFEST.md`. Source/model downloads and compiled binaries remain local, outside the source distribution. GB10 qualification does not select speech recognition, video, or Agent Factory.
+
+## GB10 optional text encoder quantization
+
+TorchAO 0.18.0, https://github.com/pytorch/ao, BSD-3-Clause. Copyright 2023 Meta; Arm contributions Copyright (c) 2024-2026 Arm Limited and/or its affiliates. The upstream BSD-3-Clause conditions and disclaimer are retained with the installed wheel. Exact source, license and wheel hashes are recorded in docs/ASSET-MANIFEST.md and config/gb10-build.json.

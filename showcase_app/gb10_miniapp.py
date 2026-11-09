@@ -53,10 +53,11 @@ async def launch_browser(playwright, **options):
 
 
 def numeric(text):
-    found = re.search(r'-?\d+(?:\.\d+)?', text.replace(',', ''))
+    cleaned = text.replace(',', '').replace('−', '-')
+    found = re.search(r'([+-]?)\s*[$€£]?\s*(\d+(?:\.\d+)?)', cleaned)
     if not found:
         raise ValueError('Calculator did not display a numeric result')
-    return float(found.group())
+    return float(found.group(2)) * (-1 if found.group(1) == '-' else 1)
 
 
 async def validate_app(source, folder):
@@ -86,7 +87,8 @@ async def validate_app(source, folder):
                     raise ValueError('Generated calculator failed a real input/output check')
             await frame.locator('#cost').fill('0')
             await frame.locator('#calculate').click()
-            if (await frame.locator('#roi').inner_text()).strip().upper() not in ('N/A', 'UNDEFINED'):
+            zero = (await frame.locator('#roi').inner_text()).strip().upper()
+            if not re.search(r'\bN/A\b|\bUNDEFINED\b', zero) or re.search(r'\d', zero):
                 raise ValueError('Calculator must handle a zero cost without a false ROI')
             for selector, value in [('#hourly', '75'), ('#hours', '20'), ('#cost', '500')]:
                 await frame.locator(selector).fill(value)

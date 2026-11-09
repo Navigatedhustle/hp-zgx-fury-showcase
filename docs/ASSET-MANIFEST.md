@@ -127,3 +127,11 @@ Revision `f3ff3571791e39611d31c381e3a41a3af07b4987`; license Apache-2.0.
 [llama.cpp](https://github.com/ggml-org/llama.cpp/tree/7d7f0287530bc8981690f361d8c1627dbae1c99a) is pinned to `7d7f0287530bc8981690f361d8c1627dbae1c99a`. Its MIT LICENSE was read directly; SHA256 `94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d`. Build target CUDA `sm_121`, Release, six compiler workers, server and benchmark targets. Build products and upstream checkout remain ignored under `.tools/`. This does not modify system CUDA, drivers or the GB300 engines.
 
 The deterministic `git archive --format=tar` source SHA256 for this llama.cpp commit is `96b30678d8996513b4b041e8c7cdde1dea86d23bbbf94a40d04d37b6e157ebd8`, enforced by `ops/build-gb10-llama.py`. The pinned upstream spells non-mmap loading `--load-mode none`; it removed the historical `--no-mmap` flag. Qualification compares default auto against this equivalent with lazy loading and automatic fitting disabled.
+
+### Optional GB10 FLUX text encoder FP8 remedy
+
+The source FLUX weights and revision above remain the input, with only the text encoder linear weights converted locally to FP8 E4M3 per row. Transformer weights and compute activations remain BF16. This is an explicit candidate profile until measured qualification passes. The transformation is `torchao.quantization.quantize_(text_encoder, Float8WeightOnlyConfig(set_inductor_config=False))`, version 2. No alternate checkpoint or remote code is loaded.
+
+TorchAO 0.18.0 is BSD-3-Clause. Its [license](https://github.com/pytorch/ao/blob/5f2baf9d575cf732362594c998c399902942531f/LICENSE) was read directly on 2026-11-08; immutable source revision `5f2baf9d575cf732362594c998c399902942531f`, license SHA256 `67901e351baeaa5aef967cccd0886ba679f085df8673d1ecd49592bf284115af`. The ARM64-compatible pure Python wheel `torchao-0.18.0-py3-none-any.whl` is pinned to SHA256 `5c2b4485341bf28b7fed2c4fc95b9f298e209f41685350f067de85527a05585e` in `config/gb10-build.json` and the GB10 model lock. PyTorch supplies the underlying tensor operations; no binary extension is substituted.
+
+The GB10 lock excludes optional multilingual phonemizer backends and uses the existing pure English Kokoro service and pinned MIT spaCy tagger. Local Python headers are extracted into the ignored project tools directory; host Python, CUDA and drivers are unchanged.

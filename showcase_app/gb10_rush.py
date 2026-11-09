@@ -2,6 +2,7 @@
 import asyncio
 import base64
 import json
+import logging
 import re
 import time
 from pathlib import Path
@@ -51,6 +52,7 @@ class NanoRush:
         if result['finish_reason'] != 'stop':
             raise ValueError('Generated app was incomplete')
         source = json_content(result['content'])['html']
+        (self.folder / 'calculator-candidate.txt').write_text(source)
         self.event('app_validating')
         checked = await asyncio.wait_for(validate_app(source, self.folder), 18)
         return {**checked, 'model': result['model'], 'routing': result['routing']}
@@ -61,10 +63,15 @@ class NanoRush:
 
     async def chart(self):
         image = base64.b64encode((ROOT / 'samples/stage/vision/chart.png').read_bytes()).decode()
+        schema = object_schema({'columns': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 3, 'maxItems': 3},
+            'rows': {'type': 'array', 'minItems': 4, 'maxItems': 4, 'items': {'type': 'array', 'minItems': 3, 'maxItems': 3,
+                'items': {'anyOf': [{'type': 'string'}, {'type': 'number'}]}}}})
         result = await self.language([{'role': 'user', 'content': [
             {'type': 'image_url', 'image_url': {'url': 'data:image/png;base64,' + image}},
-            {'type': 'text', 'text': 'Extract the entire chart as JSON with columns and rows. Use positional row arrays, preserve every label and numeric value, and include no other text.'}]}], role='chart', tokens=600)
+            {'type': 'text', 'text': 'Extract the entire chart as JSON with columns and rows. Use positional row arrays, preserve every label and numeric value, and include no other text.'}]}], role='chart', tokens=600,
+            response_format={'type': 'json_schema', 'json_schema': {'name': 'chart_table', 'strict': True, 'schema': schema}})
         table = json_content(result['content'])
+        (self.folder / 'chart-candidate.json').write_text(json.dumps(table, ensure_ascii=False, indent=2))
         from showcase_app.gb10_quality import extraction_matches
         expected = json.loads((ROOT / 'samples/stage/vision/expected.json').read_text())['chart.png']
         if result['finish_reason'] != 'stop' or not extraction_matches('chart.png', table, expected):
@@ -77,19 +84,27 @@ class NanoRush:
         schema = object_schema({'pages': {'type': 'array', 'items': {'type': 'string', 'minLength': 30}, 'minItems': 2, 'maxItems': 2}})
 
         async def language(name, code):
-            result = await self.language([{'role': 'system', 'content': 'Translate both fictional document pages into ' + name + '. Return JSON with a pages array containing both complete translated pages. Preserve page boundaries, every number, the literal ISO date2026-11-08, and the Latin name Northwind. No commentary or omissions.'},
-                {'role': 'user', 'content': json.dumps({'pages': pages}, ensure_ascii=False)}], role='translate_' + code, caller='translate', tokens=2300,
-                response_format={'type': 'json_schema', 'json_schema': {'name': 'translated_pages', 'strict': True, 'schema': schema}})
-            if result['finish_reason'] != 'stop':
-                raise ValueError('Document translation was incomplete')
-            data = json_content(result['content'])
-            from jsonschema import validate
-            validate(data, schema)
-            for source, target in zip(pages, data['pages']):
-                if not set(re.findall(r'\d+', source)) <= set(re.findall(r'\d+', target)):
-                    raise ValueError('Translated page lost a source number or date')
-            (self.folder / ('document-' + code + '.json')).write_text(json.dumps(data, ensure_ascii=False, indent=2))
-            return data['pages']
+            messages = [{'role': 'system', 'content': 'Translate both fictional document pages into ' + name + '. Return JSON with a pages array containing both complete translated pages. Preserve page boundaries, every number, the literal ISO date 2026-11-08, and the Latin proper name Northwind. Translate every ordinary English word into the requested language, with fluent native phrasing. In Japanese only Northwind should remain in Latin letters. No commentary or omissions.'},
+                {'role': 'user', 'content': json.dumps({'pages': pages}, ensure_ascii=False)}]
+            for attempt in range(2):
+                result = await self.language(messages, role='translate_' + code + ('_retry' if attempt else ''), caller='translate', tokens=2300,
+                    response_format={'type': 'json_schema', 'json_schema': {'name': 'translated_pages', 'strict': True, 'schema': schema}})
+                if result['finish_reason'] != 'stop':
+                    raise ValueError('Document translation was incomplete')
+                data = json_content(result['content'])
+                from jsonschema import validate
+                validate(data, schema)
+                for source, target in zip(pages, data['pages']):
+                    if not set(re.findall(r'\d+', source)) <= set(re.findall(r'\d+', target)):
+                        raise ValueError('Translated page lost a source number or date')
+                untranslated = set(re.findall(r'[A-Za-z]+', '\n'.join(data['pages']))) - {'Northwind'} if code == 'ja' else set()
+                if not untranslated:
+                    (self.folder / ('document-' + code + '.json')).write_text(json.dumps(data, ensure_ascii=False, indent=2))
+                    return data['pages']
+                (self.folder / ('document-' + code + '-rejected.json')).write_text(json.dumps(data, ensure_ascii=False, indent=2))
+                self.event('translation_retry', language=code, attempt=attempt + 1, reason='Ordinary English text remained untranslated')
+                messages += [{'role': 'assistant', 'content': result['content']}, {'role': 'user', 'content': 'Some ordinary English words remained untranslated: ' + ', '.join(sorted(untranslated)) + '. Translate those words too. Return both complete corrected pages in the same JSON structure.'}]
+            raise ValueError('Japanese document still contains untranslated ordinary English text')
 
         spanish, japanese = await asyncio.gather(language('Spanish', 'es'), language('Japanese', 'ja'))
         return {'languages': ['es', 'ja'], 'pages': 4, 'spanish': spanish, 'japanese': japanese, 'model': WORKER}
@@ -116,6 +131,7 @@ class NanoRush:
             result = await function()
             row.update(status='complete', seconds=time.monotonic() - began, result=result)
         except Exception as exc:
+            logging.exception('Nano Rush job failed name=%s', name)
             row.update(status='failed', seconds=time.monotonic() - began, error=type(exc).__name__)
         self.event('job', job=dict(row))
 

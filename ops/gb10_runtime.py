@@ -23,6 +23,7 @@ def components():
                    '--ctx-size', str(context), '--parallel', str(slots), '--n-gpu-layers', '999', '--flash-attn', 'on',
                    '--jinja', '--offline', '--metrics', '--no-webui', '--threads', '8', '--fit', 'off',
                    '--lazy-mode', 'off', '--kv-unified-per-slot', '16384', '--perf',
+                   '--cache-ram', '256',
                    '--cors-origins', 'http://127.0.0.1:18808,http://localhost:18808', '--no-cors-credentials']
         if name == 'text':
             command += ['--mmproj', str(ROOT / 'models/Qwen3.6-35B-A3B-GGUF/mmproj-F16.gguf')]
@@ -39,7 +40,7 @@ def components():
                 'command': ['.model-venv/bin/python', '-m', 'uvicorn', 'showcase_app.gb10_voice_api:app', '--host', '127.0.0.1',
                             '--port', '18204', '--app-dir', 'build/sources/atlas-gpt-main', '--timeout-graceful-shutdown', '15']},
         'gateway': {'port': 18001, 'health': '/health',
-                    'command': ['.venv/bin/python', '-m', 'uvicorn', 'showcase_app.gateway:app', '--host', '127.0.0.1',
+                    'command': ['.venv/bin/python', '-m', 'uvicorn', 'showcase_app.gb10_gateway_api:app', '--host', '127.0.0.1',
                                 '--port', '18001', '--timeout-graceful-shutdown', '15']},
     })
     return result

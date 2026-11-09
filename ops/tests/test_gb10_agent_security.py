@@ -53,3 +53,11 @@ def test_read_schema_bounds_batch_and_email_has_no_send_fields():
         validate({'files': [FILES[0]]}, TOOL_SCHEMAS['read_file'])
     with pytest.raises(ValidationError):
         validate({'subject': 'Fictional', 'body': 'Draft', 'to': 'person@example.invalid'}, TOOL_SCHEMAS['draft_email'])
+
+
+def test_generated_compliance_and_certification_statements_cannot_be_published():
+    from showcase_app.gb10_agent import check_claims
+    for value in ['This model is HIPAA compliant', {'subtitle': 'SOC 2 certified'}, ['GDPR compliance']]:
+        with pytest.raises(ValueError, match='unsupported'):
+            check_claims(value)
+    assert check_claims({'title': 'Review access controls', 'points': ['Confirm the fictional pilot owner']})

@@ -4,6 +4,8 @@ import os
 import threading
 import time
 import uuid
+import sys
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
@@ -11,6 +13,10 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'build/sources/atlas-gpt-main'))
+from atlas.offline_guard import install
+
+install()
 from showcase_app.creative import CreativeLane
 from showcase_app.gateway import execution_end, execution_start, record
 
@@ -39,6 +45,7 @@ async def work():
             record(job['id'], 'stage_image', 'image', 'FLUX.2-klein-4B', 'complete', began,
                    run_id=spec.run_id, purpose=spec.purpose, images=len(files))
         except Exception as exc:
+            logging.exception('GB10 image job failed id=%s', job['id'])
             job.update(status='failed', error=type(exc).__name__, ended=time.time())
             record(job['id'], 'stage_image', 'image', 'FLUX.2-klein-4B', 'failed', began,
                    error=type(exc).__name__, run_id=spec.run_id, purpose=spec.purpose)

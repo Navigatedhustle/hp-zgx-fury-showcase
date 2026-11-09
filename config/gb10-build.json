@@ -24,5 +24,19 @@
     "TRANSFORMERS_OFFLINE": "1",
     "DO_NOT_TRACK": "1",
     "HF_HUB_DISABLE_TELEMETRY": "1"
-  }
+  },
+  "fp8_text_encoder": {
+    "name": "torchao",
+    "version": "0.18.0",
+    "license": "BSD-3-Clause",
+    "source": "https://github.com/pytorch/ao/tree/v0.18.0",
+    "wheel": "torchao-0.18.0-py3-none-any.whl",
+    "url": "https://files.pythonhosted.org/packages/c4/4d/485477bb8f05bd501016059c6d8abd742f830cb1b24ab7704e086c7cc35a/torchao-0.18.0-py3-none-any.whl",
+    "sha256": "5c2b4485341bf28b7fed2c4fc95b9f298e209f41685350f067de85527a05585e",
+    "revision": "5f2baf9d575cf732362594c998c399902942531f",
+    "license_sha256": "67901e351baeaa5aef967cccd0886ba679f085df8673d1ecd49592bf284115af",
+    "recipe": "torchao.quantization.quantize_(FLUX text_encoder, Float8WeightOnlyConfig(set_inductor_config=False)); BF16 transformer and activations unchanged"
+  },
+  "cpu_prompt_cache_limit_mib": 256,
+  "cache_limit_note": "Pinned llama.cpp defaults to an additional 8192 MiB CPU prompt snapshot cache per server. GB10 explicitly caps this at256MiB each; per-slot native KV prompt reuse remains enabled."
 }

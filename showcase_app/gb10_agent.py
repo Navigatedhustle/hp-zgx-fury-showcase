@@ -22,6 +22,13 @@ FILES = ('meeting_notes.txt', 'quarterly_review.txt', 'it_priorities.txt', 'prod
 DELIVERABLES = ('deck', 'email_en', 'email_es', 'image')
 
 
+def check_claims(value):
+    text = json.dumps(value, ensure_ascii=False)
+    if re.search(r'\b(?:HIPAA|GDPR|SOC\s*2|ISO\s*27001|compliant|compliance|certified|certification)\b', text, re.I):
+        raise ValueError('Draft contains an unsupported compliance or certification statement')
+    return value
+
+
 def object_schema(properties, required=None):
     return {'type': 'object', 'properties': properties, 'required': list(properties) if required is None else required, 'additionalProperties': False}
 
@@ -47,6 +54,7 @@ DECK_SCHEMA = object_schema({'title': TEXT(90), 'slides': {'type': 'array', 'ite
 
 def validate_plan(plan, audio=False):
     validate(plan, PLAN_SCHEMA)
+    check_claims(plan)
     names = {step['tool'] for step in plan['steps']}
     if not {'list_files', 'read_file', 'build_deck', 'draft_email', 'translate', 'generate_image'} <= names:
         raise ValueError('Plan does not cover all required artifacts')
@@ -113,6 +121,7 @@ async def image_job(prompt, run_id, purpose='live', *, batch=1, width=1344, heig
 def write_deck(data, folder):
     """Use the existing Presentations assembler with five validated, escaped specs."""
     validate(data, DECK_SCHEMA)
+    check_claims(data)
     sys.path.insert(0, str(ROOT / 'build/sources/html_builder-main/backend'))
     from app.assemble import DeckInput, DeckSlide, assemble
     from app.spec import SlideSpec, SpecMeta
@@ -209,6 +218,7 @@ class NanoAgent:
             raise ValueError('Read all four sample notes before generating artifacts')
         context = '\n\n'.join(name + '\n' + self.notes[name] for name in FILES)
         if name == 'draft_email':
+            check_claims(arguments)
             self.artifacts['email_en'] = dict(arguments)
             (self.folder / 'email-en.json').write_text(json.dumps(arguments, ensure_ascii=False, indent=2))
             self.email_ready.set()
@@ -242,6 +252,7 @@ class NanoAgent:
                 raise ValueError('Spanish email was incomplete')
             translated = json_content(result['content'])
             validate(translated, object_schema({'subject': TEXT(200), 'body': TEXT(5000)}))
+            check_claims(translated)
             self.artifacts['email_es'] = translated
             (self.folder / 'email-es.json').write_text(json.dumps(translated, ensure_ascii=False, indent=2))
             self.event('artifact', artifact='email_es', data=translated)
@@ -279,10 +290,12 @@ class NanoAgent:
                 'draft_email': 'Save the English email YOU author in subject/body as a draft. This never sends email.',
                 'translate': 'Translate the saved email-en draft into Spanish live with Qwen. This may run in the same parallel batch as draft_email.',
                 'speak_summary': 'Synthesize a short summary with the local Kokoro voice.'}[name], 'parameters': TOOL_SCHEMAS[name]}} for name in names]
-            messages = [{'role': 'system', 'content': 'You are a local personal agent for fictional sample data. Execute the supplied plan using only the provided tools. First list files, then read ALL FOUR files in ONE read_file call. After reading, issue build_deck, generate_image, draft_email and translate together as independent parallel tool calls. Author the English email yourself in draft_email arguments, under 150 words. translate refers to email-en and waits for that draft. Do not type tool code or a final answer in place of calls. No more than eight tool calls total. No paths, URLs, shell commands or SQL. Audio is ' + ('on.' if self.audio else 'off; never request speech.')},
+            messages = [{'role': 'system', 'content': 'You are a local personal agent for fictional sample data. Execute the supplied plan using only the provided tools. First list files, then read ALL FOUR files in ONE read_file call. After reading, request build_deck, generate_image, draft_email and translate as independent parallel tool calls. The scheduler queues artifact requests until all four have been requested, then executes them together. A queued response means you must request the remaining tools, never repeat a queued request. Author the English email yourself in draft_email arguments, under 150 words. translate refers to email-en and waits for that draft. Do not type tool code or a final answer in place of calls. No more than eight tool calls total. No paths, URLs, shell commands or SQL. Audio is ' + ('on; also request speak_summary with a short account briefing summary.' if self.audio else 'off; never request speech.')},
                         {'role': 'user', 'content': GOAL + '\nValidated plan: ' + json.dumps(plan)}]
             total_calls = 0
-            for turn in range(6):
+            pending = {}
+            required = {'build_deck', 'generate_image', 'draft_email', 'translate'} | ({'speak_summary'} if self.audio else set())
+            for turn in range(8):
                 result = await infer(messages, run_id=self.run_id, purpose=self.purpose, role='agent_tools', max_tokens=1500,
                                      tools=tools, parallel_tool_calls=True)
                 calls = result['tool_calls']
@@ -300,10 +313,23 @@ class NanoAgent:
                     validate(arguments, TOOL_SCHEMAS[name])
                     parsed.append((name, arguments))
                 messages.append({'role': 'assistant', 'content': result['content'] or None, 'tool_calls': calls})
-                outputs = await parallel_tools(self, parsed)
+                outputs = []
+                for name, arguments in parsed:
+                    if name in required:
+                        if set(self.notes) != set(FILES) or name in pending:
+                            raise ValueError('Artifact request requires all notes and cannot be repeated')
+                        pending[name] = arguments
+                        self.event('step', step={'tool': name, 'status': 'queued', 'model':
+                            {'build_deck': LEAD, 'generate_image': 'FLUX.2-klein-4B', 'translate': WORKER,
+                             'speak_summary': 'Kokoro-82M'}.get(name, 'Local tool'), 'queued_at': time.time()})
+                        outputs.append({'status': 'queued', 'tool': name, 'remaining': sorted(required - set(pending)),
+                                        'reason': 'Independent artifacts start together after all requests arrive'})
+                    else:
+                        outputs.append(await self.tool(name, arguments))
                 for call, output in zip(calls, outputs):
                     messages.append({'role': 'tool', 'tool_call_id': call['id'], 'content': json.dumps(output, ensure_ascii=False)})
-                if set(DELIVERABLES) <= set(self.artifacts):
+                if set(pending) == required:
+                    await parallel_tools(self, list(pending.items()))
                     break
             else:
                 raise ValueError('Agent exceeded its bounded execution rounds')

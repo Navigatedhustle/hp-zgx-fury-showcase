@@ -3,6 +3,12 @@ import pytest
 from showcase_app.gb10_miniapp import CSP, preview_document, secure_html
 
 
+@pytest.mark.parametrize('text,expected', [('Net: -$500.00', -500), ('$1,000.00', 1000), ('ROI: −50%', -50)])
+def test_functional_validator_accepts_currency_and_signed_percent(text, expected):
+    from showcase_app.gb10_miniapp import numeric
+    assert numeric(text) == expected
+
+
 def test_opaque_iframe_and_no_network_policy_are_both_present():
     source = secure_html('<html><body><p>Original local calculator</p><script>let n=1;</script></body></html>')
     document = preview_document(source)

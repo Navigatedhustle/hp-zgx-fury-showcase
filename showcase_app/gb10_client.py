@@ -28,6 +28,7 @@ async def infer(messages, *, model=LEAD, caller='agent', run_id='', purpose='liv
     finish = None
     actual = model
     routing = ''
+    saw_done = False
     async with httpx.AsyncClient(trust_env=False, timeout=httpx.Timeout(90, connect=3)) as client:
         async with client.stream('POST', GATEWAY + '/stage/' + caller + '/v1/chat/completions', json=body, headers=headers) as response:
             response.raise_for_status()
@@ -38,7 +39,8 @@ async def infer(messages, *, model=LEAD, caller='agent', run_id='', purpose='liv
                     continue
                 raw = line[5:].strip()
                 if raw == '[DONE]':
-                    break
+                    saw_done = True
+                    continue
                 item = json.loads(raw)
                 if item.get('error'):
                     raise RuntimeError('Local inference failed: ' + actual)
@@ -57,6 +59,8 @@ async def infer(messages, *, model=LEAD, caller='agent', run_id='', purpose='liv
                         call['function']['name'] += function.get('name') or ''
                         call['function']['arguments'] += function.get('arguments') or ''
                     finish = choice.get('finish_reason') or finish
+    if not saw_done:
+        raise RuntimeError('Local inference stream ended without its completion marker')
     if usage is None:
         raise RuntimeError('Local inference returned no measured token usage')
     return {'content': text, 'tool_calls': list(calls.values()), 'usage': usage, 'timings': timings,
