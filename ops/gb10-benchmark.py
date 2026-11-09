@@ -162,7 +162,7 @@ def benchmark_llama(args, records):
     if any(control.discover(name) for name in ('lead', 'text')) or control.port_open(port):
         raise RuntimeError('Qualification port already occupied; inspect verified controller status before proceeding')
     row = {'lane': args.lane, 'quant': 'MXFP4' if lane == 'lead' else args.quant, 'loading': args.loading,
-           'cpu_prompt_cache_limit_mib': 256,
+           'cpu_prompt_cache_limit_mib': 0, 'batch_tokens': 512, 'microbatch_tokens': 128,
            'started_at': time.time(), 'status': 'running', 'benchmarks': [],
            'other_compute_processes_count': other_compute_count()}
     row['qualification_scope'] = 'isolated_candidate' if row['other_compute_processes_count'] == 0 else 'diagnostic_with_unrelated_workloads'

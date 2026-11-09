@@ -23,7 +23,7 @@ def components():
                    '--ctx-size', str(context), '--parallel', str(slots), '--n-gpu-layers', '999', '--flash-attn', 'on',
                    '--jinja', '--offline', '--metrics', '--no-webui', '--threads', '8', '--fit', 'off',
                    '--lazy-mode', 'off', '--kv-unified-per-slot', '16384', '--perf',
-                   '--cache-ram', '256',
+                   '--cache-ram', '0', '--batch-size', '512', '--ubatch-size', '128',
                    '--cors-origins', 'http://127.0.0.1:18808,http://localhost:18808', '--no-cors-credentials']
         if name == 'text':
             command += ['--mmproj', str(ROOT / 'models/Qwen3.6-35B-A3B-GGUF/mmproj-F16.gguf')]

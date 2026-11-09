@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-09",
+  "model": "FLUX.2-klein-4B pinned text encoder",
+  "method": "Real 4B encoder comparison of hidden states 9, 18 and 27 and a fixed-seed 1344x768 pixel comparison; full original model weights retained",
+  "real_encoder_hidden_states_exactly_equal": true,
+  "all_parameters_retained": true,
+  "identical_rendered_pixels": true,
+  "max_pixel_difference": 0,
+  "metrics": {
+    "full": {
+      "seconds": 4.282987755999784,
+      "render_seconds": 4.166284192004241,
+      "gpu_peak_allocated_bytes": 16781654528,
+      "gpu_peak_reserved_bytes": 17085497344
+    },
+    "hidden_states": {
+      "seconds": 3.96934154999326,
+      "render_seconds": 3.845392967996304,
+      "gpu_peak_allocated_bytes": 15319996928,
+      "gpu_peak_reserved_bytes": 17611882496
+    }
+  },
+  "reproduction": ".model-venv/bin/python ops/acceptance/gb10-encoder.py (requires all other model lanes stopped)"
+}

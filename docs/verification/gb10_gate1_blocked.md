@@ -1,79 +1,73 @@
 # GB10 Gate 1: blocked
 
-Measured on the GB10 Nano on 2026-11-08 local time. This is qualification evidence, not stage readiness. Gate 0 passed. Phase 2 and P1 have not started.
+Measured on 2026-11-09. Gate 0 passed. Gate 1 failed, and hardware retries stopped under the owner's repeated-failure rule. Phase 2, P1 and stage readiness are not claimed.
 
-Base: `origin/customer_skin` at `369ba6d4cb0f02a9a5fc6925197bb8df4a0dcb65`; `v3.1.0` was absent at initial fetch. Work is isolated on `nano_exec`.
+Base: `origin/customer_skin` at `369ba6d4cb0f02a9a5fc6925197bb8df4a0dcb65`; `v3.1.0` was absent at the initial fetch. Branch: `nano_exec`. Main, tags and Fury hardware remain untouched.
 
-## Model stack
+## Latest actual candidate
 
-| Lane | Model and quant | License |
+| Lane | Model and placement | License |
 |---|---|---|
-| Lead | gpt-oss-120b MXFP4 | Apache-2.0 |
-| Worker and vision | Qwen3.6-35B-A3B UD-Q4_K_XL with F16 projector | Apache-2.0 |
-| Image | FLUX.2 klein 4B, BF16 transformer and FP8 E4M3 text encoder weights | Apache-2.0 |
-| Voice | Kokoro 82M v1.0 | Apache-2.0 |
+| Lead | gpt-oss-120b MXFP4, no mmap, 16k per slot, 2 slots | Apache-2.0 |
+| Worker and vision | Qwen3.6-35B-A3B UD-Q4_K_XL, F16 projector, no mmap, 16k per slot, 3 slots | Apache-2.0 |
+| Image | FLUX.2 klein 4B, BF16 transformer, FP8 E4M3 encoder weights, full original encoder retained | Apache-2.0 |
+| Voice | Kokoro 82M v1.0, CPU, same weights and voices | Apache-2.0 |
 
-Immutable revisions and SHA256 values are in [ASSET-MANIFEST.md](../ASSET-MANIFEST.md), `config/model-files.json` and `config/gb10-build.json`. llama.cpp is MIT; TorchAO is BSD-3-Clause. No headline model was dropped or substituted.
+Revisions and SHA256 values are in [ASSET-MANIFEST.md](../ASSET-MANIFEST.md), `config/model-files.json` and `config/gb10-build.json`. llama.cpp is MIT and TorchAO is BSD-3-Clause. No model substitution. CPU prompt snapshots are disabled, with batch size 512 and microbatch size 128; native per-slot GPU KV reuse remains enabled.
 
-## Actual isolated measurements
+All five owned model/gateway processes ran in an unprivileged transient user scope with `MemorySwapMax=0`. Membership and zero scope swap were checked each run. Global swap stayed enabled and its counters were monitored without subtracting background activity. No global swap, kernel, boot service, driver or network configuration was changed by the agent.
 
-| Lane and final loading | Load seconds | MemAvailable drop GiB | Decode tokens/s at 1k / 8k |
+## Isolated measurements used for admission
+
+| Lane | Load seconds | MemAvailable drop GiB | Decode tokens/s at 1k / 8k |
 |---|---:|---:|---:|
-| lead / no-mmap | 56.22 | 61.668 | 55.26 / 51.90 |
-| text / mmap | 21.33 | 24.137 | 66.89 / 64.12 |
-| image / BF16/FP8 text encoder | 6.90 | 14.479 | not applicable |
-| voice / publisher v1.0 | 4.73 | 3.523 | not applicable |
+| lead | 55.72 | 61.145 | 54.50 / 50.76 |
+| text | 21.64 | 23.991 | 63.55 / 61.28 |
+| image | 7.09 | 15.275 | n/a / n/a |
+| voice | 4.77 | 1.854 | n/a / n/a |
 
-Q8 and Q6 were measured and rejected by the summed residency admission check before unsafe simultaneous loading. Both vision samples passed for every measured Qwen quant. Contexts are already at the requested floor: 16k per slot, two lead slots and three worker slots.
+Q8 was measured first, then Q6 and Q4. Both larger Qwen quants were rejected by the summed residency check before unsafe simultaneous loading. All three correctly extracted every whiteboard owner/date/action and chart cell. Full prefill, TTFT, loading comparisons, image batches and voice timings remain in [gb10_memory_plan.json](gb10_memory_plan.json).
 
-## Completed five-run candidate, before the final cache cap
+The image adapter skips the unused language vocabulary projection while retaining the complete original encoder weights. A real pinned encoder test found exact equality of hidden states 9, 18 and 27 and identical pixels for the same seed at 1344×768. CUDA peak allocation fell by 1.36 GiB. See [gb10_encoder_equivalence.json](gb10_encoder_equivalence.json); reproduction: `.model-venv/bin/python ops/acceptance/gb10-encoder.py` with every other model lane stopped. This is image equivalence evidence, not stage acceptance.
 
-| Measurement | Actual result | Required |
+## Five actual Agent runs and five actual Rushes
+
+Two complete S1/S2/S3 warm passes preceded the measured runs. The native Agent produced the five-slide briefing, English email, Spanish email and image. Each Rush ran six actual jobs including the model-written calculator with four browser functional checks, exact chart extraction and Spanish/Japanese translation. Audio was off, so the sixth job was the specified summary; Kokoro remained resident and had been tested separately.
+
+| Measurement | Actual | Requirement |
 |---|---:|---:|
-| Agent p50 / p95 | 44.85 / 45.07 s | p95 at most75s |
-| Rush p50 / p95 / maximum | 33.33 / 34.69 / 34.87 s | maximum60s |
-| Minimum MemAvailable during Rush | 11.293 GiB | at least10GiB |
-| Completed Rush jobs | 6 of6 in all five runs | 6 of6 |
-| Lanes resident | all five processes retained their verified identities | all model lanes resident |
-| Swap input pages | 280, 77, 167, 38, 121 | zero |
-| Swap output pages | zero in every measured Rush | zero |
+| Agent p50 / p95 | 43.41 / 44.90 s | p95 at most 75 s |
+| Rush p50 / p95 / max | 48.68 / 52.11 / 52.18 s | max 60 s |
+| Rush minimum MemAvailable | 10.566 GiB | at least 10 GiB |
+| Rush peak OS memory used | 111.061 GiB of 121.627 GiB | measured, not GPU memory |
+| Rush jobs completed | 6 of 6 in all 5 runs | 6 of 6 |
+| Model residency | all original process identities retained | all resident |
+| OOM | none | none |
+| Runtime scope swap used | 0 bytes each run | 0 |
+| Global swap activity | nonzero input in all 5 runs | zero input and output |
 
-That candidate failed. The zero-swap requirement was not waived. A separate60second idle investigation found317 global swap input pages correlated with major faults in build agents and existing host daemons. No model process faults were observed in that idle test; this does not establish attribution for every prior Rush page.
+| Rush | Seconds | Minimum available GiB | Aggregate output tokens/s | Swap input / output pages |
+|---|---:|---:|---:|---:|
+| 1 | 48.68 | 10.621 | 61.48 | 132 / 0 |
+| 2 | 52.18 | 10.603 | 57.30 | 108 / 0 |
+| 3 | 46.29 | 10.589 | 63.71 | 102 / 0 |
+| 4 | 51.83 | 10.617 | 56.89 | 51 / 0 |
+| 5 | 46.72 | 10.566 | 63.69 | 52 / 0 |
 
-## Latest bounded-cache candidate
+**Gate 1 fails on global swap input.** The first cold Agent warm-up also reached 9.202 GiB available and is reported without alteration. The specified 10 GiB memory gate applies to the measured Rushes. An earlier driver mistakenly applied that floor to the entire cold show; the source now evaluates the requested Rush rule, with unit regressions. Reassessing these unchanged measurements still fails because of global swap. It does not convert this run into a pass.
 
-Pinned upstream defaulted to8192MiB additional CPU prompt cache per server. GB10 now explicitly caps it at256MiB each, preserving the required contexts, slots and native KV reuse. This was a concrete configuration correction after the failed series.
+## Failure history and limits
 
-The unattended remeasurement retained the source fixes for a strict chart table shape and complete Japanese translation. Ordinary English left in a Japanese draft triggers one visible, logged retry. The generated calculator passed four real browser input/output checks in its opaque network-blocked iframe.
+Earlier candidates and all failed attempts remain in the JSON report. Fixes addressed real allocator limits, CPU prompt snapshot growth and unnecessary image encoder projection. The latest candidate completed every required job without those failures.
 
-| Latest warm-up | Seconds | Minimum MemAvailable GiB |
-|---|---:|---:|
-| S1 complete | 39.67 | 11.237 |
-| S2 complete | 6.24 | 14.751 |
-| S3 complete | 43.29 | 10.351 |
-| S1 failed | 17.05 | 11.092 |
+A prior separate 60 second idle diagnostic correlated 317 global swap input pages with major faults in build agents and existing host daemons, with no model faults observed. That does not attribute every page in the latest Rushes. The build does not claim that background swap can be excluded.
 
-The second Agent warm-up failed in FLUX text encoder dequantization. PyTorch rejected a742MiB allocation against a15.10GiB per-process allowance with14.90GiB allocated. MemAvailable remained above11GiB. This is an allocator OOM failure even though the kernel OOM-kill counter did not increase. No final five-run acceptance exists for this configuration.
+All five owned model/gateway components have been stopped through the verified controller; the GPU is free. No unknown processes were signalled. Stage UI, backups, ten-show proof, three offline shows, chaos, 45 minute idle proof, screenshots, presenter PDF and show-day launch commands remain unbuilt or unperformed. Unit tests are not hardware acceptance.
 
-## Next options requiring a resumed qualification
+## Options before another qualification
 
-1. Correct the GB10 allocator allowance to use the same10.125GiB safety threshold as its checkpoint, then repeat every required live measurement. The required10GiB acceptance floor remains unchanged. A proposed patch is retained outside the repository for owner review; it has not been applied or accepted.
-2. Evaluate device-native FP8 text encoder matrix multiplication to avoid the742MiB BF16 dequantization temporary, then repeat quality, residency and workload measurements. This preserves the headline model and all four resident lanes.
+1. Repeat from the Nano's local terminal after the build agent and unrelated interactive applications have exited. Prior attribution makes this a plausible diagnostic, not a guaranteed fix. Do not disable global swap or change the zero-swap rule.
+2. Investigate clean weight-file page cache after GPU upload, using a per-file advisory only on this runtime's own model files. This is unimplemented and unmeasured; it would need an isolated comparison before another full trial.
+3. Investigate native FP8 encoder matrix multiplication to reduce temporary BF16 dequantization memory further, preserving all four models and the contexts/slots. This is also unimplemented and would require equivalence and full workload measurements.
 
-Hardware retries are stopped under the requested repeated-failure rule. Stage UI, recordings, ten-show proof, offline shows, chaos,45minute idle proof, screenshots and presenter handoff remain unbuilt or unperformed. Existing source/config tests are useful regression checks only, not hardware acceptance.
-
-## Resumed qualification and next candidate, 2026-11-09
-
-The owner resumed work and the reviewed allocator fix was applied. Two warm passes, five Agents and five Rushes completed without an allocator OOM. Every Rush completed all six actual jobs and retained the lane identities. Swap input still failed acceptance; no gate was waived.
-
-| Measured run | Seconds | Minimum MemAvailable GiB | Swap input pages |
-|---|---:|---:|---:|
-| Rush | 44.67 | 11.835 | 79 |
-| Rush | 44.57 | 11.763 | 71 |
-| Rush | 43.48 | 11.577 | 130 |
-| Rush | 44.29 | 11.630 | 175 |
-| Rush | 43.29 | 11.675 | 79 |
-
-An isolated placement probe measured the same Kokoro82M weights on CPU:1.854GiB resident instead of3.492GiB with CUDA, with speech generation1.136/1.089/1.067seconds for4.95seconds of audio. This is the next explicitly reported device candidate; it has not passed the full-stack gate. GPU context memory is avoided, and no model or voice is substituted.
-
-CPU buffer trimming alone released very little voice memory. It is not claimed as the solution. A clean swap-state baseline and fresh full workload are pending. All full-stack services remain stopped during that prerequisite.
+The repeated-failure stop is in force. No further hardware retry starts automatically, and Phase 2 cannot begin on these measurements.

@@ -30,6 +30,45 @@ def percentile(values, fraction):
     return values[low] + (values[min(low + 1, len(values) - 1)] - values[low]) * (position - low)
 
 
+def process_scope(pid='self'):
+    return next(line.split('::', 1)[1] for line in Path('/proc', str(pid), 'cgroup').read_text().splitlines() if line.startswith('0::'))
+
+
+def scope_snapshot():
+    folder = Path('/sys/fs/cgroup') / process_scope().lstrip('/')
+    return {'swap_limit': (folder / 'memory.swap.max').read_text().strip(),
+            'swap_current_bytes': int((folder / 'memory.swap.current').read_text()),
+            'memory_current_bytes': int((folder / 'memory.current').read_text()),
+            'memory_peak_bytes': int((folder / 'memory.peak').read_text())}
+
+
+def assess_gate(row, *, warmups, agent_runs, rush_runs, require_no_swap_scope):
+    """Evaluate recorded measurements; this never constitutes new acceptance."""
+    runs = row.get('runs', [])
+    agents = [r for r in runs if r['purpose'] == 'live' and r['segment'] == 'S1']
+    rushes = [r for r in runs if r['purpose'] == 'live' and r['segment'] == 'S3']
+    checks = {
+        'two_full_warm_passes': warmups >= 2 and all(
+            sum(r['purpose'] == 'warmup' and r['segment'] == segment for r in runs) >= warmups
+            for segment in ('S1', 'S2', 'S3')),
+        'five_agent_samples': agent_runs >= 5 and len(agents) == agent_runs,
+        'five_rush_samples': rush_runs >= 5 and len(rushes) == rush_runs,
+        'all_jobs_complete': bool(runs) and all(r['status'] == 'complete' for r in runs),
+        'all_lanes_resident': bool(runs) and all(r.get('lanes_resident', False) for r in runs),
+        'agent_p95_at_most_75_seconds': bool(agents) and percentile([r['seconds'] for r in agents], .95) <= 75,
+        'rush_at_most_60_seconds': bool(rushes) and max(r['seconds'] for r in rushes) <= 60,
+        'rush_minimum_10_gib_available': bool(rushes) and all(r.get('memory', {}).get('min_available_bytes', 0) >= 10 * 2**30 for r in rushes),
+        'rush_zero_global_swap': bool(rushes) and all(r.get('memory', {}).get('swap_in_pages') == r.get('memory', {}).get('swap_out_pages') == 0 for r in rushes),
+        'no_kernel_oom': bool(runs) and all(
+            isinstance(r.get('memory', {}).get('baseline', {}).get('oom_kill'), int)
+            and r.get('memory', {}).get('after', {}).get('oom_kill') == r['memory']['baseline']['oom_kill'] for r in runs),
+        'runtime_scope_swap_zero': require_no_swap_scope and bool(runs) and all(
+            r.get('runtime_memory', {}).get('swap_limit') == '0'
+            and r.get('runtime_memory', {}).get('swap_current_bytes') == 0 for r in runs),
+    }
+    return {'passed': all(checks.values()), 'checks': checks}
+
+
 def save(row):
     folder = ROOT / 'state/gb10-qualification'
     folder.mkdir(parents=True, exist_ok=True)
@@ -43,8 +82,9 @@ def save(row):
     data['workloads'][row['quant']] = row
     if row.get('passed'):
         data['status'] = 'gate_1_passed'
-        data['decision'] = {'passed': True, 'quant': row['quant'], 'lead_loading': 'no-mmap', 'text_loading': 'mmap',
-                            'flux_encoder': row['flux_encoder'], 'cpu_prompt_cache_limit_mib_per_server': 256,
+        data['decision'] = {'passed': True, 'quant': row['quant'], 'lead_loading': 'no-mmap', 'text_loading': row['text_loading'],
+                            'flux_encoder': row['flux_encoder'], 'cpu_prompt_cache_limit_mib_per_server': 0,
+                            'batch_tokens': 512, 'microbatch_tokens': 128, 'process_swap_limit_bytes': 0,
                             'voice_device': row['voice_device'],
                             'context_per_slot': 16384, 'lead_slots': 2, 'text_slots': 3,
                             'reason': 'Actual resident stack, Agent and five six-job Rush runs meet every required threshold'}
@@ -67,7 +107,11 @@ async def one(name, number, purpose, row, module, audio=False):
     import control
     identities = {lane: control.fingerprint(control.discover(lane)) if control.discover(lane) else None
                   for lane in ('image', 'tts', 'text', 'lead', 'gateway')}
+    monitor = None
     try:
+        if row.get('runtime_policy'):
+            if any(not identity or process_scope(identity['pid']) != process_scope() for identity in identities.values()):
+                raise RuntimeError('A model lane is outside the verified runtime memory scope')
         with module.Monitor() as monitor:
             if name == 'S1':
                 result = await asyncio.wait_for(NanoAgent(run_id, purpose=purpose, audio=audio, emit=emit).run(), 90)
@@ -88,10 +132,16 @@ async def one(name, number, purpose, row, module, audio=False):
         sample['output_tokens'] = tokens
         sample['aggregate_output_tokens_per_second'] = tokens / sample['seconds']
         sample['lanes_resident'] = all(identities[lane] and control.unchanged(identities[lane]) and control.ready(lane) for lane in identities)
+        if row.get('runtime_policy'):
+            sample['runtime_memory'] = scope_snapshot()
+            if sample['runtime_memory']['swap_limit'] != '0' or sample['runtime_memory']['swap_current_bytes'] != 0:
+                sample.update(status='failed', error='RuntimeScopeSwapInvariant')
         if not sample['lanes_resident']:
             sample.update(status='failed', error='ResidentLaneIdentityChanged')
     except Exception as exc:
-        sample.update(status='failed', seconds=time.monotonic() - began, error=type(exc).__name__, memory=monitor.summary())
+        sample.update(status='failed', seconds=time.monotonic() - began, error=type(exc).__name__)
+        if monitor is not None:
+            sample['memory'] = monitor.summary()
         print(name, type(exc).__name__, str(exc), flush=True)
     save(row)
     print(json.dumps(sample), flush=True)
@@ -100,11 +150,21 @@ async def one(name, number, purpose, row, module, audio=False):
 
 async def main(args):
     os.environ.update(FURY_PROFILE='gb10', FURY_GB10_QUANT=args.quant, FURY_GB10_FLUX_ENCODER=args.flux_encoder, FURY_GB10_VOICE_DEVICE=args.voice_device,
-                      FURY_GB10_LEAD_NO_MMAP='1', FURY_GB10_TEXT_NO_MMAP='0',
+                      FURY_GB10_LEAD_NO_MMAP='1', FURY_GB10_TEXT_NO_MMAP='1' if args.text_loading == 'no-mmap' else '0',
                       HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', LOGURU_LEVEL='WARNING',
                       PLAYWRIGHT_BROWSERS_PATH=str(ROOT / '.cache/ms-playwright'))
     module = benchmark_module()
-    row = {'quant': args.quant, 'flux_encoder': args.flux_encoder, 'voice_device': args.voice_device, 'started_at': time.time(), 'status': 'running', 'passed': False, 'runs': [], 'loads': []}
+    row = {'quant': args.quant, 'flux_encoder': args.flux_encoder, 'voice_device': args.voice_device, 'text_loading': args.text_loading,
+           'started_at': time.time(), 'status': 'running', 'passed': False, 'runs': [], 'loads': []}
+    if args.require_no_swap_scope:
+        relative = next(line.split('::', 1)[1] for line in Path('/proc/self/cgroup').read_text().splitlines() if line.startswith('0::'))
+        scope = Path('/sys/fs/cgroup') / relative.lstrip('/')
+        if (scope / 'memory.swap.max').read_text().strip() != '0':
+            raise RuntimeError('Qualification requires a transient user scope with MemorySwapMax=0')
+        row['runtime_policy'] = {'process_swap_limit_bytes': 0, 'transient_user_scope': True,
+                                 'global_swap_enabled': bool(Path('/proc/swaps').read_text().splitlines()[1:])}
+        if not row['runtime_policy']['global_swap_enabled']:
+            raise RuntimeError('Global swap must remain enabled for this acceptance test')
     plan = ROOT / 'state/stage/plans/rehearsed.json'
     plan.parent.mkdir(parents=True, exist_ok=True)
     if not plan.exists():
@@ -115,7 +175,7 @@ async def main(args):
         records = json.loads((ROOT / 'state/gb10-qualification/measurements.json').read_text())['runs']
         chosen = []
         image_quant = 'BF16/FP8 text encoder' if args.flux_encoder == 'fp8' else 'BF16'
-        for lane, quant, loading in [('lead', 'MXFP4', 'no-mmap'), ('text', args.quant, 'mmap'), ('image', image_quant, None), ('voice', 'publisher v1.0', None)]:
+        for lane, quant, loading in [('lead', 'MXFP4', 'no-mmap'), ('text', args.quant, args.text_loading), ('image', image_quant, None), ('voice', 'publisher v1.0', None)]:
             matches = [r for r in records if r['lane'] == lane and r.get('quant') == quant and r.get('loading') == loading and r['status'] == 'measured' and r['qualification_scope'] == 'isolated_candidate']
             if lane == 'voice':
                 matches = [r for r in matches if r.get('device', 'cuda') == args.voice_device]
@@ -165,13 +225,9 @@ async def main(args):
     rushes = [r['seconds'] for r in row['runs'] if r['purpose'] == 'live' and r['segment'] == 'S3' and r['status'] == 'complete']
     row['agent_p95_seconds'] = percentile(agents, .95) if agents else None
     row['rush_max_seconds'] = max(rushes) if rushes else None
-    row['passed'] = (args.warmups >= 2 and args.agent_runs >= 5 and args.rush_runs >= 5
-        and len(agents) == args.agent_runs and len(rushes) == args.rush_runs
-        and row['agent_p95_seconds'] <= 75 and max(rushes) <= 60
-        and all(r['status'] == 'complete' for r in row['runs'])
-        and row['memory']['min_available_bytes'] >= 10 * 2**30
-        and all(r['memory']['swap_in_pages'] == r['memory']['swap_out_pages'] == 0
-                for r in row['runs'] if r['segment'] == 'S3' and r['purpose'] == 'live'))
+    row['assessment'] = assess_gate(row, warmups=args.warmups, agent_runs=args.agent_runs,
+                                  rush_runs=args.rush_runs, require_no_swap_scope=args.require_no_swap_scope)
+    row['passed'] = row['assessment']['passed']
     row.update(status='passed' if row['passed'] else 'failed', ended_at=time.time())
     save(row)
     print(json.dumps({k: v for k, v in row.items() if k != 'runs'}, indent=2), flush=True)
@@ -188,4 +244,6 @@ if __name__ == '__main__':
     parser.add_argument('--audio', action='store_true')
     parser.add_argument('--flux-encoder', choices=['bf16', 'fp8'], default='bf16')
     parser.add_argument('--voice-device', choices=['cuda', 'cpu'], default='cuda')
+    parser.add_argument('--text-loading', choices=['mmap', 'no-mmap'], default='mmap')
+    parser.add_argument('--require-no-swap-scope', action='store_true')
     sys.exit(0 if asyncio.run(main(parser.parse_args())) else 1)

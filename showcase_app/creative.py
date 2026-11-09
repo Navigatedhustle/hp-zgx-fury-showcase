@@ -153,6 +153,8 @@ class CreativeLane:
             began = time.monotonic()
             self.flux.to('cuda')
             self.load_timings['device_transfer_seconds'] = time.monotonic() - began
+            from showcase_app.gb10_encoder import ImageConditioningEncoder
+            self.flux.text_encoder = ImageConditioningEncoder(self.flux.text_encoder).eval()
             from showcase_app.gb10_memory import release_unused_buffers
             self.load_cleanup = release_unused_buffers()
             self.parameter_count = sum(parameter.numel() for component in self.flux.components.values()

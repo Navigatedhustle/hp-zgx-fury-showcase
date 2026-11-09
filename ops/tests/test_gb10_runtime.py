@@ -39,7 +39,8 @@ def test_context_floor_and_explicit_residency():
         assert cmd[cmd.index('--fit') + 1] == 'off'
         assert cmd[cmd.index('--lazy-mode') + 1] == 'off'
         assert '--jinja' in cmd and '--offline' in cmd
-        assert cmd[cmd.index('--cache-ram') + 1] == '256'
+        assert cmd[cmd.index('--cache-ram') + 1] == '0'
+        assert cmd[cmd.index('--ubatch-size') + 1] == '128'
     assert gb10.environment()['HF_HUB_OFFLINE'] == '1'
     assert gb10.environment()['TRANSFORMERS_OFFLINE'] == '1'
 
