@@ -199,6 +199,11 @@ def _start_one(name,registry):
  if COMPONENTS[name].get('engine')=='llama.cpp':
   available=next(int(line.split()[1])*1024 for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:'))
   if available<12*1024**3:raise RuntimeError('GB10 loaded below 12 GiB MemAvailable; refusing inference.')
+  if os.getenv('FURY_GB10_RELEASE_WEIGHT_CACHE')=='1':
+   from gb10_file_cache import release_model_cache
+   model_directory=Path(COMPONENTS[name]['model_path']).parent.name
+   cache=release_model_cache(model_directory,os.getenv('FURY_GB10_QUANT','Q8_0'))
+   (STATE/('weight-cache-'+name+'.json')).write_text(json.dumps(cache,indent=2))
  row=discover(name)
  registry[name]['leader']=fingerprint(row)
  registry[name]['members']=[fingerprint(r) for r in processes() if r['pgid']==row['pgid']];save(registry)

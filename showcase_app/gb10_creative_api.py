@@ -90,7 +90,8 @@ def public(job):
 async def health():
     return {'ready': lane.flux is not None, 'model': 'FLUX.2-klein-4B', 'placement': lane.placement(),
             'active': sum(job['status'] == 'running' for job in jobs.values()), 'queued': queue.qsize(), 'limit': 1,
-            'parameter_count': getattr(lane, 'parameter_count', None), 'load_timings': getattr(lane, 'load_timings', {})}
+            'parameter_count': getattr(lane, 'parameter_count', None), 'load_timings': getattr(lane, 'load_timings', {}),
+            'weight_file_cache': getattr(lane, 'weight_cache', None)}
 
 
 @app.post('/generate')

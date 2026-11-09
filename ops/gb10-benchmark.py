@@ -21,6 +21,7 @@ def memory():
     mem = {line.split(':')[0]: int(line.split()[1]) * 1024 for line in Path('/proc/meminfo').read_text().splitlines()}
     vm = {line.split()[0]: int(line.split()[1]) for line in Path('/proc/vmstat').read_text().splitlines()}
     return {'time': time.time(), 'total_bytes': mem['MemTotal'], 'available_bytes': mem['MemAvailable'],
+            'free_bytes': mem['MemFree'], 'file_cache_bytes': mem['Cached'], 'anonymous_bytes': mem['AnonPages'],
             'swap_used_bytes': mem['SwapTotal'] - mem['SwapFree'], 'pswpin': vm['pswpin'], 'pswpout': vm['pswpout'],
             'oom_kill': vm.get('oom_kill')}
 
@@ -74,6 +75,8 @@ class Monitor:
         first, last = self.samples[0], self.samples[-1]
         return {'baseline': first, 'after': last,
                 'min_available_bytes': min(s['available_bytes'] for s in self.samples),
+                'min_free_bytes': min(s['free_bytes'] for s in self.samples),
+                'max_file_cache_bytes': max(s['file_cache_bytes'] for s in self.samples),
                 'peak_memory_used_bytes': max(s['total_bytes'] - s['available_bytes'] for s in self.samples),
                 'swap_in_pages': last['pswpin'] - first['pswpin'],
                 'swap_out_pages': last['pswpout'] - first['pswpout'], 'sample_interval_ms': 100}
@@ -169,13 +172,24 @@ def benchmark_llama(args, records):
     records.append(row)
     save(records)
     baseline = memory()
+    log_path = ROOT / 'logs' / (lane + '.log')
+    log_offset = log_path.stat().st_size if log_path.exists() else 0
     started = False
     try:
         with Monitor() as monitor:
             row['load_seconds'] = controller('start', lane, env)
             started = True
         row['load_memory'] = monitor.summary()
+        if args.loading == 'direct':
+            with log_path.open('rb') as stream:
+                stream.seek(log_offset)
+                fallback = b'Falling back to buffered I/O' in stream.read()
+            row['direct_io_fallback_detected'] = fallback
+            if fallback:
+                raise RuntimeError('Native direct I/O fell back to buffered reads; candidate rejected')
         row['resident_memavailable_drop_bytes'] = baseline['available_bytes'] - memory()['available_bytes']
+        if os.getenv('FURY_GB10_RELEASE_WEIGHT_CACHE') == '1':
+            row['weight_file_cache'] = json.loads((ROOT / 'state' / ('weight-cache-' + lane + '.json')).read_text())
         row['other_compute_processes_after_load'] = other_compute_count()
         # Run real decode at both requested context sizes. Keep actual template token counts.
         for target in (1024, 8192):
@@ -295,6 +309,8 @@ def benchmark_creative(records):
                    resident_memavailable_drop_bytes=baseline['available_bytes'] - memory()['available_bytes'])
         row['load_timings'] = lane.load_timings
         row['parameter_count'] = lane.parameter_count
+        if hasattr(lane, 'weight_cache'):
+            row['weight_file_cache'] = lane.weight_cache
         folder = ROOT / 'state/gb10-qualification/images'
         folder.mkdir(parents=True, exist_ok=True)
         prompt = 'Original editorial illustration of a small navy desktop computer beside a folded paper landscape, calm blue lighting, no text, no logo.'
@@ -357,7 +373,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--lane', choices=['lead', 'text', 'image', 'voice'], required=True)
     parser.add_argument('--quant', choices=['Q8_0', 'Q6_K', 'Q4_K_XL'], default='Q8_0')
-    parser.add_argument('--loading', choices=['mmap', 'no-mmap'], default='mmap')
+    parser.add_argument('--loading', choices=['mmap', 'no-mmap', 'direct'], default='mmap')
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--require-isolated', action='store_true')
     parser.add_argument('--flux-encoder', choices=['bf16', 'fp8'], default='bf16')
@@ -366,6 +382,8 @@ def main():
     # Ownership discovery imports the controller, whose profile is fixed at import.
     os.environ.update(FURY_PROFILE='gb10', FURY_GB10_QUANT=args.quant, FURY_GB10_FLUX_ENCODER=args.flux_encoder, FURY_GB10_VOICE_DEVICE=args.voice_device,
                       FURY_GB10_NO_MMAP='1' if args.loading == 'no-mmap' else '0')
+    if args.loading == 'direct':
+        os.environ['FURY_GB10_LOAD_MODE'] = 'dio'
     headers = ROOT / '.local-debs/extracted/usr/include'
     if headers.is_dir():
         os.environ['C_INCLUDE_PATH'] = str(headers) + ':' + str(headers / 'python3.12')

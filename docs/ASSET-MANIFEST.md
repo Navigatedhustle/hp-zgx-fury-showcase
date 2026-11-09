@@ -145,3 +145,7 @@ Local Python headers are extracted from Ubuntu`libpython3.12-dev` version`3.12.3
 ### GB10 conditioning execution, 2026-11-09
 
 The pinned FLUX.2 klein pipeline consumes intermediate Qwen hidden states 9, 18 and 27. GB10 retains the entire original text encoder and all parameters, but forwards its base encoder to avoid computing the unused vocabulary logits. Real 4B encoder hidden states and a same-seed 1344×768 render were exactly equal to the original execution (zero pixel difference). Peak allocated CUDA memory fell from 16,781,654,528 to 15,319,996,928 bytes. This is recorded in `docs/verification/gb10_encoder_equivalence.json`; it is not a replacement checkpoint or a model-size reduction. Fury execution remains unchanged.
+
+### GB10 weight loading, 2026-11-09
+
+The same pinned MIT llama.cpp supports direct I/O (`--load-mode dio`) to avoid duplicate clean weight pages during upload. No source revision, model or quant changed. A GB10-only per-file cache advisory applies `POSIX_FADV_DONTNEED` through read-only descriptors after upload, limited to regular weights listed in the pinned GB10 manifest. It neither writes files nor changes global cache, swap or kernel settings. The actual buffered lead comparison released 53.82 GiB of duplicate clean cache while retaining the resident model; both direct native lanes passed actual throughput, tool-call and vision checks. Full workload acceptance is still blocked by old global swap-ins, as documented in the memory report.

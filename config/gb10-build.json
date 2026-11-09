@@ -11,7 +11,11 @@
       "--load-mode",
       "none"
     ],
-    "load_mode_note": "Pinned upstream removed --no-mmap; --load-mode none is its documented non-mmap equivalent. Default comparison uses auto. Lazy loading and automatic fit are disabled to keep measured residency and contexts explicit."
+    "load_mode_note": "Pinned upstream removed --no-mmap; --load-mode none is its documented non-mmap equivalent. Default comparison uses auto. Lazy loading and automatic fit are disabled to keep measured residency and contexts explicit.",
+    "direct_io_cli": [
+      "--load-mode",
+      "dio"
+    ]
   },
   "model_profile": "gb10",
   "qualification_quant_order": [
@@ -61,5 +65,12 @@
     "transient_user_scope": true,
     "MemorySwapMax": 0,
     "global_swap": "enabled and monitored without excluding pages"
+  },
+  "file_cache_policy": {
+    "scope": "GB10 manifest-listed regular weight files only, after model upload",
+    "advice": "POSIX_FADV_DONTNEED on read-only descriptors",
+    "content_changes": false,
+    "global_cache_setting_changes": false,
+    "enabled_by": "FURY_GB10_RELEASE_WEIGHT_CACHE=1"
   }
 }

@@ -157,6 +157,9 @@ class CreativeLane:
             self.flux.text_encoder = ImageConditioningEncoder(self.flux.text_encoder).eval()
             from showcase_app.gb10_memory import release_unused_buffers
             self.load_cleanup = release_unused_buffers()
+            if os.getenv('FURY_GB10_RELEASE_WEIGHT_CACHE') == '1':
+                from ops.gb10_file_cache import release_model_cache
+                self.weight_cache = release_model_cache('FLUX.2-klein-4B')
             self.parameter_count = sum(parameter.numel() for component in self.flux.components.values()
                                        if isinstance(component, torch.nn.Module) for parameter in component.parameters())
             return

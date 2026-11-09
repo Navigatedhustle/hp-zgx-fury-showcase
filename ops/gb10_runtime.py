@@ -27,7 +27,12 @@ def components():
                    '--cors-origins', 'http://127.0.0.1:18808,http://localhost:18808', '--no-cors-credentials']
         if name == 'text':
             command += ['--mmproj', str(ROOT / 'models/Qwen3.6-35B-A3B-GGUF/mmproj-F16.gguf')]
-        if os.getenv('FURY_GB10_' + name.upper() + '_NO_MMAP', os.getenv('FURY_GB10_NO_MMAP', '0')) == '1':
+        loading = os.getenv('FURY_GB10_' + name.upper() + '_LOAD_MODE', os.getenv('FURY_GB10_LOAD_MODE'))
+        if loading is not None:
+            if loading not in ('auto', 'none', 'dio'):
+                raise ValueError('Unsupported GB10 file loading mode')
+            command += ['--load-mode', loading]
+        elif os.getenv('FURY_GB10_' + name.upper() + '_NO_MMAP', os.getenv('FURY_GB10_NO_MMAP', '0')) == '1':
             # This pinned upstream replaces the historical --no-mmap with this spelling.
             command += ['--load-mode', 'none']
         result[name] = {'engine': 'llama.cpp', 'port': port, 'health': '/health', 'model': alias,

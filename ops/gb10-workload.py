@@ -82,7 +82,7 @@ def save(row):
     data['workloads'][row['quant']] = row
     if row.get('passed'):
         data['status'] = 'gate_1_passed'
-        data['decision'] = {'passed': True, 'quant': row['quant'], 'lead_loading': 'no-mmap', 'text_loading': row['text_loading'],
+        data['decision'] = {'passed': True, 'quant': row['quant'], 'lead_loading': row['lead_loading'], 'text_loading': row['text_loading'],
                             'flux_encoder': row['flux_encoder'], 'cpu_prompt_cache_limit_mib_per_server': 0,
                             'batch_tokens': 512, 'microbatch_tokens': 128, 'process_swap_limit_bytes': 0,
                             'voice_device': row['voice_device'],
@@ -153,8 +153,10 @@ async def main(args):
                       FURY_GB10_LEAD_NO_MMAP='1', FURY_GB10_TEXT_NO_MMAP='1' if args.text_loading == 'no-mmap' else '0',
                       HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', LOGURU_LEVEL='WARNING',
                       PLAYWRIGHT_BROWSERS_PATH=str(ROOT / '.cache/ms-playwright'))
+    os.environ['FURY_GB10_LEAD_LOAD_MODE'] = 'dio' if args.lead_loading == 'direct' else 'none'
+    os.environ['FURY_GB10_TEXT_LOAD_MODE'] = {'mmap': 'auto', 'no-mmap': 'none', 'direct': 'dio'}[args.text_loading]
     module = benchmark_module()
-    row = {'quant': args.quant, 'flux_encoder': args.flux_encoder, 'voice_device': args.voice_device, 'text_loading': args.text_loading,
+    row = {'quant': args.quant, 'flux_encoder': args.flux_encoder, 'voice_device': args.voice_device, 'text_loading': args.text_loading, 'lead_loading': args.lead_loading,
            'started_at': time.time(), 'status': 'running', 'passed': False, 'runs': [], 'loads': []}
     if args.require_no_swap_scope:
         relative = next(line.split('::', 1)[1] for line in Path('/proc/self/cgroup').read_text().splitlines() if line.startswith('0::'))
@@ -162,6 +164,7 @@ async def main(args):
         if (scope / 'memory.swap.max').read_text().strip() != '0':
             raise RuntimeError('Qualification requires a transient user scope with MemorySwapMax=0')
         row['runtime_policy'] = {'process_swap_limit_bytes': 0, 'transient_user_scope': True,
+                                 'weight_file_cache_advice': os.getenv('FURY_GB10_RELEASE_WEIGHT_CACHE') == '1',
                                  'global_swap_enabled': bool(Path('/proc/swaps').read_text().splitlines()[1:])}
         if not row['runtime_policy']['global_swap_enabled']:
             raise RuntimeError('Global swap must remain enabled for this acceptance test')
@@ -175,7 +178,7 @@ async def main(args):
         records = json.loads((ROOT / 'state/gb10-qualification/measurements.json').read_text())['runs']
         chosen = []
         image_quant = 'BF16/FP8 text encoder' if args.flux_encoder == 'fp8' else 'BF16'
-        for lane, quant, loading in [('lead', 'MXFP4', 'no-mmap'), ('text', args.quant, args.text_loading), ('image', image_quant, None), ('voice', 'publisher v1.0', None)]:
+        for lane, quant, loading in [('lead', 'MXFP4', args.lead_loading), ('text', args.quant, args.text_loading), ('image', image_quant, None), ('voice', 'publisher v1.0', None)]:
             matches = [r for r in records if r['lane'] == lane and r.get('quant') == quant and r.get('loading') == loading and r['status'] == 'measured' and r['qualification_scope'] == 'isolated_candidate']
             if lane == 'voice':
                 matches = [r for r in matches if r.get('device', 'cuda') == args.voice_device]
@@ -244,6 +247,7 @@ if __name__ == '__main__':
     parser.add_argument('--audio', action='store_true')
     parser.add_argument('--flux-encoder', choices=['bf16', 'fp8'], default='bf16')
     parser.add_argument('--voice-device', choices=['cuda', 'cpu'], default='cuda')
-    parser.add_argument('--text-loading', choices=['mmap', 'no-mmap'], default='mmap')
+    parser.add_argument('--lead-loading', choices=['no-mmap', 'direct'], default='no-mmap')
+    parser.add_argument('--text-loading', choices=['mmap', 'no-mmap', 'direct'], default='mmap')
     parser.add_argument('--require-no-swap-scope', action='store_true')
     sys.exit(0 if asyncio.run(main(parser.parse_args())) else 1)

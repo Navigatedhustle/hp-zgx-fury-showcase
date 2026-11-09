@@ -51,6 +51,16 @@ def test_unsupported_quant_never_substituted(monkeypatch):
         gb10.components()
 
 
+def test_explicit_direct_io_and_invalid_loading_mode(monkeypatch):
+    monkeypatch.setenv('FURY_GB10_LOAD_MODE', 'dio')
+    for name in ('lead', 'text'):
+        command = gb10.components()[name]['command']
+        assert command[command.index('--load-mode') + 1] == 'dio'
+    monkeypatch.setenv('FURY_GB10_LOAD_MODE', 'unknown')
+    with pytest.raises(ValueError, match='loading mode'):
+        gb10.components()
+
+
 def test_own_native_process_requires_exact_executable_and_args():
     script = '''
 import control, json, os
