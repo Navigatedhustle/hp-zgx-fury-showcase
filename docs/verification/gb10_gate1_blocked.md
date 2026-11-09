@@ -61,3 +61,19 @@ The second Agent warm-up failed in FLUX text encoder dequantization. PyTorch rej
 2. Evaluate device-native FP8 text encoder matrix multiplication to avoid the742MiB BF16 dequantization temporary, then repeat quality, residency and workload measurements. This preserves the headline model and all four resident lanes.
 
 Hardware retries are stopped under the requested repeated-failure rule. Stage UI, recordings, ten-show proof, offline shows, chaos,45minute idle proof, screenshots and presenter handoff remain unbuilt or unperformed. Existing source/config tests are useful regression checks only, not hardware acceptance.
+
+## Resumed qualification and next candidate, 2026-11-09
+
+The owner resumed work and the reviewed allocator fix was applied. Two warm passes, five Agents and five Rushes completed without an allocator OOM. Every Rush completed all six actual jobs and retained the lane identities. Swap input still failed acceptance; no gate was waived.
+
+| Measured run | Seconds | Minimum MemAvailable GiB | Swap input pages |
+|---|---:|---:|---:|
+| Rush | 44.67 | 11.835 | 79 |
+| Rush | 44.57 | 11.763 | 71 |
+| Rush | 43.48 | 11.577 | 130 |
+| Rush | 44.29 | 11.630 | 175 |
+| Rush | 43.29 | 11.675 | 79 |
+
+An isolated placement probe measured the same Kokoro82M weights on CPU:1.854GiB resident instead of3.492GiB with CUDA, with speech generation1.136/1.089/1.067seconds for4.95seconds of audio. This is the next explicitly reported device candidate; it has not passed the full-stack gate. GPU context memory is avoided, and no model or voice is substituted.
+
+CPU buffer trimming alone released very little voice memory. It is not claimed as the solution. A clean swap-state baseline and fresh full workload are pending. All full-stack services remain stopped during that prerequisite.

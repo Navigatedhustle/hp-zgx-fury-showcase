@@ -135,3 +135,9 @@ The source FLUX weights and revision above remain the input, with only the text 
 TorchAO 0.18.0 is BSD-3-Clause. Its [license](https://github.com/pytorch/ao/blob/5f2baf9d575cf732362594c998c399902942531f/LICENSE) was read directly on 2026-11-08; immutable source revision `5f2baf9d575cf732362594c998c399902942531f`, license SHA256 `67901e351baeaa5aef967cccd0886ba679f085df8673d1ecd49592bf284115af`. The ARM64-compatible pure Python wheel `torchao-0.18.0-py3-none-any.whl` is pinned to SHA256 `5c2b4485341bf28b7fed2c4fc95b9f298e209f41685350f067de85527a05585e` in `config/gb10-build.json` and the GB10 model lock. PyTorch supplies the underlying tensor operations; no binary extension is substituted.
 
 The GB10 lock excludes optional multilingual phonemizer backends and uses the existing pure English Kokoro service and pinned MIT spaCy tagger. Local Python headers are extracted into the ignored project tools directory; host Python, CUDA and drivers are unchanged.
+
+### GB10 PyTorch wheel and local compilation headers
+
+PyTorch2.13.0+cu130 core BSD-3-Clause [LICENSE](https://github.com/pytorch/pytorch/blob/cf30153c4c131c8164ee7798e5022d810682e2cb/LICENSE) was read at immutable source revision`cf30153c4c131c8164ee7798e5022d810682e2cb`. Source LICENSE SHA256`bd018feef8825e88181c84eb7e3aa4eafb8f08a20d9fd6ef948569610c4a3e43`; official ARM64 CPython3.12 wheel SHA256`5ebd552c887e707c8e64927aceb8377ca2e81588c4e7494bcd23cb8ac0aca14d`, now hash-pinned by direct URL in the GB10 lock. Installed bundled license notices remain with the environment; environments and binaries are not release files.
+
+Local Python headers are extracted from Ubuntu`libpython3.12-dev` version`3.12.3-1ubuntu0.17`, ARM64 package SHA256`945ad3f651f683c11e72d19d804b1cff097308dcffa01057635cba038f875164`. This is an ignored build input and does not change host Python, CUDA or packages.

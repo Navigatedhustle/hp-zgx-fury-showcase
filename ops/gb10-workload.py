@@ -45,6 +45,7 @@ def save(row):
         data['status'] = 'gate_1_passed'
         data['decision'] = {'passed': True, 'quant': row['quant'], 'lead_loading': 'no-mmap', 'text_loading': 'mmap',
                             'flux_encoder': row['flux_encoder'], 'cpu_prompt_cache_limit_mib_per_server': 256,
+                            'voice_device': row['voice_device'],
                             'context_per_slot': 16384, 'lead_slots': 2, 'text_slots': 3,
                             'reason': 'Actual resident stack, Agent and five six-job Rush runs meet every required threshold'}
     public.write_text(json.dumps(data, indent=2) + '\n')
@@ -98,12 +99,12 @@ async def one(name, number, purpose, row, module, audio=False):
 
 
 async def main(args):
-    os.environ.update(FURY_PROFILE='gb10', FURY_GB10_QUANT=args.quant, FURY_GB10_FLUX_ENCODER=args.flux_encoder,
+    os.environ.update(FURY_PROFILE='gb10', FURY_GB10_QUANT=args.quant, FURY_GB10_FLUX_ENCODER=args.flux_encoder, FURY_GB10_VOICE_DEVICE=args.voice_device,
                       FURY_GB10_LEAD_NO_MMAP='1', FURY_GB10_TEXT_NO_MMAP='0',
                       HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', LOGURU_LEVEL='WARNING',
                       PLAYWRIGHT_BROWSERS_PATH=str(ROOT / '.cache/ms-playwright'))
     module = benchmark_module()
-    row = {'quant': args.quant, 'flux_encoder': args.flux_encoder, 'started_at': time.time(), 'status': 'running', 'passed': False, 'runs': [], 'loads': []}
+    row = {'quant': args.quant, 'flux_encoder': args.flux_encoder, 'voice_device': args.voice_device, 'started_at': time.time(), 'status': 'running', 'passed': False, 'runs': [], 'loads': []}
     plan = ROOT / 'state/stage/plans/rehearsed.json'
     plan.parent.mkdir(parents=True, exist_ok=True)
     if not plan.exists():
@@ -116,6 +117,8 @@ async def main(args):
         image_quant = 'BF16/FP8 text encoder' if args.flux_encoder == 'fp8' else 'BF16'
         for lane, quant, loading in [('lead', 'MXFP4', 'no-mmap'), ('text', args.quant, 'mmap'), ('image', image_quant, None), ('voice', 'publisher v1.0', None)]:
             matches = [r for r in records if r['lane'] == lane and r.get('quant') == quant and r.get('loading') == loading and r['status'] == 'measured' and r['qualification_scope'] == 'isolated_candidate']
+            if lane == 'voice':
+                matches = [r for r in matches if r.get('device', 'cuda') == args.voice_device]
             if not matches:
                 raise RuntimeError('Missing isolated measurement: ' + lane + '/' + quant)
             if lane == 'text' and (len(matches[-1].get('vision_quality', [])) != 2 or not all(q['passed'] for q in matches[-1]['vision_quality'])):
@@ -184,4 +187,5 @@ if __name__ == '__main__':
     parser.add_argument('--rush-runs', type=int, default=5)
     parser.add_argument('--audio', action='store_true')
     parser.add_argument('--flux-encoder', choices=['bf16', 'fp8'], default='bf16')
+    parser.add_argument('--voice-device', choices=['cuda', 'cpu'], default='cuda')
     sys.exit(0 if asyncio.run(main(parser.parse_args())) else 1)

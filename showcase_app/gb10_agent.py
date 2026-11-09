@@ -130,12 +130,14 @@ def write_deck(data, folder):
         points = ''.join('<li>' + html.escape(point) + '</li>' for point in slide['points'])
         markup = '<section class="nano-deck"><p class="tag">HP ZGX NANO / ' + str(index) + '</p><h1>' + html.escape(slide['title']) + '</h1><p class="subtitle">' + html.escape(slide['subtitle']) + '</p><ul>' + points + '</ul><footer>Fictional account notes · source date 2026-11-08</footer></section>'
         css = '.nano-deck{height:100%;box-sizing:border-box;padding:68px 80px;background:#0A0D14;color:white;font-family:Arial,Helvetica,"Liberation Sans",sans-serif}.nano-deck h1{font-size:72px;color:#D1DDF1;border-bottom:3px solid #004BDF;padding-bottom:22px;margin:36px 0}.nano-deck .tag{font-size:28px;letter-spacing:3px;color:#73A1FF}.nano-deck .subtitle{font-size:36px;color:#D1DDF1}.nano-deck li{font-size:36px;line-height:1.4;margin:20px 0}.nano-deck footer{position:absolute;bottom:40px;font-size:28px;color:#B4C1D7}'
-        spec = SlideSpec(meta=SpecMeta(title=slide['title'], theme='paper', notes=[slide['notes']],
+        css += '.nano-deck,.nano-deck *{font-family:Arial,Helvetica,"Liberation Sans",Arimo,sans-serif!important}'
+        spec = SlideSpec(meta=SpecMeta(title=slide['title'], theme='dark', notes=[slide['notes']],
                          sources='Original fictional sample account notes, 2026-11-08'), html=markup, css=css)
         specs.append(DeckSlide(id='nano-' + str(index), spec=spec))
     wordmark = folder / 'wordmark.svg'
     wordmark.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="60"><text x="0" y="44" fill="#D1DDF1" font-family="Arial,Helvetica,sans-serif" font-size="38">HP ZGX Nano</text></svg>')
     document = assemble(DeckInput(title=data['title'], slides=specs, assets={'hp': wordmark}), embed=True, instant=True)
+    document = re.sub(r'@font-face\s*\{[^}]*\}', '', document)
     (folder / 'briefing.html').write_text(document)
     (folder / 'briefing.json').write_text(json.dumps(data, ensure_ascii=False, indent=2))
     return {'file': 'briefing.html', 'data_file': 'briefing.json', 'title': data['title'], 'slides': data['slides']}

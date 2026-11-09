@@ -271,7 +271,7 @@ def save(records):
               'measurement': 'MemAvailable deltas and 100 ms /proc/meminfo sampling; /proc/vmstat swap deltas; native llama.cpp timings and observed SSE TTFT',
               'preexisting_workloads_present': any(row.get('other_compute_processes_count', 0) > 0 for row in records),
               'minimum_memavailable_gib': 10, 'runs': publish(records), 'workloads': prior.get('workloads', {}),
-              'workload_attempts': prior.get('workload_attempts', [])}
+              'workload_attempts': prior.get('workload_attempts', []), 'swap_diagnostics': prior.get('swap_diagnostics', {})}
     if prior.get('decision', {}).get('passed'):
         report['decision'] = prior['decision']
     public.write_text(json.dumps(report, indent=2) + '\n')
@@ -323,6 +323,7 @@ def benchmark_voice(records):
     os.environ.update(FURY_PROFILE='gb10', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', HF_HUB_DISABLE_TELEMETRY='1')
     sys.path.insert(0, str(ROOT / 'build/sources/atlas-gpt-main'))
     row = {'lane': 'voice', 'model': 'Kokoro-82M', 'quant': 'publisher v1.0', 'started_at': time.time(),
+           'device': os.getenv('FURY_GB10_VOICE_DEVICE', 'cuda'),
            'status': 'running', 'benchmarks': [], 'other_compute_processes_count': other_compute_count()}
     row['qualification_scope'] = 'isolated_candidate' if row['other_compute_processes_count'] == 0 else 'diagnostic_with_unrelated_workloads'
     records.append(row)
@@ -332,7 +333,9 @@ def benchmark_voice(records):
         began = time.monotonic()
         with Monitor() as monitor:
             from atlas import tts_server
-            tts_server.load()
+            tts_server.load(row['device'])
+            from showcase_app.gb10_memory import release_unused_buffers
+            row['load_cleanup'] = release_unused_buffers()
         row.update(load_seconds=time.monotonic() - began, load_memory=monitor.summary(),
                    resident_memavailable_drop_bytes=baseline['available_bytes'] - memory()['available_bytes'])
         for repeat in range(3):
@@ -358,9 +361,10 @@ def main():
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--require-isolated', action='store_true')
     parser.add_argument('--flux-encoder', choices=['bf16', 'fp8'], default='bf16')
+    parser.add_argument('--voice-device', choices=['cuda', 'cpu'], default='cuda')
     args = parser.parse_args()
     # Ownership discovery imports the controller, whose profile is fixed at import.
-    os.environ.update(FURY_PROFILE='gb10', FURY_GB10_QUANT=args.quant, FURY_GB10_FLUX_ENCODER=args.flux_encoder,
+    os.environ.update(FURY_PROFILE='gb10', FURY_GB10_QUANT=args.quant, FURY_GB10_FLUX_ENCODER=args.flux_encoder, FURY_GB10_VOICE_DEVICE=args.voice_device,
                       FURY_GB10_NO_MMAP='1' if args.loading == 'no-mmap' else '0')
     headers = ROOT / '.local-debs/extracted/usr/include'
     if headers.is_dir():

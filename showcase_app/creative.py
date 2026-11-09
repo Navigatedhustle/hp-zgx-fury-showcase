@@ -153,11 +153,8 @@ class CreativeLane:
             began = time.monotonic()
             self.flux.to('cuda')
             self.load_timings['device_transfer_seconds'] = time.monotonic() - began
-            import gc
-            gc.collect()
-            torch.cuda.synchronize()
-            # Return temporary CPU materialization/quantization arenas to this process's allocator.
-            ctypes.CDLL(None).malloc_trim(0)
+            from showcase_app.gb10_memory import release_unused_buffers
+            self.load_cleanup = release_unused_buffers()
             self.parameter_count = sum(parameter.numel() for component in self.flux.components.values()
                                        if isinstance(component, torch.nn.Module) for parameter in component.parameters())
             return
@@ -200,13 +197,13 @@ class CreativeLane:
             began = time.monotonic()
             self.load_video()
             job['model_load_seconds'] = time.monotonic() - began
-        # GB10 uses the measured 10 GiB floor plus a 1 GiB guard. Fury retains 14 GiB.
+        # GB10 allocator and checkpoint share the 10 GiB floor plus a 128 MiB guard. Fury retains 14 GiB.
         # Existing text engines and their fractions/contexts/slots are untouched.
         torch.cuda.empty_cache()
         free, total = torch.cuda.mem_get_info()
         if self.gb10:
             free = unified_available()
-        budget = torch.cuda.memory_reserved() + free - (11 if self.gb10 else 14) * 1024 ** 3
+        budget = torch.cuda.memory_reserved() + free - (10.125 if self.gb10 else 14) * 1024 ** 3
         if budget <= 0:
             raise RuntimeError('Insufficient unified memory above the creative reserve guard' if self.gb10 else 'Insufficient measured HBM above the creative reserve guard')
         torch.cuda.set_per_process_memory_fraction(min(.95, budget / total))
@@ -259,6 +256,9 @@ class CreativeLane:
             job.update(render_seconds=time.monotonic() - began, gpu_peak_allocated_bytes=torch.cuda.max_memory_allocated(), gpu_peak_reserved_bytes=torch.cuda.max_memory_reserved())
             pipeline.maybe_free_model_hooks()
             torch.cuda.empty_cache()
+            if self.gb10:
+                from showcase_app.gb10_memory import release_unused_buffers
+                job['buffer_cleanup'] = release_unused_buffers()
 
     def placement(self):
         def device(module):

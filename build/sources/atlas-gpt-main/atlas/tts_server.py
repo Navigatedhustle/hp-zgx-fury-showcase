@@ -11,7 +11,7 @@ from atlas.offline_guard import install as install_offline_guard
 install_offline_guard()
 from atlas.number_words import num2words
 model=None;g2p=None;voice=None;last_ms=None;voices={};active=0;queued=0;last_request=0;lock=asyncio.Lock()
-def load():
+def load(device='cuda'):
  global model,g2p,voice,last_ms,voices
  import torch
  torch.set_num_threads(4)
@@ -25,7 +25,7 @@ def load():
  import spacy
  if not spacy.util.is_package('en_core_web_sm'):raise RuntimeError('Install-time English tagger is missing; runtime downloads are disabled.')
  p=Path(json.loads((ROOT/'models/kokoro.json').read_text())['path'])
- model=KModel(repo_id='hexgrad/Kokoro-82M',config=str(p/'config.json'),model=str(p/'kokoro-v1_0.pth')).to('cuda').eval()
+ model=KModel(repo_id='hexgrad/Kokoro-82M',config=str(p/'config.json'),model=str(p/'kokoro-v1_0.pth')).to(device).eval()
  voice=torch.load(p/'voices/af_heart.pt',weights_only=True)
  voices={'af_heart':voice,'am_michael':torch.load(p/'voices/am_michael.pt',weights_only=True)}
  g2p=en.G2P(trf=False,british=False,fallback=None,unk='')

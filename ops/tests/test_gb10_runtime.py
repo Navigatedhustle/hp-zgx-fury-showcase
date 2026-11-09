@@ -23,6 +23,8 @@ def test_explicit_profile_keeps_fury_defaults():
     assert fury['components']['lead']['port'] == 8100
     assert fury['components']['text']['model'] == 'unsloth/Qwen3.6-27B-NVFP4'
     assert 'agent' in fury['components'] and 'asr' in fury['components']
+    assert fury['components']['tts']['command'][3] == 'atlas.tts_server:app'
+    assert nano['components']['tts']['command'][3] == 'showcase_app.gb10_voice_api:app'
     assert set(nano['components']) == {'lead', 'text', 'image', 'tts', 'gateway'}
     assert nano['serve'] == {}
     assert all(item['command'][item['command'].index('--host') + 1] == '127.0.0.1' for item in nano['components'].values())

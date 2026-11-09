@@ -4,8 +4,7 @@
   "status": "gate_1_blocked",
   "decision": {
     "passed": false,
-    "reason": "Latest bounded-cache candidate failed its second Agent warm-up with a PyTorch allocator OOM. Earlier five-Rush candidate failed the zero-global-swap rule. Hardware retries stopped under the requested stop rule.",
-    "headline_model_retained": true
+    "reason": "Allocator fix completed full live workload; remaining acceptance failure is nonzero global swap input. CPU Kokoro placement measured as a lower-memory candidate; full-stack validation pending."
   },
   "measurement": "MemAvailable deltas and 100 ms /proc/meminfo sampling; /proc/vmstat swap deltas; native llama.cpp timings and observed SSE TTFT",
   "preexisting_workloads_present": true,
@@ -8405,6 +8404,297 @@
       "other_compute_processes_before_stop": 0,
       "other_compute_processes_at_end": 0,
       "ended_at": 1794189387.1180708
+    },
+    {
+      "lane": "voice",
+      "model": "Kokoro-82M",
+      "quant": "publisher v1.0",
+      "started_at": 1794236029.8200228,
+      "status": "measured",
+      "benchmarks": [
+        {
+          "repeat": 1,
+          "seconds": 0.07444139299332164,
+          "pcm_bytes": 237600,
+          "audio_played": false,
+          "memory": {
+            "baseline": {
+              "time": 1794236034.4701722,
+              "total_bytes": 130596188160,
+              "available_bytes": 123504521216,
+              "swap_used_bytes": 377544704,
+              "pswpin": 359413,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794236034.5457916,
+              "total_bytes": 130596188160,
+              "available_bytes": 123435237376,
+              "swap_used_bytes": 377544704,
+              "pswpin": 359413,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 123435237376,
+            "peak_memory_used_bytes": 7160950784,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "repeat": 2,
+          "seconds": 0.0604985050013056,
+          "pcm_bytes": 237600,
+          "audio_played": false,
+          "memory": {
+            "baseline": {
+              "time": 1794236034.5600243,
+              "total_bytes": 130596188160,
+              "available_bytes": 123432914944,
+              "swap_used_bytes": 377544704,
+              "pswpin": 359413,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794236034.6220863,
+              "total_bytes": 130596188160,
+              "available_bytes": 123432914944,
+              "swap_used_bytes": 377544704,
+              "pswpin": 359413,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 123432914944,
+            "peak_memory_used_bytes": 7163273216,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "repeat": 3,
+          "seconds": 0.059848729011719115,
+          "pcm_bytes": 237600,
+          "audio_played": false,
+          "memory": {
+            "baseline": {
+              "time": 1794236034.6357555,
+              "total_bytes": 130596188160,
+              "available_bytes": 123432919040,
+              "swap_used_bytes": 377544704,
+              "pswpin": 359413,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794236034.6963556,
+              "total_bytes": 130596188160,
+              "available_bytes": 123406938112,
+              "swap_used_bytes": 377544704,
+              "pswpin": 359413,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 123406938112,
+            "peak_memory_used_bytes": 7189250048,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        }
+      ],
+      "other_compute_processes_count": 0,
+      "qualification_scope": "isolated_candidate",
+      "load_cleanup": {
+        "before": {
+          "rss_bytes": 2284711936,
+          "swap_bytes": 0,
+          "available_bytes": 123411349504
+        },
+        "after": {
+          "rss_bytes": 2284171264,
+          "swap_bytes": 0,
+          "available_bytes": 123504521216
+        },
+        "model_weights_released": false
+      },
+      "load_seconds": 4.612769398998353,
+      "load_memory": {
+        "baseline": {
+          "time": 1794236029.8572795,
+          "total_bytes": 130596188160,
+          "available_bytes": 127253573632,
+          "swap_used_bytes": 377679872,
+          "pswpin": 359385,
+          "pswpout": 2908801,
+          "oom_kill": 0
+        },
+        "after": {
+          "time": 1794236034.4699538,
+          "total_bytes": 130596188160,
+          "available_bytes": 123504521216,
+          "swap_used_bytes": 377544704,
+          "pswpin": 359413,
+          "pswpout": 2908801,
+          "oom_kill": 0
+        },
+        "min_available_bytes": 123426009088,
+        "peak_memory_used_bytes": 7170179072,
+        "swap_in_pages": 28,
+        "swap_out_pages": 0,
+        "sample_interval_ms": 100
+      },
+      "resident_memavailable_drop_bytes": 3749052416,
+      "ended_at": 1794236034.709793
+    },
+    {
+      "lane": "voice",
+      "model": "Kokoro-82M",
+      "quant": "publisher v1.0",
+      "started_at": 1794236233.5594103,
+      "device": "cpu",
+      "status": "measured",
+      "benchmarks": [
+        {
+          "repeat": 1,
+          "seconds": 1.1358859640022274,
+          "pcm_bytes": 237600,
+          "audio_played": false,
+          "memory": {
+            "baseline": {
+              "time": 1794236238.3700628,
+              "total_bytes": 130596188160,
+              "available_bytes": 125228081152,
+              "swap_used_bytes": 376573952,
+              "pswpin": 359701,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794236239.5064273,
+              "total_bytes": 130596188160,
+              "available_bytes": 125151666176,
+              "swap_used_bytes": 376573952,
+              "pswpin": 359701,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 124888604672,
+            "peak_memory_used_bytes": 5707583488,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "repeat": 2,
+          "seconds": 1.0891932500089752,
+          "pcm_bytes": 237600,
+          "audio_played": false,
+          "memory": {
+            "baseline": {
+              "time": 1794236239.5204086,
+              "total_bytes": 130596188160,
+              "available_bytes": 125151612928,
+              "swap_used_bytes": 376573952,
+              "pswpin": 359701,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794236240.6100993,
+              "total_bytes": 130596188160,
+              "available_bytes": 125063598080,
+              "swap_used_bytes": 376569856,
+              "pswpin": 359701,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 124939345920,
+            "peak_memory_used_bytes": 5656842240,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "repeat": 3,
+          "seconds": 1.0671824800083414,
+          "pcm_bytes": 237600,
+          "audio_played": false,
+          "memory": {
+            "baseline": {
+              "time": 1794236240.623354,
+              "total_bytes": 130596188160,
+              "available_bytes": 125063741440,
+              "swap_used_bytes": 376569856,
+              "pswpin": 359701,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794236241.6910222,
+              "total_bytes": 130596188160,
+              "available_bytes": 125067595776,
+              "swap_used_bytes": 376569856,
+              "pswpin": 359701,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 124891308032,
+            "peak_memory_used_bytes": 5704880128,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        }
+      ],
+      "other_compute_processes_count": 0,
+      "qualification_scope": "isolated_candidate",
+      "load_cleanup": {
+        "before": {
+          "rss_bytes": 1654382592,
+          "swap_bytes": 0,
+          "available_bytes": 125456158720
+        },
+        "after": {
+          "rss_bytes": 1732268032,
+          "swap_bytes": 0,
+          "available_bytes": 125228081152
+        },
+        "model_weights_released": false
+      },
+      "load_seconds": 4.772352133993991,
+      "load_memory": {
+        "baseline": {
+          "time": 1794236233.5975714,
+          "total_bytes": 130596188160,
+          "available_bytes": 127218909184,
+          "swap_used_bytes": 376692736,
+          "pswpin": 359672,
+          "pswpout": 2908801,
+          "oom_kill": 0
+        },
+        "after": {
+          "time": 1794236238.3698287,
+          "total_bytes": 130596188160,
+          "available_bytes": 125228081152,
+          "swap_used_bytes": 376573952,
+          "pswpin": 359701,
+          "pswpout": 2908801,
+          "oom_kill": 0
+        },
+        "min_available_bytes": 125228081152,
+        "peak_memory_used_bytes": 5368107008,
+        "swap_in_pages": 29,
+        "swap_out_pages": 0,
+        "sample_interval_ms": 100
+      },
+      "resident_memavailable_drop_bytes": 1990828032,
+      "ended_at": 1794236241.704211
     }
   ],
   "workloads": {
@@ -8475,144 +8765,144 @@
     "Q4_K_XL": {
       "quant": "Q4_K_XL",
       "flux_encoder": "fp8",
-      "started_at": 1794189387.2023857,
-      "status": "warmup_failed",
+      "started_at": 1794234564.877826,
+      "status": "failed",
       "passed": false,
       "runs": [
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_warmup_1_1794189474",
+          "run_id": "qual_Q4_K_XL_S1_warmup_1_1794234674",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 39.670081274998665,
+          "seconds": 39.679359178000595,
           "memory": {
             "baseline": {
-              "time": 1794189475.0911012,
+              "time": 1794234674.82298,
               "total_bytes": 130596188160,
-              "available_bytes": 18001616896,
-              "swap_used_bytes": 3161079808,
-              "pswpin": 222066,
-              "pswpout": 2264754,
+              "available_bytes": 17953009664,
+              "swap_used_bytes": 1048190976,
+              "pswpin": 302658,
+              "pswpout": 2426919,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794189514.6404915,
+              "time": 1794234714.3825536,
               "total_bytes": 130596188160,
-              "available_bytes": 16365805568,
-              "swap_used_bytes": 3093905408,
-              "pswpin": 256867,
-              "pswpout": 2264754,
+              "available_bytes": 18132336640,
+              "swap_used_bytes": 3157831680,
+              "pswpin": 323092,
+              "pswpout": 2908801,
               "oom_kill": 0
             },
-            "min_available_bytes": 12065701888,
-            "peak_memory_used_bytes": 118530486272,
-            "swap_in_pages": 34801,
-            "swap_out_pages": 0,
+            "min_available_bytes": 13803073536,
+            "peak_memory_used_bytes": 116793114624,
+            "swap_in_pages": 20434,
+            "swap_out_pages": 481882,
             "sample_interval_ms": 100
           },
           "rehearsed_plan": false,
           "tool_seconds": [
             {
               "tool": "list_files",
-              "seconds": 0.00021960099911666475,
+              "seconds": 0.00010404699423816055,
               "status": "complete"
             },
             {
               "tool": "read_file",
-              "seconds": 0.0004097929995623417,
+              "seconds": 0.00027009399491362274,
               "status": "complete"
             },
             {
               "tool": "build_deck",
-              "seconds": 19.718230160997336,
+              "seconds": 20.832071422002628,
               "status": "complete"
             },
             {
               "tool": "generate_image",
-              "seconds": 11.296665969999594,
+              "seconds": 14.54916746300296,
               "status": "complete"
             },
             {
               "tool": "draft_email",
-              "seconds": 0.0002544800008763559,
+              "seconds": 0.00016257599054370075,
               "status": "complete"
             },
             {
               "tool": "translate",
-              "seconds": 11.860454042001948,
+              "seconds": 9.860424955011695,
               "status": "complete"
             }
           ],
-          "output_tokens": 1602,
-          "aggregate_output_tokens_per_second": 40.383078342963486,
+          "output_tokens": 1537,
+          "aggregate_output_tokens_per_second": 38.735504600894814,
           "lanes_resident": true
         },
         {
           "segment": "S2",
-          "run_id": "qual_Q4_K_XL_S2_warmup_1_1794189514",
+          "run_id": "qual_Q4_K_XL_S2_warmup_1_1794234714",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 6.241160827001295,
+          "seconds": 6.28798108099727,
           "memory": {
             "baseline": {
-              "time": 1794189514.8685968,
+              "time": 1794234714.6187882,
               "total_bytes": 130596188160,
-              "available_bytes": 16359145472,
-              "swap_used_bytes": 3093852160,
-              "pswpin": 256949,
-              "pswpout": 2264754,
+              "available_bytes": 18130919424,
+              "swap_used_bytes": 3157729280,
+              "pswpin": 323266,
+              "pswpout": 2908801,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794189520.9888072,
+              "time": 1794234720.7813382,
               "total_bytes": 130596188160,
-              "available_bytes": 15838969856,
-              "swap_used_bytes": 3092807680,
-              "pswpin": 257846,
-              "pswpout": 2264754,
+              "available_bytes": 17620754432,
+              "swap_used_bytes": 3154825216,
+              "pswpin": 324134,
+              "pswpout": 2908801,
               "oom_kill": 0
             },
-            "min_available_bytes": 15838969856,
-            "peak_memory_used_bytes": 114757218304,
-            "swap_in_pages": 897,
+            "min_available_bytes": 17620754432,
+            "peak_memory_used_bytes": 112975433728,
+            "swap_in_pages": 868,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
           },
           "output_tokens": 234,
-          "aggregate_output_tokens_per_second": 37.49302517372085,
+          "aggregate_output_tokens_per_second": 37.213852425091545,
           "lanes_resident": true
         },
         {
           "segment": "S3",
-          "run_id": "qual_Q4_K_XL_S3_warmup_1_1794189521",
+          "run_id": "qual_Q4_K_XL_S3_warmup_1_1794234720",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 43.28733787500096,
+          "seconds": 42.924191005004104,
           "memory": {
             "baseline": {
-              "time": 1794189521.2205925,
+              "time": 1794234720.996443,
               "total_bytes": 130596188160,
-              "available_bytes": 15838220288,
-              "swap_used_bytes": 3092762624,
-              "pswpin": 257893,
-              "pswpout": 2264754,
+              "available_bytes": 17624555520,
+              "swap_used_bytes": 3154735104,
+              "pswpin": 324201,
+              "pswpout": 2908801,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794189564.384208,
+              "time": 1794234763.7996166,
               "total_bytes": 130596188160,
-              "available_bytes": 15194013696,
-              "swap_used_bytes": 3091836928,
-              "pswpin": 265966,
-              "pswpout": 2264754,
+              "available_bytes": 17214324736,
+              "swap_used_bytes": 3150389248,
+              "pswpin": 333044,
+              "pswpout": 2908801,
               "oom_kill": 0
             },
-            "min_available_bytes": 11113951232,
-            "peak_memory_used_bytes": 119482236928,
-            "swap_in_pages": 8073,
+            "min_available_bytes": 12610605056,
+            "peak_memory_used_bytes": 117985583104,
+            "swap_in_pages": 8843,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
           },
@@ -8620,127 +8910,951 @@
             "risks": {
               "name": "risks",
               "status": "complete",
-              "seconds": 21.009287582997786
+              "seconds": 19.266935521998676
             },
             "app": {
               "name": "app",
               "status": "complete",
-              "seconds": 36.9083241920016
+              "seconds": 36.60069605699391
             },
             "images": {
               "name": "images",
               "status": "complete",
-              "seconds": 22.762816434998967
+              "seconds": 22.133580138004618
             },
             "chart": {
               "name": "chart",
               "status": "complete",
-              "seconds": 21.05165101899911
+              "seconds": 20.61622277299466
             },
             "translation": {
               "name": "translation",
               "status": "complete",
-              "seconds": 43.112954836000426
+              "seconds": 42.75365944899386
             },
             "summary": {
               "name": "summary",
               "status": "complete",
-              "seconds": 23.299723762000212
+              "seconds": 22.74628547701286
             }
           },
-          "output_tokens": 2537,
-          "aggregate_output_tokens_per_second": 58.60836273475604,
+          "output_tokens": 2518,
+          "aggregate_output_tokens_per_second": 58.66155985808682,
           "lanes_resident": true
         },
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_warmup_2_1794189564",
+          "run_id": "qual_Q4_K_XL_S1_warmup_2_1794234763",
           "purpose": "warmup",
           "audio": false,
-          "status": "failed",
-          "seconds": 17.048120340001333,
-          "error": "ExceptionGroup",
+          "status": "complete",
+          "seconds": 36.00499523698818,
           "memory": {
             "baseline": {
-              "time": 1794189564.6028197,
+              "time": 1794234764.012427,
               "total_bytes": 130596188160,
-              "available_bytes": 15191461888,
-              "swap_used_bytes": 3091800064,
-              "pswpin": 265982,
-              "pswpout": 2264754,
+              "available_bytes": 17209171968,
+              "swap_used_bytes": 3150352384,
+              "pswpin": 333069,
+              "pswpout": 2908801,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794189581.5297484,
+              "time": 1794234799.8993952,
               "total_bytes": 130596188160,
-              "available_bytes": 11910361088,
-              "swap_used_bytes": 3091435520,
-              "pswpin": 266441,
-              "pswpout": 2264754,
+              "available_bytes": 17184763904,
+              "swap_used_bytes": 3147980800,
+              "pswpin": 333841,
+              "pswpout": 2908801,
               "oom_kill": 0
             },
-            "min_available_bytes": 11910361088,
-            "peak_memory_used_bytes": 118685827072,
-            "swap_in_pages": 459,
+            "min_available_bytes": 12838404096,
+            "peak_memory_used_bytes": 117757784064,
+            "swap_in_pages": 772,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
-          }
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 8.73120006872341e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 7.119998917914927e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 17.4838202779938,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 8.004835258005187,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00014451199967879802,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 9.772952782994253,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1531,
+          "aggregate_output_tokens_per_second": 42.5218775873408,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S2",
+          "run_id": "qual_Q4_K_XL_S2_warmup_2_1794234799",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 6.0771672209957615,
+          "memory": {
+            "baseline": {
+              "time": 1794234800.1143024,
+              "total_bytes": 130596188160,
+              "available_bytes": 17183797248,
+              "swap_used_bytes": 3147980800,
+              "pswpin": 333841,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794234806.0696633,
+              "total_bytes": 130596188160,
+              "available_bytes": 17120727040,
+              "swap_used_bytes": 3147849728,
+              "pswpin": 333873,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 17119477760,
+            "peak_memory_used_bytes": 113476710400,
+            "swap_in_pages": 32,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "output_tokens": 234,
+          "aggregate_output_tokens_per_second": 38.50478216093228,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_warmup_2_1794234806",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 43.86816434698994,
+          "memory": {
+            "baseline": {
+              "time": 1794234806.295125,
+              "total_bytes": 130596188160,
+              "available_bytes": 17119993856,
+              "swap_used_bytes": 3147849728,
+              "pswpin": 333873,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794234850.0394726,
+              "total_bytes": 130596188160,
+              "available_bytes": 17087307776,
+              "swap_used_bytes": 3147624448,
+              "pswpin": 334021,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12796821504,
+            "peak_memory_used_bytes": 117799366656,
+            "swap_in_pages": 148,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 19.37442891098908
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 43.73046535901085
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 22.338673564998317
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 20.611814446005155
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 43.622382362009375
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 22.780885763000697
+            }
+          },
+          "output_tokens": 2879,
+          "aggregate_output_tokens_per_second": 65.62845842437319,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_1_1794234850",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 36.34518681099871,
+          "memory": {
+            "baseline": {
+              "time": 1794234850.2574453,
+              "total_bytes": 130596188160,
+              "available_bytes": 17084317696,
+              "swap_used_bytes": 3147608064,
+              "pswpin": 334022,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794234886.475886,
+              "total_bytes": 130596188160,
+              "available_bytes": 17143562240,
+              "swap_used_bytes": 3147460608,
+              "pswpin": 334088,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12800765952,
+            "peak_memory_used_bytes": 117795422208,
+            "swap_in_pages": 66,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 9.033600508701056e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 7.624000136274844e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 17.57166359599796,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 8.324546917996486,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00013820700405631214,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 9.873665710998466,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1531,
+          "aggregate_output_tokens_per_second": 42.12387208136984,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_2_1794234886",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 38.55926662198908,
+          "memory": {
+            "baseline": {
+              "time": 1794234886.6878178,
+              "total_bytes": 130596188160,
+              "available_bytes": 17151709184,
+              "swap_used_bytes": 3147460608,
+              "pswpin": 334088,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794234925.1255994,
+              "total_bytes": 130596188160,
+              "available_bytes": 17166024704,
+              "swap_used_bytes": 3147243520,
+              "pswpin": 334385,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12822855680,
+            "peak_memory_used_bytes": 117773332480,
+            "swap_in_pages": 297,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 0.00014118400576990098,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 0.00012312000035308301,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 20.321680630993797,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 8.326360901992302,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.000305854991893284,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 13.506236861998332,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1682,
+          "aggregate_output_tokens_per_second": 43.62116158715557,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_3_1794234925",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 37.63113345199963,
+          "memory": {
+            "baseline": {
+              "time": 1794234925.350094,
+              "total_bytes": 130596188160,
+              "available_bytes": 17166102528,
+              "swap_used_bytes": 3147235328,
+              "pswpin": 334385,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794234962.8534367,
+              "total_bytes": 130596188160,
+              "available_bytes": 17115254784,
+              "swap_used_bytes": 3138584576,
+              "pswpin": 339239,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12814704640,
+            "peak_memory_used_bytes": 117781483520,
+            "swap_in_pages": 4854,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 9.113601117860526e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 7.260701386258006e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 19.579074669993133,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 8.149095276996377,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.0005198709986871108,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 13.13364404499589,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1659,
+          "aggregate_output_tokens_per_second": 44.085836588370015,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_4_1794234962",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 37.44871942800819,
+          "memory": {
+            "baseline": {
+              "time": 1794234963.075471,
+              "total_bytes": 130596188160,
+              "available_bytes": 17114800128,
+              "swap_used_bytes": 3138580480,
+              "pswpin": 339243,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794235000.4029999,
+              "total_bytes": 130596188160,
+              "available_bytes": 17088741376,
+              "swap_used_bytes": 3137208320,
+              "pswpin": 339607,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12769046528,
+            "peak_memory_used_bytes": 117827141632,
+            "swap_in_pages": 364,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 0.00013931200373917818,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 0.00021249499695841223,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 19.439956454007188,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 8.201598367988481,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00028939099865965545,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 13.156518185991445,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1659,
+          "aggregate_output_tokens_per_second": 44.300580242517476,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_5_1794235000",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 37.36125028999231,
+          "memory": {
+            "baseline": {
+              "time": 1794235000.628235,
+              "total_bytes": 130596188160,
+              "available_bytes": 17088753664,
+              "swap_used_bytes": 3137204224,
+              "pswpin": 339611,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794235037.8663666,
+              "total_bytes": 130596188160,
+              "available_bytes": 17088237568,
+              "swap_used_bytes": 3136851968,
+              "pswpin": 339707,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12751335424,
+            "peak_memory_used_bytes": 117844852736,
+            "swap_in_pages": 96,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 8.307199459522963e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 7.417600136250257e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 19.501835846007452,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 8.195808253003634,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00017331101116724312,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 13.20390780598973,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1659,
+          "aggregate_output_tokens_per_second": 44.404295550151446,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_1_1794235037",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 44.666295153001556,
+          "memory": {
+            "baseline": {
+              "time": 1794235038.1007264,
+              "total_bytes": 130596188160,
+              "available_bytes": 17088278528,
+              "swap_used_bytes": 3136847872,
+              "pswpin": 339707,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794235082.6420767,
+              "total_bytes": 130596188160,
+              "available_bytes": 16960921600,
+              "swap_used_bytes": 3136618496,
+              "pswpin": 339786,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12707946496,
+            "peak_memory_used_bytes": 117888241664,
+            "swap_in_pages": 79,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 19.759448997996515
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 44.52741359900392
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 22.511052996997023
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 20.488812552997842
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 43.81572566898831
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 22.38800271898799
+            }
+          },
+          "output_tokens": 2894,
+          "aggregate_output_tokens_per_second": 64.79158367818032,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_2_1794235082",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 44.571039336005924,
+          "memory": {
+            "baseline": {
+              "time": 1794235082.883393,
+              "total_bytes": 130596188160,
+              "available_bytes": 16959913984,
+              "swap_used_bytes": 3136610304,
+              "pswpin": 339794,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794235127.332042,
+              "total_bytes": 130596188160,
+              "available_bytes": 16877281280,
+              "swap_used_bytes": 3136471040,
+              "pswpin": 339865,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12629938176,
+            "peak_memory_used_bytes": 117966249984,
+            "swap_in_pages": 71,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 18.52195307899092
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 44.43405860799248
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 21.789430585005903
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 19.97402157599572
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 44.054979838008876
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 22.260035334998975
+            }
+          },
+          "output_tokens": 2968,
+          "aggregate_output_tokens_per_second": 66.59032511279928,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_3_1794235127",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 43.47978821999277,
+          "memory": {
+            "baseline": {
+              "time": 1794235127.5558052,
+              "total_bytes": 130596188160,
+              "available_bytes": 16872562688,
+              "swap_used_bytes": 3136471040,
+              "pswpin": 339865,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794235170.913238,
+              "total_bytes": 130596188160,
+              "available_bytes": 16883810304,
+              "swap_used_bytes": 3136086016,
+              "pswpin": 339995,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12430729216,
+            "peak_memory_used_bytes": 118165458944,
+            "swap_in_pages": 130,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 18.463698491992545
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 43.34331022900005
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 21.795378601003904
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 20.000522943999385
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 42.852841258994886
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 21.769756876994506
+            }
+          },
+          "output_tokens": 2881,
+          "aggregate_output_tokens_per_second": 66.26067232487728,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_4_1794235171",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 44.291865814011544,
+          "memory": {
+            "baseline": {
+              "time": 1794235171.164073,
+              "total_bytes": 130596188160,
+              "available_bytes": 16885702656,
+              "swap_used_bytes": 3136086016,
+              "pswpin": 339995,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794235215.3322587,
+              "total_bytes": 130596188160,
+              "available_bytes": 16864677888,
+              "swap_used_bytes": 3135426560,
+              "pswpin": 340170,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12487462912,
+            "peak_memory_used_bytes": 118108725248,
+            "swap_in_pages": 175,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 18.457900047011208
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 44.15381120600796
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 21.879279394008336
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 20.00257090300147
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 43.784279687999515
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 22.280376022012206
+            }
+          },
+          "output_tokens": 2968,
+          "aggregate_output_tokens_per_second": 67.01004677615288,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_5_1794235215",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 43.28940566700476,
+          "memory": {
+            "baseline": {
+              "time": 1794235215.5945532,
+              "total_bytes": 130596188160,
+              "available_bytes": 16864722944,
+              "swap_used_bytes": 3135414272,
+              "pswpin": 340178,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794235258.7584958,
+              "total_bytes": 130596188160,
+              "available_bytes": 16868892672,
+              "swap_used_bytes": 3135160320,
+              "pswpin": 340257,
+              "pswpout": 2908801,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12536217600,
+            "peak_memory_used_bytes": 118059970560,
+            "swap_in_pages": 79,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 18.557186309990357
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 42.64903032699658
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 21.78952363198914
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 19.791171841992764
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 43.1134567400004
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 22.24851000700437
+            }
+          },
+          "output_tokens": 2853,
+          "aggregate_output_tokens_per_second": 65.90527072480832,
+          "lanes_resident": true
         }
       ],
       "loads": [
         {
           "lane": "image",
-          "seconds": 10.420558712001366,
+          "seconds": 20.412299761010217,
           "memory": {
             "baseline": {
-              "time": 1794189387.2331858,
+              "time": 1794234564.9064596,
               "total_bytes": 130596188160,
-              "available_bytes": 127454195712,
-              "swap_used_bytes": 396775424,
-              "pswpin": 208990,
-              "pswpout": 1635467,
+              "available_bytes": 127195832320,
+              "swap_used_bytes": 369664000,
+              "pswpin": 298110,
+              "pswpout": 2264754,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794189397.6549764,
+              "time": 1794234585.32025,
               "total_bytes": 130596188160,
-              "available_bytes": 109269921792,
-              "swap_used_bytes": 396771328,
-              "pswpin": 208990,
-              "pswpout": 1635467,
+              "available_bytes": 111104040960,
+              "swap_used_bytes": 369631232,
+              "pswpin": 298120,
+              "pswpout": 2264754,
               "oom_kill": 0
             },
-            "min_available_bytes": 107462721536,
-            "peak_memory_used_bytes": 23133466624,
-            "swap_in_pages": 0,
+            "min_available_bytes": 108284334080,
+            "peak_memory_used_bytes": 22311854080,
+            "swap_in_pages": 10,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
           }
         },
         {
           "lane": "tts",
-          "seconds": 5.405126802997984,
+          "seconds": 5.405896993004717,
           "memory": {
             "baseline": {
-              "time": 1794189397.6623433,
+              "time": 1794234585.3277016,
               "total_bytes": 130596188160,
-              "available_bytes": 109265719296,
-              "swap_used_bytes": 396771328,
-              "pswpin": 208990,
-              "pswpout": 1635467,
+              "available_bytes": 111100403712,
+              "swap_used_bytes": 369631232,
+              "pswpin": 298120,
+              "pswpout": 2264754,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794189403.0683663,
+              "time": 1794234590.734575,
               "total_bytes": 130596188160,
-              "available_bytes": 105603067904,
-              "swap_used_bytes": 396771328,
-              "pswpin": 208990,
-              "pswpout": 1635467,
+              "available_bytes": 108223447040,
+              "swap_used_bytes": 369631232,
+              "pswpin": 298120,
+              "pswpout": 2264754,
               "oom_kill": 0
             },
-            "min_available_bytes": 105603067904,
-            "peak_memory_used_bytes": 24993120256,
+            "min_available_bytes": 108223447040,
+            "peak_memory_used_bytes": 22372741120,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -8748,28 +9862,28 @@
         },
         {
           "lane": "text",
-          "seconds": 3.356674478000059,
+          "seconds": 22.860653226001887,
           "memory": {
             "baseline": {
-              "time": 1794189403.0751538,
+              "time": 1794234590.7415743,
               "total_bytes": 130596188160,
-              "available_bytes": 105603067904,
-              "swap_used_bytes": 396771328,
-              "pswpin": 208990,
-              "pswpout": 1635467,
+              "available_bytes": 108223447040,
+              "swap_used_bytes": 369631232,
+              "pswpin": 298120,
+              "pswpout": 2264754,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794189406.4326403,
+              "time": 1794234613.6028712,
               "total_bytes": 130596188160,
-              "available_bytes": 81951068160,
-              "swap_used_bytes": 396771328,
-              "pswpin": 208990,
-              "pswpout": 1635467,
+              "available_bytes": 82673938432,
+              "swap_used_bytes": 369623040,
+              "pswpin": 298120,
+              "pswpout": 2264754,
               "oom_kill": 0
             },
-            "min_available_bytes": 81951068160,
-            "peak_memory_used_bytes": 48645120000,
+            "min_available_bytes": 82669731840,
+            "peak_memory_used_bytes": 47926456320,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -8777,64 +9891,64 @@
         },
         {
           "lane": "lead",
-          "seconds": 62.90182260000074,
+          "seconds": 55.45856790999824,
           "memory": {
             "baseline": {
-              "time": 1794189406.4392674,
+              "time": 1794234613.609845,
               "total_bytes": 130596188160,
-              "available_bytes": 81948930048,
-              "swap_used_bytes": 396771328,
-              "pswpin": 208990,
-              "pswpout": 1635467,
-              "oom_kill": 0
-            },
-            "after": {
-              "time": 1794189469.349801,
-              "total_bytes": 130596188160,
-              "available_bytes": 18066915328,
-              "swap_used_bytes": 3162357760,
-              "pswpin": 219363,
+              "available_bytes": 82673938432,
+              "swap_used_bytes": 369623040,
+              "pswpin": 298120,
               "pswpout": 2264754,
               "oom_kill": 0
             },
-            "min_available_bytes": 18066915328,
-            "peak_memory_used_bytes": 112529272832,
-            "swap_in_pages": 10373,
-            "swap_out_pages": 629287,
+            "after": {
+              "time": 1794234669.0780165,
+              "total_bytes": 130596188160,
+              "available_bytes": 17313267712,
+              "swap_used_bytes": 731475968,
+              "pswpin": 299757,
+              "pswpout": 2353566,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 17005965312,
+            "peak_memory_used_bytes": 113590222848,
+            "swap_in_pages": 1637,
+            "swap_out_pages": 88812,
             "sample_interval_ms": 100
           }
         },
         {
           "lane": "gateway",
-          "seconds": 5.491013024002314,
+          "seconds": 5.503407747994061,
           "memory": {
             "baseline": {
-              "time": 1794189469.3659112,
+              "time": 1794234669.0914376,
               "total_bytes": 130596188160,
-              "available_bytes": 18069508096,
-              "swap_used_bytes": 3161403392,
-              "pswpin": 219853,
-              "pswpout": 2264754,
+              "available_bytes": 17322360832,
+              "swap_used_bytes": 739835904,
+              "pswpin": 299880,
+              "pswpout": 2355584,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794189474.8608072,
+              "time": 1794234674.599217,
               "total_bytes": 130596188160,
-              "available_bytes": 18001846272,
-              "swap_used_bytes": 3161309184,
-              "pswpin": 220080,
-              "pswpout": 2264754,
+              "available_bytes": 17969332224,
+              "swap_used_bytes": 1048367104,
+              "pswpin": 300774,
+              "pswpout": 2426919,
               "oom_kill": 0
             },
-            "min_available_bytes": 18001846272,
-            "peak_memory_used_bytes": 112594341888,
-            "swap_in_pages": 227,
-            "swap_out_pages": 0,
+            "min_available_bytes": 17322360832,
+            "peak_memory_used_bytes": 113273827328,
+            "swap_in_pages": 894,
+            "swap_out_pages": 71335,
             "sample_interval_ms": 100
           }
         }
       ],
-      "predicted_memavailable_bytes": 15993348096,
+      "predicted_memavailable_bytes": 15734984704,
       "isolated_inputs": [
         {
           "lane": "lead",
@@ -8858,48 +9972,46 @@
         }
       ],
       "resident_memory": {
-        "time": 1794189474.888239,
+        "time": 1794234674.6292589,
         "total_bytes": 130596188160,
-        "available_bytes": 18001846272,
-        "swap_used_bytes": 3161292800,
-        "pswpin": 220886,
-        "pswpout": 2264754,
+        "available_bytes": 17961603072,
+        "swap_used_bytes": 1048367104,
+        "pswpin": 301548,
+        "pswpout": 2426919,
         "oom_kill": 0
       },
       "memory": {
         "baseline": {
-          "time": 1794189474.8945084,
+          "time": 1794234674.6359541,
           "total_bytes": 130596188160,
-          "available_bytes": 18001846272,
-          "swap_used_bytes": 3161292800,
-          "pswpin": 220886,
-          "pswpout": 2264754,
+          "available_bytes": 17961119744,
+          "swap_used_bytes": 1048367104,
+          "pswpin": 301548,
+          "pswpout": 2426919,
           "oom_kill": 0
         },
         "after": {
-          "time": 1794189581.4840088,
+          "time": 1794235258.8540242,
           "total_bytes": 130596188160,
-          "available_bytes": 11910094848,
-          "swap_used_bytes": 3091435520,
-          "pswpin": 266441,
-          "pswpout": 2264754,
+          "available_bytes": 16868605952,
+          "swap_used_bytes": 3135160320,
+          "pswpin": 340257,
+          "pswpout": 2908801,
           "oom_kill": 0
         },
-        "min_available_bytes": 11113951232,
-        "peak_memory_used_bytes": 119482236928,
-        "swap_in_pages": 45555,
-        "swap_out_pages": 0,
+        "min_available_bytes": 12430729216,
+        "peak_memory_used_bytes": 118165458944,
+        "swap_in_pages": 38709,
+        "swap_out_pages": 481882,
         "sample_interval_ms": 100
       },
+      "agent_p95_seconds": 38.37363998799119,
+      "rush_max_seconds": 44.666295153001556,
+      "ended_at": 1794235258.8552468,
       "failure": {
-        "component": "FLUX text encoder",
-        "segment": "S1 second warm-up",
-        "type": "PyTorch allocator OOM",
-        "requested_allocation_mib": 742,
-        "allocator_limit_gib": 15.1,
-        "allocated_before_failure_gib": 14.9,
-        "memavailable_at_failure_gib": 11.092388153076172,
-        "kernel_oom_kill_delta": 0
+        "type": "global_swap_input",
+        "allocator_fix_verified": true,
+        "reason": "All five Agent and five Rush runs completed without allocator OOM, but every measured Rush had nonzero global swap input."
       }
     }
   },
@@ -10892,6 +12004,436 @@
       "agent_p95_seconds": 45.06888943419981,
       "rush_max_seconds": 34.872099995998724,
       "ended_at": 1794188738.9837012
+    },
+    {
+      "quant": "Q4_K_XL",
+      "flux_encoder": "fp8",
+      "started_at": 1794189387.2023857,
+      "status": "warmup_failed",
+      "passed": false,
+      "runs": [
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_warmup_1_1794189474",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 39.670081274998665,
+          "memory": {
+            "baseline": {
+              "time": 1794189475.0911012,
+              "total_bytes": 130596188160,
+              "available_bytes": 18001616896,
+              "swap_used_bytes": 3161079808,
+              "pswpin": 222066,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189514.6404915,
+              "total_bytes": 130596188160,
+              "available_bytes": 16365805568,
+              "swap_used_bytes": 3093905408,
+              "pswpin": 256867,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 12065701888,
+            "peak_memory_used_bytes": 118530486272,
+            "swap_in_pages": 34801,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 0.00021960099911666475,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 0.0004097929995623417,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 19.718230160997336,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 11.296665969999594,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.0002544800008763559,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 11.860454042001948,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1602,
+          "aggregate_output_tokens_per_second": 40.383078342963486,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S2",
+          "run_id": "qual_Q4_K_XL_S2_warmup_1_1794189514",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 6.241160827001295,
+          "memory": {
+            "baseline": {
+              "time": 1794189514.8685968,
+              "total_bytes": 130596188160,
+              "available_bytes": 16359145472,
+              "swap_used_bytes": 3093852160,
+              "pswpin": 256949,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189520.9888072,
+              "total_bytes": 130596188160,
+              "available_bytes": 15838969856,
+              "swap_used_bytes": 3092807680,
+              "pswpin": 257846,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 15838969856,
+            "peak_memory_used_bytes": 114757218304,
+            "swap_in_pages": 897,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "output_tokens": 234,
+          "aggregate_output_tokens_per_second": 37.49302517372085,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_warmup_1_1794189521",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 43.28733787500096,
+          "memory": {
+            "baseline": {
+              "time": 1794189521.2205925,
+              "total_bytes": 130596188160,
+              "available_bytes": 15838220288,
+              "swap_used_bytes": 3092762624,
+              "pswpin": 257893,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189564.384208,
+              "total_bytes": 130596188160,
+              "available_bytes": 15194013696,
+              "swap_used_bytes": 3091836928,
+              "pswpin": 265966,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11113951232,
+            "peak_memory_used_bytes": 119482236928,
+            "swap_in_pages": 8073,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 21.009287582997786
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 36.9083241920016
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 22.762816434998967
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 21.05165101899911
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 43.112954836000426
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 23.299723762000212
+            }
+          },
+          "output_tokens": 2537,
+          "aggregate_output_tokens_per_second": 58.60836273475604,
+          "lanes_resident": true
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_warmup_2_1794189564",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "failed",
+          "seconds": 17.048120340001333,
+          "error": "ExceptionGroup",
+          "memory": {
+            "baseline": {
+              "time": 1794189564.6028197,
+              "total_bytes": 130596188160,
+              "available_bytes": 15191461888,
+              "swap_used_bytes": 3091800064,
+              "pswpin": 265982,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189581.5297484,
+              "total_bytes": 130596188160,
+              "available_bytes": 11910361088,
+              "swap_used_bytes": 3091435520,
+              "pswpin": 266441,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11910361088,
+            "peak_memory_used_bytes": 118685827072,
+            "swap_in_pages": 459,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        }
+      ],
+      "loads": [
+        {
+          "lane": "image",
+          "seconds": 10.420558712001366,
+          "memory": {
+            "baseline": {
+              "time": 1794189387.2331858,
+              "total_bytes": 130596188160,
+              "available_bytes": 127454195712,
+              "swap_used_bytes": 396775424,
+              "pswpin": 208990,
+              "pswpout": 1635467,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189397.6549764,
+              "total_bytes": 130596188160,
+              "available_bytes": 109269921792,
+              "swap_used_bytes": 396771328,
+              "pswpin": 208990,
+              "pswpout": 1635467,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 107462721536,
+            "peak_memory_used_bytes": 23133466624,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "lane": "tts",
+          "seconds": 5.405126802997984,
+          "memory": {
+            "baseline": {
+              "time": 1794189397.6623433,
+              "total_bytes": 130596188160,
+              "available_bytes": 109265719296,
+              "swap_used_bytes": 396771328,
+              "pswpin": 208990,
+              "pswpout": 1635467,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189403.0683663,
+              "total_bytes": 130596188160,
+              "available_bytes": 105603067904,
+              "swap_used_bytes": 396771328,
+              "pswpin": 208990,
+              "pswpout": 1635467,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 105603067904,
+            "peak_memory_used_bytes": 24993120256,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "lane": "text",
+          "seconds": 3.356674478000059,
+          "memory": {
+            "baseline": {
+              "time": 1794189403.0751538,
+              "total_bytes": 130596188160,
+              "available_bytes": 105603067904,
+              "swap_used_bytes": 396771328,
+              "pswpin": 208990,
+              "pswpout": 1635467,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189406.4326403,
+              "total_bytes": 130596188160,
+              "available_bytes": 81951068160,
+              "swap_used_bytes": 396771328,
+              "pswpin": 208990,
+              "pswpout": 1635467,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 81951068160,
+            "peak_memory_used_bytes": 48645120000,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "lane": "lead",
+          "seconds": 62.90182260000074,
+          "memory": {
+            "baseline": {
+              "time": 1794189406.4392674,
+              "total_bytes": 130596188160,
+              "available_bytes": 81948930048,
+              "swap_used_bytes": 396771328,
+              "pswpin": 208990,
+              "pswpout": 1635467,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189469.349801,
+              "total_bytes": 130596188160,
+              "available_bytes": 18066915328,
+              "swap_used_bytes": 3162357760,
+              "pswpin": 219363,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 18066915328,
+            "peak_memory_used_bytes": 112529272832,
+            "swap_in_pages": 10373,
+            "swap_out_pages": 629287,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "lane": "gateway",
+          "seconds": 5.491013024002314,
+          "memory": {
+            "baseline": {
+              "time": 1794189469.3659112,
+              "total_bytes": 130596188160,
+              "available_bytes": 18069508096,
+              "swap_used_bytes": 3161403392,
+              "pswpin": 219853,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794189474.8608072,
+              "total_bytes": 130596188160,
+              "available_bytes": 18001846272,
+              "swap_used_bytes": 3161309184,
+              "pswpin": 220080,
+              "pswpout": 2264754,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 18001846272,
+            "peak_memory_used_bytes": 112594341888,
+            "swap_in_pages": 227,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        }
+      ],
+      "predicted_memavailable_bytes": 15993348096,
+      "isolated_inputs": [
+        {
+          "lane": "lead",
+          "started_at": 1794189221.652056,
+          "resident_memavailable_drop_bytes": 66215100416
+        },
+        {
+          "lane": "text",
+          "started_at": 1794189323.5640638,
+          "resident_memavailable_drop_bytes": 25916542976
+        },
+        {
+          "lane": "image",
+          "started_at": 1794187556.005269,
+          "resident_memavailable_drop_bytes": 15546241024
+        },
+        {
+          "lane": "voice",
+          "started_at": 1794185028.264688,
+          "resident_memavailable_drop_bytes": 3782963200
+        }
+      ],
+      "resident_memory": {
+        "time": 1794189474.888239,
+        "total_bytes": 130596188160,
+        "available_bytes": 18001846272,
+        "swap_used_bytes": 3161292800,
+        "pswpin": 220886,
+        "pswpout": 2264754,
+        "oom_kill": 0
+      },
+      "memory": {
+        "baseline": {
+          "time": 1794189474.8945084,
+          "total_bytes": 130596188160,
+          "available_bytes": 18001846272,
+          "swap_used_bytes": 3161292800,
+          "pswpin": 220886,
+          "pswpout": 2264754,
+          "oom_kill": 0
+        },
+        "after": {
+          "time": 1794189581.4840088,
+          "total_bytes": 130596188160,
+          "available_bytes": 11910094848,
+          "swap_used_bytes": 3091435520,
+          "pswpin": 266441,
+          "pswpout": 2264754,
+          "oom_kill": 0
+        },
+        "min_available_bytes": 11113951232,
+        "peak_memory_used_bytes": 119482236928,
+        "swap_in_pages": 45555,
+        "swap_out_pages": 0,
+        "sample_interval_ms": 100
+      },
+      "failure": {
+        "component": "FLUX text encoder",
+        "segment": "S1 second warm-up",
+        "type": "PyTorch allocator OOM",
+        "requested_allocation_mib": 742,
+        "allocator_limit_gib": 15.1,
+        "allocated_before_failure_gib": 14.9,
+        "memavailable_at_failure_gib": 11.092388153076172,
+        "kernel_oom_kill_delta": 0
+      }
     }
   ]
 }
