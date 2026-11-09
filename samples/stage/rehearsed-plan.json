@@ -1,0 +1,11 @@
+{
+  "steps": [
+    {"tool": "list_files", "label": "Find the account notes"},
+    {"tool": "read_file", "label": "Read the four fictional files"},
+    {"tool": "build_deck", "label": "Build the five slide briefing"},
+    {"tool": "draft_email", "label": "Prepare the English draft"},
+    {"tool": "translate", "label": "Create the Spanish version"},
+    {"tool": "generate_image", "label": "Generate the cover illustration"}
+  ],
+  "deliverables": ["deck", "email_en", "email_es", "image"]
+}

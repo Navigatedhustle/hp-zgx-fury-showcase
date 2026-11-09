@@ -1,0 +1,16 @@
+FICTIONAL DEMONSTRATION DATA
+Source date: 2026-11-08
+
+Northwind Regional Health is an invented organization. All people and plans in
+this folder are invented. No patient, employee or real customer records appear.
+
+The next meeting is with Mara Vale, the fictional CIO, and Theo Rowan, the
+fictional infrastructure lead. They want to evaluate a desktop AI workstation
+for an internal planning team. Start with a bounded pilot using synthetic notes
+and public reference material. Keep the briefing practical and avoid promises
+about legal or regulatory outcomes.
+
+Propose a pilot owner, agree on success measures, and schedule a technical
+workshop. Ask which workflows should run without internet access. The meeting
+should end with a short list of agreed next actions, rather than a purchase
+commitment. Do not imply that a pilot or commercial decision has been approved.

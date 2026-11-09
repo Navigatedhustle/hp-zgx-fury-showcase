@@ -1,0 +1,129 @@
+"""Actual six-job Nano Rush; the same jobs are used by qualification and the stage."""
+import asyncio
+import base64
+import json
+import re
+import time
+from pathlib import Path
+
+import httpx
+
+from showcase_app.gb10_agent import ACCOUNT, FILES, ROOT, image_job, object_schema
+from showcase_app.gb10_client import LEAD, WORKER, infer, json_content
+from showcase_app.gb10_miniapp import validate_app
+
+VOICE_LINE = 'Six jobs, four models, one Nano. Everything ran locally.'
+APP_PROMPT = '''Write one complete self-contained HTML ROI calculator, no external resources, links, credits or images. Use a flat navy background, white text, pale blue headings and HP blue accents. Responsive within a640 by380 pixel iframe. Keep the code concise. Include exactly these numeric inputs: hourly (dollars per hour, default75), hours (hours saved monthly, default20), cost (monthly cost, default500). Button id calculate. Visible outputs id net and id roi. net=hourly*hours-cost. roi=net/cost*100; display percent, or N/A when cost is zero. Calculate on load and on button click. Use direct arithmetic, no eval. Label the assumptions fictional, source date2026-11-08. Return JSON with one key html containing the entire file. No Markdown.'''
+
+
+class NanoRush:
+    def __init__(self, run_id, *, purpose='live', audio=False, emit=None):
+        if not re.fullmatch(r'[A-Za-z0-9_-]{1,100}', run_id):
+            raise ValueError('Invalid run identity')
+        self.run_id = run_id
+        self.purpose = purpose
+        self.audio = audio
+        self.emit = emit or (lambda event: None)
+        self.folder = ROOT / 'state/stage/outputs' / run_id / 'S3'
+        self.folder.mkdir(parents=True, exist_ok=True)
+        self.context = '\n\n'.join((ACCOUNT / name).read_text() for name in FILES)
+        self.jobs = {}
+
+    def event(self, kind, **data):
+        self.emit({'kind': kind, 'at': time.time(), **data})
+
+    async def language(self, messages, *, role, model=WORKER, tokens=1500, caller='rush', **options):
+        return await infer(messages, model=model, caller=caller, run_id=self.run_id, purpose=self.purpose,
+                           role=role, max_tokens=tokens, call_id=self.run_id + '_' + role, **options)
+
+    async def risks(self):
+        result = await self.language([{'role': 'system', 'content': 'Give exactly three short account risks grounded in these fictional notes. No new facts or legal claims.'},
+                                     {'role': 'user', 'content': self.context + '\nWhat are the top three risks for this account?'}], role='risks', model=LEAD, tokens=260)
+        if result['finish_reason'] != 'stop':
+            raise ValueError('Risk readout was incomplete')
+        (self.folder / 'risks.txt').write_text(result['content'])
+        return {'text': result['content'], 'model': result['model'], 'routing': result['routing']}
+
+    async def app(self):
+        result = await self.language([{'role': 'user', 'content': APP_PROMPT}], role='app', tokens=1900,
+            response_format={'type': 'json_schema', 'json_schema': {'name': 'roi_app', 'strict': True,
+                'schema': object_schema({'html': {'type': 'string', 'minLength': 50, 'maxLength': 65536}})}})
+        if result['finish_reason'] != 'stop':
+            raise ValueError('Generated app was incomplete')
+        source = json_content(result['content'])['html']
+        self.event('app_validating')
+        checked = await asyncio.wait_for(validate_app(source, self.folder), 18)
+        return {**checked, 'model': result['model'], 'routing': result['routing']}
+
+    async def images(self):
+        return await image_job('Original calm editorial illustration of abstract planning cards and folded blue paper landscapes, no people, no text, no logos.',
+            self.run_id, self.purpose, batch=4, width=1024, height=576, on_update=lambda job: self.event('images_progress', job=job))
+
+    async def chart(self):
+        image = base64.b64encode((ROOT / 'samples/stage/vision/chart.png').read_bytes()).decode()
+        result = await self.language([{'role': 'user', 'content': [
+            {'type': 'image_url', 'image_url': {'url': 'data:image/png;base64,' + image}},
+            {'type': 'text', 'text': 'Extract the entire chart as JSON with columns and rows. Use positional row arrays, preserve every label and numeric value, and include no other text.'}]}], role='chart', tokens=600)
+        table = json_content(result['content'])
+        from showcase_app.gb10_quality import extraction_matches
+        expected = json.loads((ROOT / 'samples/stage/vision/expected.json').read_text())['chart.png']
+        if result['finish_reason'] != 'stop' or not extraction_matches('chart.png', table, expected):
+            raise ValueError('Chart extraction did not match all visible data')
+        (self.folder / 'chart.json').write_text(json.dumps(table, ensure_ascii=False, indent=2))
+        return {'table': table, 'model': result['model']}
+
+    async def translate(self):
+        pages = (ROOT / 'samples/stage/translation/two_pages.txt').read_text().split('--- PAGE BREAK ---')
+        schema = object_schema({'pages': {'type': 'array', 'items': {'type': 'string', 'minLength': 30}, 'minItems': 2, 'maxItems': 2}})
+
+        async def language(name, code):
+            result = await self.language([{'role': 'system', 'content': 'Translate both fictional document pages into ' + name + '. Return JSON with a pages array containing both complete translated pages. Preserve page boundaries, every number, the literal ISO date2026-11-08, and the Latin name Northwind. No commentary or omissions.'},
+                {'role': 'user', 'content': json.dumps({'pages': pages}, ensure_ascii=False)}], role='translate_' + code, caller='translate', tokens=2300,
+                response_format={'type': 'json_schema', 'json_schema': {'name': 'translated_pages', 'strict': True, 'schema': schema}})
+            if result['finish_reason'] != 'stop':
+                raise ValueError('Document translation was incomplete')
+            data = json_content(result['content'])
+            from jsonschema import validate
+            validate(data, schema)
+            for source, target in zip(pages, data['pages']):
+                if not set(re.findall(r'\d+', source)) <= set(re.findall(r'\d+', target)):
+                    raise ValueError('Translated page lost a source number or date')
+            (self.folder / ('document-' + code + '.json')).write_text(json.dumps(data, ensure_ascii=False, indent=2))
+            return data['pages']
+
+        spanish, japanese = await asyncio.gather(language('Spanish', 'es'), language('Japanese', 'ja'))
+        return {'languages': ['es', 'ja'], 'pages': 4, 'spanish': spanish, 'japanese': japanese, 'model': WORKER}
+
+    async def voice_or_summary(self):
+        if self.audio:
+            async with httpx.AsyncClient(trust_env=False, timeout=12) as client:
+                response = await client.post('http://127.0.0.1:18204/v1/audio/speech', json={'input': VOICE_LINE, 'voice': 'am_michael'})
+                response.raise_for_status()
+                (self.folder / 'voice.pcm').write_bytes(response.content)
+            return {'file': 'voice.pcm', 'pcm_bytes': len(response.content), 'model': 'Kokoro-82M'}
+        result = await self.language([{'role': 'system', 'content': 'Write one short paragraph summarizing this fictional local planning pilot. No invented statistics or claims.'},
+                                     {'role': 'user', 'content': self.context}], role='summary', tokens=180)
+        return {'text': result['content'], 'model': result['model']}
+
+    async def job(self, name, function):
+        row = {'name': name, 'status': 'queued', 'created': time.time()}
+        self.jobs[name] = row
+        self.event('job', job=dict(row))
+        began = time.monotonic()
+        try:
+            row.update(status='running', started=time.time())
+            self.event('job', job=dict(row))
+            result = await function()
+            row.update(status='complete', seconds=time.monotonic() - began, result=result)
+        except Exception as exc:
+            row.update(status='failed', seconds=time.monotonic() - began, error=type(exc).__name__)
+        self.event('job', job=dict(row))
+
+    async def run(self):
+        began = time.monotonic()
+        await asyncio.gather(*(self.job(name, function) for name, function in [
+            ('risks', self.risks), ('app', self.app), ('images', self.images), ('chart', self.chart),
+            ('translation', self.translate), ('voice' if self.audio else 'summary', self.voice_or_summary)]))
+        result = {'seconds': time.monotonic() - began, 'done': sum(job['status'] == 'complete' for job in self.jobs.values()), 'jobs': self.jobs}
+        (self.folder / 'result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2))
+        return result

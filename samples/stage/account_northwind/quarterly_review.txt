@@ -1,0 +1,14 @@
+FICTIONAL DEMONSTRATION DATA
+Source date: 2026-11-08
+
+Last quarterly review: the fictional planning team spends time preparing
+briefings, reading meeting notes and translating internal drafts. The team
+prefers a local review process and wants a person to check every generated
+artifact before use. Original documents must remain available beside drafts.
+
+Open issues: the owner of the pilot is not yet agreed; the team has not chosen
+its evaluation samples; and integration with existing file permissions needs
+to be demonstrated. These are planning risks, not measured product defects.
+Success means completing a small set of useful workflows consistently, keeping
+the source context visible and documenting real elapsed time. No financial
+benefit or performance improvement has been measured for this fictional account.

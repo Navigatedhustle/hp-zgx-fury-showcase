@@ -196,6 +196,9 @@ def _start_one(name,registry):
   if not identity(process(row['pid']),name):raise RuntimeError(name+' exited during startup; inspect logs/'+name+'.log')
   if time.monotonic()>deadline:raise RuntimeError(name+' readiness timed out; inspect logs/'+name+'.log')
   print(name+' loading / waiting for readiness…',flush=True);time.sleep(.25 if COMPONENTS[name].get('engine')=='llama.cpp' else 5)
+ if COMPONENTS[name].get('engine')=='llama.cpp':
+  available=next(int(line.split()[1])*1024 for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:'))
+  if available<12*1024**3:raise RuntimeError('GB10 loaded below 12 GiB MemAvailable; refusing inference.')
  row=discover(name)
  registry[name]['leader']=fingerprint(row)
  registry[name]['members']=[fingerprint(r) for r in processes() if r['pgid']==row['pgid']];save(registry)

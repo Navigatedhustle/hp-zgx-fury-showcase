@@ -1,0 +1,13 @@
+FICTIONAL DEMONSTRATION DATA
+Source date: 2026-11-08
+
+Areas of interest: HP ZGX Nano as a desktop local AI development and demonstration
+workstation; large local language models; a bounded agent with read-only sample
+file access; vision extraction; image generation; and multilingual drafting.
+
+Briefing outline: account context, priorities, a bounded local pilot, open risks,
+and next actions. Use exactly five slides. A cover image should be an original,
+calm abstract illustration of connected planning cards beside a small desktop
+computer. Do not use real people, medical imagery, logos, product photography,
+or numerical product claims in the image. Avoid invented budgets, benchmarks,
+commercial commitments, customer testimonials and legal assurances.

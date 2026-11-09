@@ -126,11 +126,22 @@ class CreativeLane:
 
     def load(self):
         if self.gb10:
+            began = time.monotonic()
             import torch
+            self.load_timings = {'torch_import_seconds': time.monotonic() - began}
+            began = time.monotonic()
             from diffusers import Flux2KleinPipeline
+            self.load_timings['diffusers_import_seconds'] = time.monotonic() - began
             torch.set_num_threads(8)
             self.grace_node = None
-            self.flux = Flux2KleinPipeline.from_pretrained(str(ROOT / 'models/FLUX.2-klein-4B'), torch_dtype=torch.bfloat16, local_files_only=True).to('cuda')
+            began = time.monotonic()
+            self.flux = Flux2KleinPipeline.from_pretrained(str(ROOT / 'models/FLUX.2-klein-4B'), torch_dtype=torch.bfloat16, local_files_only=True)
+            self.load_timings['read_weights_seconds'] = time.monotonic() - began
+            began = time.monotonic()
+            self.flux.to('cuda')
+            self.load_timings['device_transfer_seconds'] = time.monotonic() - began
+            self.parameter_count = sum(parameter.numel() for component in self.flux.components.values()
+                                       if isinstance(component, torch.nn.Module) for parameter in component.parameters())
             return
         self.grace_node = bind_grace()
         import torch
@@ -148,8 +159,6 @@ class CreativeLane:
             raise RuntimeError('Selected video assets are missing; run ./launch.sh setup')
 
     def load_video(self):
-        if self.gb10:
-            raise RuntimeError('Video is not included in the GB10 profile')
         if self.wan is not None:
             return
         import torch
@@ -181,7 +190,7 @@ class CreativeLane:
             free = unified_available()
         budget = torch.cuda.memory_reserved() + free - 14 * 1024 ** 3
         if budget <= 0:
-            raise RuntimeError('Insufficient measured HBM above the creative reserve guard')
+            raise RuntimeError('Insufficient unified memory above the creative reserve guard' if self.gb10 else 'Insufficient measured HBM above the creative reserve guard')
         torch.cuda.set_per_process_memory_fraction(min(.95, budget / total))
         torch.cuda.reset_peak_memory_stats()
         job['allocator_budget_bytes'] = budget

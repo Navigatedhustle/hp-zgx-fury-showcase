@@ -4,6 +4,7 @@ import argparse
 import base64
 import json
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -22,6 +23,34 @@ def memory():
     return {'time': time.time(), 'total_bytes': mem['MemTotal'], 'available_bytes': mem['MemAvailable'],
             'swap_used_bytes': mem['SwapTotal'] - mem['SwapFree'], 'pswpin': vm['pswpin'], 'pswpout': vm['pswpout'],
             'oom_kill': vm.get('oom_kill')}
+
+
+def other_compute_count():
+    result = subprocess.run(['nvidia-smi', '--query-compute-apps=pid', '--format=csv,noheader,nounits'],
+                            capture_output=True, text=True, timeout=10)
+    if result.returncode:
+        raise RuntimeError('Cannot verify isolated GPU process state')
+    owned = {os.getpid()}
+    registry = ROOT / 'state/supervisor.json'
+    if registry.exists():
+        import control
+        for name, entry in json.loads(registry.read_text()).items():
+            leader = entry.get('leader')
+            if name in control.COMPONENTS and leader and control.unchanged(leader) and control.identity(control.process(leader['pid']), name):
+                owned.add(leader['pid'])
+    live = set()
+    for line in result.stdout.splitlines():
+        if not line.strip().isdigit():
+            continue
+        process = Path('/proc', line.strip())
+        try:
+            if process.joinpath('stat').read_text().rsplit(') ', 1)[1].split()[0] != 'Z':
+                live.add(int(line.strip()))
+        except FileNotFoundError:
+            pass
+        except OSError:
+            live.add(int(line.strip()))
+    return len(live - owned)
 
 
 class Monitor:
@@ -56,6 +85,9 @@ def request(port, route, data=None):
                                  headers={'Content-Type': 'application/json'})
     with OPENER.open(req, timeout=240) as response:
         return json.load(response)
+
+
+from showcase_app.gb10_quality import canonical_table, extraction_matches
 
 
 def chat(port, model, messages, max_tokens=256, **extras):
@@ -127,10 +159,12 @@ def benchmark_llama(args, records):
     # A baseline load is required. Never adopt a server already resident for another run.
     os.environ.update({key: env[key] for key in ('FURY_PROFILE', 'FURY_GB10_QUANT', 'FURY_GB10_NO_MMAP')})
     import control
-    if control.discover(lane) or control.port_open(port):
+    if any(control.discover(name) for name in ('lead', 'text')) or control.port_open(port):
         raise RuntimeError('Qualification port already occupied; inspect verified controller status before proceeding')
     row = {'lane': args.lane, 'quant': 'MXFP4' if lane == 'lead' else args.quant, 'loading': args.loading,
-           'started_at': time.time(), 'status': 'running', 'benchmarks': []}
+           'started_at': time.time(), 'status': 'running', 'benchmarks': [],
+           'other_compute_processes_count': other_compute_count()}
+    row['qualification_scope'] = 'isolated_candidate' if row['other_compute_processes_count'] == 0 else 'diagnostic_with_unrelated_workloads'
     records.append(row)
     save(records)
     baseline = memory()
@@ -141,16 +175,40 @@ def benchmark_llama(args, records):
             started = True
         row['load_memory'] = monitor.summary()
         row['resident_memavailable_drop_bytes'] = baseline['available_bytes'] - memory()['available_bytes']
+        row['other_compute_processes_after_load'] = other_compute_count()
         # Run real decode at both requested context sizes. Keep actual template token counts.
         for target in (1024, 8192):
             messages, token_count = context_messages(port, target)
             for repeat in range(args.repeats):
                 with Monitor() as monitor:
                     result = chat(port, model, messages)
+                if not result['timings'] or not all(key in result['timings'] for key in ('prompt_per_second', 'predicted_per_second')):
+                    raise RuntimeError('Native prompt/decode timings missing; no throughput result can be accepted')
                 result.update(target_context=target, calibrated_prompt_tokens=token_count, repeat=repeat + 1,
                               memory=monitor.summary())
                 row['benchmarks'].append(result)
                 save(records)
+        if lane == 'lead':
+            result = chat(port, model, [{'role': 'user', 'content': 'First list the fictional account folder using the list_files tool.'}],
+                max_tokens=512, tools=[{'type': 'function', 'function': {'name': 'list_files',
+                'description': 'List read-only fictional account notes.',
+                'parameters': {'type': 'object', 'properties': {}, 'additionalProperties': False}}}],
+                tool_choice={'type': 'function', 'function': {'name': 'list_files'}})
+            calls = {}
+            for delta in result['tool_call_deltas']:
+                item = calls.setdefault(delta.get('index', 0), {'name': '', 'arguments': ''})
+                function = delta.get('function') or {}
+                item['name'] += function.get('name') or ''
+                item['arguments'] += function.get('arguments') or ''
+            result['parsed_calls'] = list(calls.values())
+            result['passed'] = len(calls) == 1 and next(iter(calls.values()))['name'] == 'list_files'
+            if result['passed']:
+                try:
+                    result['passed'] = json.loads(next(iter(calls.values()))['arguments']) == {}
+                except ValueError:
+                    result['passed'] = False
+            row['native_tool_call'] = result
+            save(records)
         if lane == 'text':
             row['vision_quality'] = []
             expected = json.loads((ROOT / 'samples/stage/vision/expected.json').read_text())
@@ -168,7 +226,7 @@ def benchmark_llama(args, records):
                     text = text.split('\n', 1)[1].rsplit('```', 1)[0].strip()
                 try:
                     result['extracted'] = json.loads(text)
-                    result['passed'] = result['extracted'] == answer
+                    result['passed'] = extraction_matches(filename, result['extracted'], answer) and result['finish_reason'] == 'stop'
                 except json.JSONDecodeError:
                     result['passed'] = False
                 row['vision_quality'].append({'sample': filename, **result})
@@ -181,8 +239,12 @@ def benchmark_llama(args, records):
         raise
     finally:
         # Controller verifies PID/starttime/cwd/executable/session before any signal.
+        row['other_compute_processes_before_stop'] = other_compute_count()
         if started:
             controller('stop', lane, env)
+        row['other_compute_processes_at_end'] = other_compute_count()
+        if row.get('other_compute_processes_after_load') or row['other_compute_processes_before_stop']:
+            row['qualification_scope'] = 'diagnostic_with_unrelated_workloads'
         row['ended_at'] = time.time()
         save(records)
 
@@ -195,10 +257,21 @@ def save(records):
     temporary.replace(destination)
     public = ROOT / 'docs/verification/gb10_memory_plan.json'
     public.parent.mkdir(parents=True, exist_ok=True)
-    report = {'schema': 1, 'hardware': 'NVIDIA GB10', 'status': 'qualification_incomplete',
+    prior = json.loads(public.read_text()) if public.exists() else {}
+    def publish(value):
+        if isinstance(value, list):
+            return [publish(item) for item in value]
+        if isinstance(value, dict):
+            return {key: ('Qualification error; raw diagnostic retained privately' if key == 'error' else publish(item))
+                    for key, item in value.items() if key not in ('content', 'tool_call_deltas', 'extracted', 'parsed_calls')}
+        return value
+    report = {'schema': 1, 'hardware': 'NVIDIA GB10', 'status': prior.get('status', 'qualification_incomplete'),
               'decision': {'passed': False, 'reason': 'All required residency, quality and workload measurements must complete'},
               'measurement': 'MemAvailable deltas and 100 ms /proc/meminfo sampling; /proc/vmstat swap deltas; native llama.cpp timings and observed SSE TTFT',
-              'preexisting_workloads_present': True, 'minimum_memavailable_gib': 10, 'runs': records}
+              'preexisting_workloads_present': any(row.get('other_compute_processes_count', 0) > 0 for row in records),
+              'minimum_memavailable_gib': 10, 'runs': publish(records), 'workloads': prior.get('workloads', {})}
+    if prior.get('decision', {}).get('passed'):
+        report['decision'] = prior['decision']
     public.write_text(json.dumps(report, indent=2) + '\n')
 
 
@@ -206,7 +279,8 @@ def benchmark_creative(records):
     os.environ.update(FURY_PROFILE='gb10', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', HF_HUB_DISABLE_TELEMETRY='1')
     from showcase_app.creative import CreativeLane
     row = {'lane': 'image', 'model': 'FLUX.2-klein-4B', 'quant': 'BF16', 'started_at': time.time(),
-           'status': 'running', 'benchmarks': []}
+           'status': 'running', 'benchmarks': [], 'other_compute_processes_count': other_compute_count()}
+    row['qualification_scope'] = 'isolated_candidate' if row['other_compute_processes_count'] == 0 else 'diagnostic_with_unrelated_workloads'
     records.append(row)
     save(records)
     baseline = memory()
@@ -245,7 +319,8 @@ def benchmark_voice(records):
     os.environ.update(FURY_PROFILE='gb10', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', HF_HUB_DISABLE_TELEMETRY='1')
     sys.path.insert(0, str(ROOT / 'build/sources/atlas-gpt-main'))
     row = {'lane': 'voice', 'model': 'Kokoro-82M', 'quant': 'publisher v1.0', 'started_at': time.time(),
-           'status': 'running', 'benchmarks': []}
+           'status': 'running', 'benchmarks': [], 'other_compute_processes_count': other_compute_count()}
+    row['qualification_scope'] = 'isolated_candidate' if row['other_compute_processes_count'] == 0 else 'diagnostic_with_unrelated_workloads'
     records.append(row)
     save(records)
     baseline = memory()
@@ -277,7 +352,20 @@ def main():
     parser.add_argument('--quant', choices=['Q8_0', 'Q6_K', 'Q4_K_XL'], default='Q8_0')
     parser.add_argument('--loading', choices=['mmap', 'no-mmap'], default='mmap')
     parser.add_argument('--repeats', type=int, default=3)
+    parser.add_argument('--require-isolated', action='store_true')
     args = parser.parse_args()
+    # Ownership discovery imports the controller, whose profile is fixed at import.
+    os.environ.update(FURY_PROFILE='gb10', FURY_GB10_QUANT=args.quant,
+                      FURY_GB10_NO_MMAP='1' if args.loading == 'no-mmap' else '0')
+    headers = ROOT / '.local-debs/extracted/usr/include'
+    if headers.is_dir():
+        os.environ['C_INCLUDE_PATH'] = str(headers) + ':' + str(headers / 'python3.12')
+    if args.require_isolated:
+        drain_deadline = time.monotonic() + 10
+        while other_compute_count():
+            if time.monotonic() >= drain_deadline:
+                raise RuntimeError('Unrelated GPU compute workload present; isolated single-lane qualification refused')
+            time.sleep(.2)
     path = ROOT / 'state/gb10-qualification/measurements.json'
     records = json.loads(path.read_text())['runs'] if path.exists() else []
     if args.lane == 'image':

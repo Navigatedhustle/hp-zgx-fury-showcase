@@ -23,13 +23,15 @@ def test_explicit_profile_keeps_fury_defaults():
     assert fury['components']['lead']['port'] == 8100
     assert fury['components']['text']['model'] == 'unsloth/Qwen3.6-27B-NVFP4'
     assert 'agent' in fury['components'] and 'asr' in fury['components']
-    assert set(nano['components']) == {'lead', 'text'}
+    assert set(nano['components']) == {'lead', 'text', 'image', 'tts', 'gateway'}
     assert nano['serve'] == {}
     assert all(item['command'][item['command'].index('--host') + 1] == '127.0.0.1' for item in nano['components'].values())
 
 
 def test_context_floor_and_explicit_residency():
     for item in gb10.components().values():
+        if item.get('engine') != 'llama.cpp':
+            continue
         cmd = item['command']
         assert int(cmd[cmd.index('--ctx-size') + 1]) // int(cmd[cmd.index('--parallel') + 1]) >= 16384
         assert cmd[cmd.index('--fit') + 1] == 'off'

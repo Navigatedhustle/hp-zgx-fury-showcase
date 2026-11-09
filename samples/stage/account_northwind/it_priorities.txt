@@ -1,0 +1,15 @@
+FICTIONAL DEMONSTRATION EMAIL
+Source date: 2026-11-08
+From: Mara Vale, fictional CIO
+Subject: Priorities for our planning discussion
+
+Please cover local document briefing, image and chart understanding, multilingual
+drafting, and the ability to run a complete demonstration without cloud model
+calls. Use only synthetic samples for the pilot. Make the source material and
+the selected model visible. A person must review generated text and images.
+
+We would like an English follow up with a Spanish version for a fictional
+regional planning group. Propose a technical workshop, ask who will own the
+pilot, and agree on a compact evaluation checklist. We are exploring options;
+no deployment, budget or purchase has been authorized. Do not send an email on
+our behalf. Prepare drafts for review only.

@@ -9,3 +9,5 @@ All video qualification portraits, reference edits and generated clips remain ou
 ## GB10 stage vision qualification
 
 `samples/stage/vision/whiteboard.png` and `chart.png` are original deterministic drawings from `ops/render-gb10-samples.py`, authored for this repository under MIT. They use the existing local Liberation Sans font. Northwind and every owner, action, date, count and chart value are fictional test data; no photograph, real account, employee, event detail or external image is used. `expected.json` is the exact extraction truth for model quality qualification. The whiteboard is a marker-style drawing and must be described as a shipped sample, never a live camera capture.
+
+The four text files in `samples/stage/account_northwind/` and the two-page source in `samples/stage/translation/two_pages.txt` are original MIT-licensed fictional writing, dated2026-11-08. Northwind Regional Health, Mara Vale, Theo Rowan, every plan and every circumstance are invented for this demonstration. They contain no real account, personal record, event identity, commercial commitment or customer story.
