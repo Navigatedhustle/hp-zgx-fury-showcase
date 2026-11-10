@@ -6,6 +6,7 @@ No health-only, synthetic adapter or recording-bootstrap run is accepted.
 Evidence stays in ignored state/stage/proof; publish only reviewed aggregates.
 """
 import argparse
+import gzip
 import asyncio
 import json
 import os
@@ -94,10 +95,16 @@ class Proof:
     async def segment(self, number, dwell=True):
         await self.page.keyboard.press(KEYS[number])
         began = time.monotonic()
+        previous = BEATS[number - 1] if number else 'READY'
         while True:
             s = await self.state()
             row = s['run']
             if s['beat'] != BEATS[number] or not row:
+                # A real keyboard event starts an asynchronous browser fetch.
+                # Observe that single press; never resend it or skip a beat.
+                if s['beat'] == previous and time.monotonic() - began < 3:
+                    await asyncio.sleep(.02)
+                    continue
                 raise RuntimeError('Unexpected beat after clicker Next')
             if row['backup'] or row.get('recording_error') or row['status'] in ('failed', 'interrupted'):
                 self.save('failed-' + BEATS[number] + '.json', s)
@@ -140,7 +147,7 @@ class Proof:
 
     async def sockets(self):
         """Capture all host sockets; attribute app sockets by verified ownership."""
-        with (self.folder / 'all-sockets.log').open('w') as log:
+        with gzip.open(self.folder / 'all-sockets.log.gz', 'wt', compresslevel=1) as log:
             while not self.stop_sockets:
                 processes = {p['pid']: p for p in control.processes()}
                 owners = {row['pid'] for name in control.COMPONENTS if (row := control.discover(name))}

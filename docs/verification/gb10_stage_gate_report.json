@@ -76,23 +76,26 @@
     ]
   },
   "final_idle_and_ten_show_proof": {
-    "status": "in_progress",
+    "status": "new_consecutive_sequence_in_progress",
     "mode": "final",
     "required_idle_minutes": 45,
     "required_consecutive_shows": 10,
     "show_pacing_minutes": 5,
-    "socket_capture_scope": "All host sockets captured; only verified owned stage process trees are included in the loopback application claim."
+    "socket_capture_scope": "All host sockets captured; only verified owned stage process trees are included in the loopback application claim.",
+    "idle_gate_passed": true,
+    "post_idle_full_show_passed": true,
+    "post_idle_show_is_part_of_final_consecutive_sequence": false
   },
   "source_validation": {
     "fury_source_suite": {
       "passed": true,
       "factory": 189,
-      "operations_gateway_booth": 180,
+      "operations_gateway_booth": 182,
       "node": 7
     },
     "gb10_focused_suite": {
       "passed": true,
-      "tests": 56
+      "tests": 58
     },
     "all_ops_and_showcase_python_sources_compile": true,
     "fury_hardware_scope": "Configuration and unit/source checks only. No Fury hardware contacted or hardware run claimed."
