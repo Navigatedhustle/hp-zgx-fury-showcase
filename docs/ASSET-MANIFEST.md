@@ -149,3 +149,29 @@ The pinned FLUX.2 klein pipeline consumes intermediate Qwen hidden states 9, 18 
 ### GB10 weight loading, 2026-11-09
 
 The same pinned MIT llama.cpp supports direct I/O (`--load-mode dio`) to avoid duplicate clean weight pages during upload. No source revision, model or quant changed. A GB10-only per-file cache advisory applies `POSIX_FADV_DONTNEED` through read-only descriptors after upload, limited to regular weights listed in the pinned GB10 manifest. It neither writes files nor changes global cache, swap or kernel settings. The actual buffered lead comparison released 53.82 GiB of duplicate clean cache while retaining the resident model; both direct native lanes passed actual throughput, tool-call and vision checks. Full workload acceptance is still blocked by old global swap-ins, as documented in the memory report.
+
+### GB10 stage backup recorder sources, verified 2026-11-09
+
+The stage uses permissive source headers for H.264 MP4 encoding. The `veryfast` preset maps to minih264 speed 8, at 30 fps and GOP 30. The existing Playwright FFmpeg decodes the native kiosk capture; downloaded sources and built binaries remain outside the release. All source and license files were read and hashed at immutable revisions.
+
+| Source | Revision | License | Header SHA256 |
+|---|---|---|---|
+| [minih264](https://github.com/lieff/minih264) | `b0baea7a80ef9d12da97301dd1099b8791b5ba43` | CC0-1.0 | `661afe7802b4e1174e8389632f3ee437b903e036a9c91a7f035830947c6a7aae` |
+| [minimp4](https://github.com/lieff/minimp4) | `2a3014a7753cfcba4442adeb469431967238fe6a` | CC0-1.0 | `9d122076cc23e5f4a7560ce4056c7d84484a8b8bf094d27c8f652f11fc725ce7` |
+| [stb](https://github.com/nothings/stb) | `4e9b368bfc071e97206ea5c6adba68dd0cbf8897` | MIT | `594c2fe35d49488b4382dbfaec8f98366defca819d916ac95becf3e75f4200b3` |
+
+Every downloaded file, including the license texts, is SHA256-pinned in `config/gb10-build.json`. CC0 licenses include a broad public-license fallback; stb uses its MIT option.
+
+### Local stage and presenter card font
+
+Arial resolves locally to Liberation Sans from Ubuntu `fonts-liberation` version `1:2.1.5-3`. Its SIL Open Font License 1.1 permits use and embedding. No remote font is requested. The installed regular font SHA256 is `4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144`; the package copyright notice SHA256 is `f32df582a2aab128c07b2f7e36e7b928dc5f6bd82657b905c04f91459f9e5cf9`. The generated presenter PDF embeds the local subset. The stage uses the system font stack and does not distribute a new font file. Source: [Liberation fonts 2.1.5](https://github.com/liberationfonts/liberation-fonts/tree/2.1.5).
+
+### GB10 stage margin candidate
+
+The same Apache 2.0 Qwen3.6 GGUF repository and pinned revision `a483e9e6cbd595906af30beda3187c2663a1118c` also provides `Qwen3.6-35B-A3B-UD-Q4_K_M.gguf`, 22134528992 bytes, SHA256 `ac0e2c1189e055faa36eff361580e79c5bd6f8e76bffb4ce547f167d53e31a61`. The pinned model card and Apache license already reviewed for Q4 XL apply to this quant. The immutable upstream LFS SHA256 was fetched on 2026-11-09, and the existing downloader must verify the actual file before qualification. This candidate is being measured because the native kiosk recorder exposed insufficient margin with Q4 XL; it is not selected until the exact vision and memory gates pass. The headline gpt-oss model and all context and parallel floors stay unchanged.
+
+The selected GB10 stage quant remains Q4_K_XL after the bounded allocator clean-baseline qualification passed. Q4_K_M was checksum verified and passed both vision samples but its development memory trial failed before the loader and allocator correction; it is retained only as a measured candidate. See docs/verification/gb10_gate1.md and gb10_memory_plan.json.
+
+### GB10 generated artwork text policy
+
+Cover and Rush artwork use fixed wordless abstract landscape prompts and the already pinned Qwen vision lane to review original pixels before publication. No additional third party asset or checkpoint is introduced. `docs/verification/gb10_text_free_images.json` records real positive-control rejection, five accepted live renders and their SHA256 values. Runtime candidates, accepted images and backup footage stay excluded from Git and releases.

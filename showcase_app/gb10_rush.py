@@ -12,9 +12,10 @@ import httpx
 from showcase_app.gb10_agent import ACCOUNT, FILES, ROOT, image_job, object_schema
 from showcase_app.gb10_client import LEAD, WORKER, infer, json_content
 from showcase_app.gb10_miniapp import validate_app
+from showcase_app.gb10_image_policy import RUSH_PROMPT
 
 VOICE_LINE = 'Six jobs, four models, one Nano. Everything ran locally.'
-APP_PROMPT = '''Write one complete self-contained HTML ROI calculator, no external resources, links, credits or images. Use a flat navy background, white text, pale blue headings and HP blue accents. Responsive within a640 by380 pixel iframe. Keep the code concise. Include exactly these numeric inputs: hourly (dollars per hour, default75), hours (hours saved monthly, default20), cost (monthly cost, default500). Button id calculate. Visible outputs id net and id roi. net=hourly*hours-cost. roi=net/cost*100; display percent, or N/A when cost is zero. Calculate on load and on button click. Use direct arithmetic, no eval. Label the assumptions fictional, source date2026-11-08. Return JSON with one key html containing the entire file. No Markdown.'''
+APP_PROMPT = '''Write a complete self-contained HTML ROI calculator using only semantic HTML controls and inline vanilla JavaScript. The host adds the trusted stage layout, labels and styling: do not generate CSS, decorative markup, headers, frameworks or external resources. Keep the whole HTML under1200 characters. Include numeric inputs with ids hourly (default75), hours (default20), cost (default500); button id calculate; outputs id net and id roi. net=hourly*hours-cost. roi=net/cost*100 with percent, or N/A when cost is zero. Calculate on load and on button click using the current inputs. Direct arithmetic only, no eval. Label assumptions fictional, source date2026-11-08. Return JSON with one key html containing the entire working file. No Markdown.'''
 
 
 class NanoRush:
@@ -46,7 +47,7 @@ class NanoRush:
         return {'text': result['content'], 'model': result['model'], 'routing': result['routing']}
 
     async def app(self):
-        result = await self.language([{'role': 'user', 'content': APP_PROMPT}], role='app', tokens=1900,
+        result = await self.language([{'role': 'user', 'content': APP_PROMPT}], role='app', tokens=900,
             response_format={'type': 'json_schema', 'json_schema': {'name': 'roi_app', 'strict': True,
                 'schema': object_schema({'html': {'type': 'string', 'minLength': 50, 'maxLength': 65536}})}})
         if result['finish_reason'] != 'stop':
@@ -58,7 +59,7 @@ class NanoRush:
         return {**checked, 'model': result['model'], 'routing': result['routing']}
 
     async def images(self):
-        return await image_job('Original calm editorial illustration of abstract planning cards and folded blue paper landscapes, no people, no text, no logos.',
+        return await image_job(RUSH_PROMPT,
             self.run_id, self.purpose, batch=4, width=1024, height=576, on_update=lambda job: self.event('images_progress', job=job))
 
     async def chart(self):
@@ -77,6 +78,8 @@ class NanoRush:
         if result['finish_reason'] != 'stop' or not extraction_matches('chart.png', table, expected):
             raise ValueError('Chart extraction did not match all visible data')
         (self.folder / 'chart.json').write_text(json.dumps(table, ensure_ascii=False, indent=2))
+        from showcase_app.gb10_accounting import validated_counts
+        validated_counts(result['call_id'], images_analyzed=1)
         return {'table': table, 'model': result['model']}
 
     async def translate(self):
@@ -99,6 +102,8 @@ class NanoRush:
                         raise ValueError('Translated page lost a source number or date')
                 untranslated = set(re.findall(r'[A-Za-z]+', '\n'.join(data['pages']))) - {'Northwind'} if code == 'ja' else set()
                 if not untranslated:
+                    from showcase_app.gb10_accounting import validated_counts
+                    validated_counts(result['call_id'], pages=2)
                     (self.folder / ('document-' + code + '.json')).write_text(json.dumps(data, ensure_ascii=False, indent=2))
                     return data['pages']
                 (self.folder / ('document-' + code + '-rejected.json')).write_text(json.dumps(data, ensure_ascii=False, indent=2))

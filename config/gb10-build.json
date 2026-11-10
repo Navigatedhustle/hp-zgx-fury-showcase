@@ -72,5 +72,86 @@
     "content_changes": false,
     "global_cache_setting_changes": false,
     "enabled_by": "FURY_GB10_RELEASE_WEIGHT_CACHE=1"
+  },
+  "stage_recorder_sources": [
+    {
+      "name": "minih264",
+      "repository": "https://github.com/lieff/minih264",
+      "revision": "b0baea7a80ef9d12da97301dd1099b8791b5ba43",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "path": "minih264e.h",
+          "url": "https://raw.githubusercontent.com/lieff/minih264/b0baea7a80ef9d12da97301dd1099b8791b5ba43/minih264e.h",
+          "sha256": "661afe7802b4e1174e8389632f3ee437b903e036a9c91a7f035830947c6a7aae"
+        },
+        {
+          "path": "minih264e_test.c",
+          "url": "https://raw.githubusercontent.com/lieff/minih264/b0baea7a80ef9d12da97301dd1099b8791b5ba43/minih264e_test.c",
+          "sha256": "c7ecab95d199ad4e46f7f53cfe675b5576211bf4d4c91230eef4a420cbf81d4a"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/lieff/minih264/b0baea7a80ef9d12da97301dd1099b8791b5ba43/LICENSE",
+          "sha256": "6a1ee543e5282cd9061881edf462e6fdab181f328da71fc2c9a6950a80e94d01"
+        },
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/lieff/minih264/b0baea7a80ef9d12da97301dd1099b8791b5ba43/README.md",
+          "sha256": "f90ebee3c2e8311ffe1a12b5c267eb5b75913359a61215323be90349eeca96f5"
+        }
+      ]
+    },
+    {
+      "name": "minimp4",
+      "repository": "https://github.com/lieff/minimp4",
+      "revision": "2a3014a7753cfcba4442adeb469431967238fe6a",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "path": "minimp4.h",
+          "url": "https://raw.githubusercontent.com/lieff/minimp4/2a3014a7753cfcba4442adeb469431967238fe6a/minimp4.h",
+          "sha256": "9d122076cc23e5f4a7560ce4056c7d84484a8b8bf094d27c8f652f11fc725ce7"
+        },
+        {
+          "path": "minimp4_test.c",
+          "url": "https://raw.githubusercontent.com/lieff/minimp4/2a3014a7753cfcba4442adeb469431967238fe6a/minimp4_test.c",
+          "sha256": "d0fb79c3612c7002fb1e6070ebd43813d4ca4d8fbd2da90cd82e547fbb721551"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/lieff/minimp4/2a3014a7753cfcba4442adeb469431967238fe6a/LICENSE",
+          "sha256": "6a1ee543e5282cd9061881edf462e6fdab181f328da71fc2c9a6950a80e94d01"
+        }
+      ]
+    },
+    {
+      "name": "stb",
+      "repository": "https://github.com/nothings/stb",
+      "revision": "4e9b368bfc071e97206ea5c6adba68dd0cbf8897",
+      "license": "MIT",
+      "files": [
+        {
+          "path": "stb_image.h",
+          "url": "https://raw.githubusercontent.com/nothings/stb/4e9b368bfc071e97206ea5c6adba68dd0cbf8897/stb_image.h",
+          "sha256": "594c2fe35d49488b4382dbfaec8f98366defca819d916ac95becf3e75f4200b3"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/nothings/stb/4e9b368bfc071e97206ea5c6adba68dd0cbf8897/LICENSE",
+          "sha256": "bebfe904b14301657e4e5d655c811d51fd31b97c455b9cc2d8600d6bac6cff63"
+        }
+      ]
+    }
+  ],
+  "stage_recording": {
+    "codec": "H.264 AVC",
+    "fps": 30,
+    "preset": "veryfast",
+    "encoder": "minih264",
+    "encode_speed": 8,
+    "container": "MP4",
+    "recording_source": "Playwright video of the native kiosk",
+    "decoder": "Existing cached Playwright FFmpeg 1013"
   }
 }

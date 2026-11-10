@@ -21,6 +21,8 @@ async def run_vision(run_id, purpose='live', emit=None):
     if result['finish_reason'] != 'stop' or not extraction_matches('whiteboard.png', actions, expected):
         raise ValueError('Whiteboard extraction did not match every visible action, owner and date')
     emit({'kind': 'actions', 'actions': actions})
+    from showcase_app.gb10_accounting import validated_counts
+    validated_counts(result['call_id'], images_analyzed=1)
     readout = await infer([{'role': 'system', 'content': 'Write exactly three short executive bullets from these fictional extracted actions. Preserve dates and owners, no invented facts.'},
                           {'role': 'user', 'content': json.dumps(actions)}], model=LEAD, caller='vision',
                           run_id=run_id, purpose=purpose, role='vision_readout', max_tokens=240)

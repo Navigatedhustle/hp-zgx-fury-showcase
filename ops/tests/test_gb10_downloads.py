@@ -18,7 +18,7 @@ def test_default_fury_records_unchanged():
     assert downloads.selected_records() == original
 
 
-@pytest.mark.parametrize('quant', ['Q8_0', 'Q6_K', 'Q4_K_XL'])
+@pytest.mark.parametrize('quant', ['Q8_0', 'Q6_K', 'Q4_K_XL', 'Q4_K_M'])
 def test_gb10_quant_isolated_and_sha256_pinned(quant):
     records = downloads.selected_records('gb10', quant)
     assert len(records) == 4

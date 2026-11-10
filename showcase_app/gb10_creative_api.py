@@ -19,6 +19,7 @@ from atlas.offline_guard import install
 install()
 from showcase_app.creative import CreativeLane
 from showcase_app.gateway import execution_end, execution_start, record
+from showcase_app.gb10_image_policy import stage_prompt, check_artwork
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'state/stage/creative'
@@ -34,24 +35,61 @@ async def work():
         try:
             job.update(status='running', started=began)
             execution_start(job['id'], 'stage_image', 'FLUX.2-klein-4B')
-            path = OUTPUT / (job['id'] + '.png')
-            metrics = await asyncio.to_thread(lane.run, 'image', spec.prompt, path, job['_stop'],
-                {'width': spec.width, 'height': spec.height, 'batch': spec.batch, 'seed': spec.seed}, job)
-            job.update(status='complete', ended=time.time(), **metrics)
-            files = [path.name] if spec.batch == 1 else [path.with_stem(path.stem + '-' + str(i)).name for i in range(1, spec.batch + 1)]
-            if not all((OUTPUT / name).is_file() for name in files):
-                raise RuntimeError('Image worker did not produce all requested artifacts')
-            job['files'] = files
+            pending = OUTPUT / 'pending' / job['id']
+            pending.mkdir(parents=True, exist_ok=False)
+            accepted = []
+            aggregate = {'render_seconds': 0, 'gpu_peak_allocated_bytes': 0, 'gpu_peak_reserved_bytes': 0}
+            job.update(policy='Text-free abstract artwork', checker_model='Qwen3.6-35B-A3B', text_rejections=0, images_generated=0, text_checks=[], _private=True)
+            for index in range(spec.batch):
+                for attempt in range(2):
+                    if job['_stop'].is_set():
+                        raise InterruptedError('Artwork job cancelled')
+                    path = pending / (str(index) + '-' + str(attempt) + '.png')
+                    job.update(phase='rendering', stage='Rendering text-free artwork', batch_index=index + 1)
+                    metrics = await asyncio.to_thread(lane.run, 'image', stage_prompt(spec.batch), path, job['_stop'],
+                        {'width': spec.width, 'height': spec.height, 'batch': 1, 'seed': spec.seed + index + attempt * 1009}, job)
+                    aggregate['render_seconds'] += metrics['render_seconds']
+                    for key in ('gpu_peak_allocated_bytes', 'gpu_peak_reserved_bytes'):
+                        aggregate[key] = max(aggregate[key], metrics[key])
+                    job['images_generated'] += 1
+                    job.update(phase='checking', stage='Checking for lettering')
+                    check = await check_artwork(path, spec.run_id, spec.purpose)
+                    job['text_checks'].append({'image': index + 1, 'attempt': attempt + 1, **check})
+                    if not check['text']:
+                        accepted.append(path)
+                        break
+                    path.unlink(missing_ok=True)
+                    job['text_rejections'] += 1
+                    job['stage'] = 'Lettering rejected; generating a new image'
+                    logging.info('Artwork lettering rejected id=%s image=%s attempt=%s', job['id'], index + 1, attempt + 1)
+                else:
+                    raise ValueError('Artwork still contains lettering after two live attempts')
+                job['images_done'] = len(accepted)
+            if job['_stop'].is_set():
+                raise InterruptedError('Artwork job cancelled')
+            files = []
+            for index, path in enumerate(accepted):
+                target = OUTPUT / (job['id'] + (('-' + str(index + 1)) if spec.batch > 1 else '') + '.png')
+                path.replace(target)
+                files.append(target.name)
+            pending.rmdir()
+            job.update(status='complete', phase='complete', stage='Text check clear', ended=time.time(), files=files, **aggregate)
             record(job['id'], 'stage_image', 'image', 'FLUX.2-klein-4B', 'complete', began,
-                   run_id=spec.run_id, purpose=spec.purpose, images=len(files))
+                   run_id=spec.run_id, purpose=spec.purpose, images=job['images_generated'])
         except Exception as exc:
             logging.exception('GB10 image job failed id=%s', job['id'])
             job.update(status='failed', error=type(exc).__name__, ended=time.time())
             record(job['id'], 'stage_image', 'image', 'FLUX.2-klein-4B', 'failed', began,
                    error=type(exc).__name__, run_id=spec.run_id, purpose=spec.purpose)
         finally:
+            import shutil
+            shutil.rmtree(OUTPUT / 'pending' / job['id'], ignore_errors=True)
             execution_end(job['id'], job['status'])
             queue.task_done()
+        # Exception tracebacks can retain inference tensors through the inner
+        # pipeline's finally block. Collect after leaving the except block too.
+        from showcase_app.gb10_memory import release_unused_buffers
+        job['post_job_cleanup'] = await asyncio.to_thread(release_unused_buffers)
 
 
 @asynccontextmanager
@@ -79,7 +117,7 @@ class ImageRequest(BaseModel):
     batch: Literal[1, 4] = 1
     seed: int = Field(default=42, ge=0, le=4294967295)
     run_id: str = Field(pattern=r'^[A-Za-z0-9_-]{1,100}$')
-    purpose: Literal['live', 'warmup'] = 'live'
+    purpose: Literal['live', 'warmup', 'keepalive'] = 'live'
 
 
 def public(job):
@@ -89,9 +127,10 @@ def public(job):
 @app.get('/health')
 async def health():
     return {'ready': lane.flux is not None, 'model': 'FLUX.2-klein-4B', 'placement': lane.placement(),
-            'active': sum(job['status'] == 'running' for job in jobs.values()), 'queued': queue.qsize(), 'limit': 1,
+            'active': sum(job['status'] == 'running' for job in jobs.values()),
+            'render_active': sum(job['status'] == 'running' and job.get('phase') == 'rendering' for job in jobs.values()), 'queued': queue.qsize(), 'limit': 1,
             'parameter_count': getattr(lane, 'parameter_count', None), 'load_timings': getattr(lane, 'load_timings', {}),
-            'weight_file_cache': getattr(lane, 'weight_cache', None)}
+            'weight_file_cache': getattr(lane, 'weight_cache', None), 'load_cleanup': getattr(lane, 'load_cleanup', None)}
 
 
 @app.post('/generate')

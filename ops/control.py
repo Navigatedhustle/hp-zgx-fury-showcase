@@ -147,7 +147,9 @@ def stop_one(name,registry):
  if row:
   members=[r for r in processes() if same_session(r,row)]
   if not all(session_member_verified(r,row,members,name) for r in members):raise RuntimeError('Unrecognised process in '+name+' session; refusing signals.')
-  saved={'leader':fingerprint(row),'members':[fingerprint(r) for r in members]};registry[name]=saved;save(registry)
+  saved={'leader':fingerprint(row),'members':[fingerprint(r) for r in members]}
+  if os.getenv('FURY_PROFILE')=='gb10':saved['stopping']=True
+  registry[name]=saved;save(registry)
   # Recheck the exact leader and every member immediately before the group signal.
   if not identity(process(row['pid']),name) or not all(unchanged(m) for m in saved['members']):raise RuntimeError('Process identity changed before stop.')
   os.killpg(row['pgid'],signal.SIGTERM)
@@ -249,7 +251,7 @@ def skin_status():
 
 def status():
  if os.getenv('FURY_PROFILE')=='gb10':
-  print('HP ZGX Nano: GB10 model qualification; stage acceptance pending')
+  print('HP ZGX Nano: GB10 hardware profile')
  else:
   print('Customer skin:',skin_status())
   print('Presenter controls: available without a PIN')

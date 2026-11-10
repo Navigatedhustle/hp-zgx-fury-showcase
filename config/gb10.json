@@ -1,0 +1,189 @@
+{
+  "hardware": "NVIDIA GB10",
+  "lanes": {
+    "lead": {
+      "port": 18100,
+      "context": 32768,
+      "slots": 2,
+      "quant": "MXFP4",
+      "loading": "dio",
+      "model": "gpt-oss-120b",
+      "repository": "ggml-org/gpt-oss-120b-GGUF",
+      "revision": "7200b74bea78b0a2964ef9f3897eefa401e890ff",
+      "license": "Apache-2.0",
+      "source_date": "2026-11-09",
+      "parameters": 116829156672,
+      "active_parameters": 5100000000,
+      "projector_parameters": 0,
+      "measured_memory_bytes": 66134171648,
+      "segments": [
+        "S0",
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "device": "cuda"
+    },
+    "text": {
+      "port": 18000,
+      "context": 49152,
+      "slots": 3,
+      "quant": "Q4_K_XL",
+      "loading": "dio",
+      "model": "Qwen3.6-35B-A3B",
+      "repository": "unsloth/Qwen3.6-35B-A3B-GGUF",
+      "revision": "a483e9e6cbd595906af30beda3187c2663a1118c",
+      "license": "Apache-2.0",
+      "source_date": "2026-11-09",
+      "parameters": 35107181936,
+      "active_parameters": 3000000000,
+      "projector_parameters": 446571248,
+      "measured_memory_bytes": 25771798528,
+      "segments": [
+        "S0",
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "device": "cuda"
+    },
+    "image": {
+      "port": 18800,
+      "context": 0,
+      "slots": 1,
+      "quant": "BF16 / FP8 text encoder",
+      "loading": "resident",
+      "model": "FLUX.2-klein-4B",
+      "repository": "black-forest-labs/FLUX.2-klein-4B",
+      "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+      "license": "Apache-2.0",
+      "source_date": "2026-11-09",
+      "parameters": 8371014947,
+      "active_parameters": null,
+      "projector_parameters": 0,
+      "measured_memory_bytes": 16146903040,
+      "segments": [
+        "S0",
+        "S1",
+        "S3",
+        "S4"
+      ],
+      "device": "cuda"
+    },
+    "tts": {
+      "port": 18204,
+      "context": 0,
+      "slots": 1,
+      "quant": "Publisher v1.0",
+      "loading": "resident",
+      "model": "Kokoro-82M",
+      "repository": "hexgrad/Kokoro-82M",
+      "revision": "f3ff3571791e39611d31c381e3a41a3af07b4987",
+      "license": "Apache-2.0",
+      "source_date": "2026-11-09",
+      "parameters": 81810022,
+      "active_parameters": null,
+      "projector_parameters": 0,
+      "measured_memory_bytes": 1932230656,
+      "segments": [
+        "S0",
+        "S1",
+        "S3",
+        "S4"
+      ],
+      "device": "cpu"
+    }
+  },
+  "gateway_port": 18001,
+  "stage_port": 18808,
+  "kiosk_health_port": 18809,
+  "kiosk_debug_port": 18810,
+  "minimum_memavailable_gib": 10,
+  "admission": {
+    "lead": 2,
+    "text": 3,
+    "total": 5,
+    "image": 1,
+    "image_queued": 3,
+    "queued": 24
+  },
+  "native": {
+    "cpu_prompt_cache_mib": 0,
+    "batch_tokens": 512,
+    "microbatch_tokens": 128
+  },
+  "flux_encoder": "fp8",
+  "release_weight_file_cache": true,
+  "runtime_scope": {
+    "MemorySwapMax": 0
+  },
+  "offline": {
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "DO_NOT_TRACK": "1",
+    "HF_HUB_DISABLE_TELEMETRY": "1"
+  },
+  "segments": {
+    "S0": {
+      "title": "One Nano. Zero cloud.",
+      "deadline": 45,
+      "target": 40
+    },
+    "S1": {
+      "title": "Nano Agent",
+      "deadline": 90,
+      "target": 75,
+      "dwell": 110
+    },
+    "S2": {
+      "title": "It can see",
+      "deadline": 30,
+      "target": 30,
+      "dwell": 50
+    },
+    "S3": {
+      "title": "Nano Rush",
+      "deadline": 75,
+      "target": 60,
+      "dwell": 60
+    },
+    "S4": {
+      "title": "Your data stays here",
+      "deadline": 45,
+      "target": 40
+    }
+  },
+  "hidden_demos": [
+    "agent_factory",
+    "video_studio",
+    "action_trailer",
+    "about"
+  ],
+  "qualification": {
+    "passed": true,
+    "source_workload_started_at": 1794269531.3598037,
+    "measured_at_utc": "2026-11-10T00:23:40.786539+00:00",
+    "agent_p95_seconds": 41.79850141819334,
+    "rush_max_seconds": 50.67650041799061,
+    "rush_min_available_gib": 10.58962631225586,
+    "text_free_artwork_review": true,
+    "reason": "All required real resident workload checks passed with checked wordless artwork and a functional model-generated calculator."
+  },
+  "creative_reserve_gib": {
+    "agent_cover": 8.125,
+    "rush": 10.125
+  },
+  "process_allocator": {
+    "MALLOC_ARENA_MAX": "2",
+    "MALLOC_MMAP_THRESHOLD_": "131072",
+    "MALLOC_TRIM_THRESHOLD_": "131072"
+  },
+  "image_policy": {
+    "art_direction": "Text-free abstract landscape",
+    "validation_model": "Qwen3.6-35B-A3B",
+    "maximum_attempts_per_image": 2,
+    "publish_only_after_text_check": true
+  }
+}

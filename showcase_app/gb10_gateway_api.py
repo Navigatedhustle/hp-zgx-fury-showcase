@@ -10,3 +10,5 @@ from atlas.offline_guard import install
 
 install()
 from showcase_app.gateway import app
+app.openapi_url = None
+app.router.routes[:] = [route for route in app.router.routes if getattr(route, 'path', '') not in ('/docs', '/redoc', '/openapi.json', '/docs/oauth2-redirect')]

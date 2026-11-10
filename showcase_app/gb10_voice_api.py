@@ -22,6 +22,7 @@ async def lifespan(app):
     await asyncio.to_thread(tts_server.load, device)
     cleanup['device'] = device
     cleanup['startup'] = await asyncio.to_thread(release_unused_buffers)
+    cleanup['parameters'] = sum(p.numel() for p in tts_server.model.parameters())
     yield
 
 
@@ -42,3 +43,12 @@ async def memory():
     return cleanup
 
 app.add_middleware(StageRequestGuard, limit=8192)
+
+# The shared service defaults to CUDA; the GB10 endpoint reports actual placement.
+app.router.routes[:] = [route for route in app.router.routes if getattr(route, 'path', '') != '/v1/models']
+
+
+@app.get('/v1/models')
+async def actual_models():
+    return {'data': [{'id': 'Kokoro-82M', 'device': cleanup.get('device'),
+                      'parameters': cleanup.get('parameters'), 'capability': 'speech'}]}

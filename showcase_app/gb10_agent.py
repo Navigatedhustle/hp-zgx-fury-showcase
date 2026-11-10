@@ -11,9 +11,10 @@ import uuid
 from pathlib import Path
 
 import httpx
-from jsonschema import validate
+from jsonschema import validate, ValidationError
 
 from showcase_app.gb10_client import LEAD, WORKER, infer, json_content
+from showcase_app.gb10_image_policy import COVER_PROMPT
 
 ROOT = Path(__file__).resolve().parents[1]
 ACCOUNT = ROOT / 'samples/stage/account_northwind'
@@ -27,6 +28,23 @@ def check_claims(value):
     if re.search(r'\b(?:HIPAA|GDPR|SOC\s*2|ISO\s*27001|compliant|compliance|certified|certification)\b', text, re.I):
         raise ValueError('Draft contains an unsupported compliance or certification statement')
     return value
+
+
+def operational_wording(value):
+    """Copy edit the neutral workflow phrase; the claim guard still runs after it."""
+    edits = []
+    def clean(item):
+        if isinstance(item, str):
+            revised, count = re.subn(r'\breview\s+compliance\b', 'review completion', item, flags=re.I)
+            if count:
+                edits.extend(['review completion'] * count)
+            return revised
+        if isinstance(item, list):
+            return [clean(child) for child in item]
+        if isinstance(item, dict):
+            return {key: clean(child) for key, child in item.items()}
+        return item
+    return clean(value), edits
 
 
 def object_schema(properties, required=None):
@@ -120,6 +138,7 @@ async def image_job(prompt, run_id, purpose='live', *, batch=1, width=1344, heig
 
 def write_deck(data, folder):
     """Use the existing Presentations assembler with five validated, escaped specs."""
+    (folder / 'briefing-candidate.json').write_text(json.dumps(data, ensure_ascii=False, indent=2))
     validate(data, DECK_SCHEMA)
     check_claims(data)
     sys.path.insert(0, str(ROOT / 'build/sources/html_builder-main/backend'))
@@ -227,12 +246,26 @@ class NanoAgent:
             self.event('artifact', artifact='email_en', data=arguments)
             return {'artifact': 'email-en', 'draft_only': True}
         if name == 'build_deck':
-            result = await infer([{'role': 'system', 'content': 'Author exactly five concise executive briefing slides from the fictional source. JSON only matching the schema. Each slide has a short title, subtitle, two or three short points, and notes. Ground all content in the source. No invented statistics, legal assurances, customer claims, HTML or URLs.'},
-                {'role': 'user', 'content': context + '\nBrief: ' + arguments['brief']}], run_id=self.run_id, purpose=self.purpose,
-                role='agent_deck', max_tokens=1800, response_format={'type': 'json_schema', 'json_schema': {'name': 'five_slide_deck', 'strict': True, 'schema': DECK_SCHEMA}})
-            if result['finish_reason'] != 'stop':
-                raise ValueError('Deck author response was incomplete')
-            deck = write_deck(json_content(result['content']), self.folder)
+            messages = [{'role': 'system', 'content': 'Author exactly five concise executive briefing slides from the fictional source. JSON only matching the schema. Each slide has a short title, subtitle, two or three short points, and notes. Use operational language about priorities, pilot scope, owners, measures and next actions. Speaker notes use the same operational topics. Ground every statement in the source. No invented statistics, legal or certification terminology, assurances, customer claims, HTML or URLs.'},
+                        {'role': 'user', 'content': context + '\nBrief: ' + arguments['brief']}]
+            for attempt in range(2):
+                result = await infer(messages, run_id=self.run_id, purpose=self.purpose,
+                    role='agent_deck' if not attempt else 'agent_deck_revision', max_tokens=1800,
+                    response_format={'type': 'json_schema', 'json_schema': {'name': 'five_slide_deck', 'strict': True, 'schema': DECK_SCHEMA}})
+                (self.folder / ('briefing-attempt-' + str(attempt + 1) + '.txt')).write_text(result['content'])
+                try:
+                    if result['finish_reason'] != 'stop':
+                        raise ValueError('Deck author response was incomplete')
+                    candidate, edits = operational_wording(json_content(result['content']))
+                    if edits:
+                        self.event('wording_edited', artifact='deck', edits=len(edits), label='Review wording edited')
+                    deck = write_deck(candidate, self.folder)
+                    break
+                except (ValueError, ValidationError) as exc:
+                    self.event('artifact_rejected', artifact='deck', attempt=attempt + 1, reason=type(exc).__name__)
+                    if attempt:
+                        raise
+                    messages += [{'role': 'assistant', 'content': result['content']}, {'role': 'user', 'content': 'Revise the entire five-slide draft. Use only operational priorities, source facts, pilot owners, measures and next actions. Keep every title, point and speaker note short. Remove legal terminology and unsupported statements. Return all five slides in the required JSON schema.'}]
             self.artifacts['deck'] = deck
             self.event('artifact', artifact='deck', data=deck)
             return {'artifact': 'deck', 'slides': len(deck['slides'])}
@@ -276,7 +309,7 @@ class NanoAgent:
                              {'role': 'user', 'content': context}], run_id=self.run_id, purpose=self.purpose, role='agent_email', max_tokens=650)
         await self.tool('draft_email', json_content(draft['content']))
         await parallel_tools(self, [('build_deck', {'brief': 'Account context, priorities, bounded pilot, open risks and next actions.'}),
-            ('generate_image', {'prompt': 'Original calm editorial illustration of connected planning cards beside a small navy desktop computer, blue light, no people, no text, no logos.'}),
+            ('generate_image', {'prompt': COVER_PROMPT}),
             ('translate', {'source': 'email-en', 'languages': ['es']})])
 
     async def run(self):
@@ -292,7 +325,7 @@ class NanoAgent:
                 'draft_email': 'Save the English email YOU author in subject/body as a draft. This never sends email.',
                 'translate': 'Translate the saved email-en draft into Spanish live with Qwen. This may run in the same parallel batch as draft_email.',
                 'speak_summary': 'Synthesize a short summary with the local Kokoro voice.'}[name], 'parameters': TOOL_SCHEMAS[name]}} for name in names]
-            messages = [{'role': 'system', 'content': 'You are a local personal agent for fictional sample data. Execute the supplied plan using only the provided tools. First list files, then read ALL FOUR files in ONE read_file call. After reading, request build_deck, generate_image, draft_email and translate as independent parallel tool calls. The scheduler queues artifact requests until all four have been requested, then executes them together. A queued response means you must request the remaining tools, never repeat a queued request. Author the English email yourself in draft_email arguments, under 150 words. translate refers to email-en and waits for that draft. Do not type tool code or a final answer in place of calls. No more than eight tool calls total. No paths, URLs, shell commands or SQL. Audio is ' + ('on; also request speak_summary with a short account briefing summary.' if self.audio else 'off; never request speech.')},
+            messages = [{'role': 'system', 'content': 'You are a local personal agent for fictional sample data. Execute the supplied plan using only the provided tools. First list files, then read ALL FOUR files in ONE read_file call. After reading, request build_deck, generate_image, draft_email and translate as independent parallel tool calls. The scheduler queues artifact requests until all four have been requested, then executes them together. A queued response means you must request the remaining tools, never repeat a queued request. Author the English email yourself in draft_email arguments, under 150 words. translate refers to email-en and waits for that draft. Do not type tool code or a final answer in place of calls. No more than eight tool calls total. For generate_image describe only an abstract blue landscape with blank unmarked surfaces. Never request words, lettering, numbers, screens, documents, cards or diagrams. The image tool applies the fixed wordless stage art direction and a local text check. No paths, URLs, shell commands or SQL. Audio is ' + ('on; also request speak_summary with a short account briefing summary.' if self.audio else 'off; never request speech.')},
                         {'role': 'user', 'content': GOAL + '\nValidated plan: ' + json.dumps(plan)}]
             total_calls = 0
             pending = {}

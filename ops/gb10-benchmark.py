@@ -313,14 +313,14 @@ def benchmark_creative(records):
             row['weight_file_cache'] = lane.weight_cache
         folder = ROOT / 'state/gb10-qualification/images'
         folder.mkdir(parents=True, exist_ok=True)
-        prompt = 'Original editorial illustration of a small navy desktop computer beside a folded paper landscape, calm blue lighting, no text, no logo.'
+        from showcase_app.gb10_image_policy import stage_prompt
         for width, height, batch in [(1344, 768, 1), (1024, 576, 4)]:
             for repeat in range(3):
                 output = folder / f'{width}-{batch}-{repeat}.png'
                 began = time.monotonic()
                 job = {}
                 with Monitor() as monitor:
-                    metrics = lane.run('image', prompt, output, threading.Event(),
+                    metrics = lane.run('image', stage_prompt(batch), output, threading.Event(),
                         {'width': width, 'height': height, 'batch': batch, 'seed': 42}, job)
                 row['benchmarks'].append({'width': width, 'height': height, 'batch': batch, 'steps': 4,
                     'warmup': repeat == 0, 'seconds': time.monotonic() - began, 'images_done': job['images_done'],
@@ -372,7 +372,7 @@ def benchmark_voice(records):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--lane', choices=['lead', 'text', 'image', 'voice'], required=True)
-    parser.add_argument('--quant', choices=['Q8_0', 'Q6_K', 'Q4_K_XL'], default='Q8_0')
+    parser.add_argument('--quant', choices=['Q8_0', 'Q6_K', 'Q4_K_XL', 'Q4_K_M'], default='Q8_0')
     parser.add_argument('--loading', choices=['mmap', 'no-mmap', 'direct'], default='mmap')
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--require-isolated', action='store_true')

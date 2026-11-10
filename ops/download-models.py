@@ -32,7 +32,7 @@ def selected_records(profile='gb300',quant='Q8_0',directory=None):
 def main():
  p=argparse.ArgumentParser();p.add_argument('--verify-only',action='store_true')
  p.add_argument('--profile',choices=['gb300','gb10'],default='gb300')
- p.add_argument('--quant',choices=['Q8_0','Q6_K','Q4_K_XL'],default='Q8_0')
+ p.add_argument('--quant',choices=['Q8_0','Q6_K','Q4_K_XL', 'Q4_K_M'],default='Q8_0')
  p.add_argument('--model',help='Download only this pinned directory in the selected profile')
  args=p.parse_args()
  from huggingface_hub import hf_hub_download

@@ -7,8 +7,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def components():
-    quant = os.getenv('FURY_GB10_QUANT', 'Q8_0')
-    quants = {'Q8_0': 'Q8_0', 'Q6_K': 'UD-Q6_K', 'Q4_K_XL': 'UD-Q4_K_XL'}
+    plan_path = ROOT / 'config/gb10.json'
+    plan = json.loads(plan_path.read_text()) if plan_path.exists() else {}
+    quant = os.getenv('FURY_GB10_QUANT', plan.get('lanes', {}).get('text', {}).get('quant', 'Q8_0'))
+    quants = {'Q8_0': 'Q8_0', 'Q6_K': 'UD-Q6_K', 'Q4_K_XL': 'UD-Q4_K_XL', 'Q4_K_M': 'UD-Q4_K_M'}
     if quant not in quants:
         raise ValueError('Unknown GB10 Qwen quant; no model substitution permitted')
     engine = '.tools/llama.cpp/build/bin/llama-server'
@@ -18,6 +20,10 @@ def components():
     ]
     result = {}
     for name, port, alias, filename, context, slots in definitions:
+        lane = plan.get('lanes', {}).get(name, {})
+        port, context, slots = lane.get('port', port), lane.get('context', context), lane.get('slots', slots)
+        if slots < (2 if name == 'lead' else 3) or context // slots < 16384:
+            raise ValueError('GB10 context and parallel slot floors must be preserved')
         model_path = str(ROOT / 'models' / filename)
         command = [engine, '--model', model_path, '--alias', alias, '--host', '127.0.0.1', '--port', str(port),
                    '--ctx-size', str(context), '--parallel', str(slots), '--n-gpu-layers', '999', '--flash-attn', 'on',
@@ -28,6 +34,9 @@ def components():
         if name == 'text':
             command += ['--mmproj', str(ROOT / 'models/Qwen3.6-35B-A3B-GGUF/mmproj-F16.gguf')]
         loading = os.getenv('FURY_GB10_' + name.upper() + '_LOAD_MODE', os.getenv('FURY_GB10_LOAD_MODE'))
+        legacy = os.getenv('FURY_GB10_' + name.upper() + '_NO_MMAP', os.getenv('FURY_GB10_NO_MMAP'))
+        if loading is None and legacy is None:
+            loading = lane.get('loading')
         if loading is not None:
             if loading not in ('auto', 'none', 'dio'):
                 raise ValueError('Unsupported GB10 file loading mode')
@@ -48,12 +57,24 @@ def components():
                     'command': ['.venv/bin/python', '-m', 'uvicorn', 'showcase_app.gb10_gateway_api:app', '--host', '127.0.0.1',
                                 '--port', '18001', '--timeout-graceful-shutdown', '15']},
     })
+    if os.getenv('FURY_STAGE_RUNTIME') == '1':
+        result.update({
+            'stage': {'port': 18808, 'health': '/health', 'command': ['.venv/bin/python', '-m', 'uvicorn',
+                'showcase_app.stage_api:app', '--host', '127.0.0.1', '--port', '18808', '--timeout-graceful-shutdown', '15']},
+            'kiosk': {'port': 18809, 'health': '/health', 'command': ['.venv/bin/python', 'ops/gb10-kiosk.py']},
+        })
     return result
 
 
 def environment():
     pins = json.loads((ROOT / 'config/gb10-build.json').read_text())
     headers = ROOT / '.local-debs/extracted/usr/include'
-    return {**os.environ, **pins['offline_environment'], 'CUDA_VISIBLE_DEVICES': os.getenv('FURY_GPU', '0'),
+    plan_path = ROOT / 'config/gb10.json'
+    plan = json.loads(plan_path.read_text()) if plan_path.exists() else {}
+    return {'FURY_GB10_FLUX_ENCODER': plan.get('flux_encoder', 'fp8'),
+            'FURY_GB10_VOICE_DEVICE': plan.get('lanes', {}).get('tts', {}).get('device', 'cpu'),
+            'FURY_GB10_RELEASE_WEIGHT_CACHE': '1' if plan.get('release_weight_file_cache') else '0',
+            **os.environ, **pins['offline_environment'], **plan.get('process_allocator', {}),
+            'CUDA_VISIBLE_DEVICES': os.getenv('FURY_GPU', '0'),
             'C_INCLUDE_PATH': str(headers) + ':' + str(headers / 'python3.12'),
             'PYTHONUNBUFFERED': '1', 'LOGURU_LEVEL': 'WARNING', 'FURY_PROFILE': 'gb10'}

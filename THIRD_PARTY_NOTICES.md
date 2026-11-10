@@ -49,3 +49,9 @@ The separately downloaded llama.cpp source is MIT at revision `7d7f0287530bc8981
 ## GB10 optional text encoder quantization
 
 TorchAO 0.18.0, https://github.com/pytorch/ao, BSD-3-Clause. Copyright 2023 Meta; Arm contributions Copyright (c) 2024-2026 Arm Limited and/or its affiliates. The upstream BSD-3-Clause conditions and disclaimer are retained with the installed wheel. Exact source, license and wheel hashes are recorded in docs/ASSET-MANIFEST.md and config/gb10-build.json.
+
+## Nano stage H.264 backup encoder
+
+minih264 and minimp4 by lieff use CC0-1.0. stb_image by Sean Barrett uses the MIT license option. Immutable revisions and source/license SHA256 values are in `config/gb10-build.json` and `docs/ASSET-MANIFEST.md`. License texts remain beside the local downloaded headers. No codec binaries are packaged.
+
+The stage and presenter handout use the locally installed Liberation Sans font, version 2.1.5, under SIL Open Font License 1.1. The PDF embeds a subset; no separate font file is added to the source distribution. See docs/ASSET-MANIFEST.md for installed file and notice hashes.

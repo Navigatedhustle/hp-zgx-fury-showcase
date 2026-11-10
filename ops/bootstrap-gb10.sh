@@ -31,6 +31,8 @@ subprocess.run(['dpkg-deb','-x',str(archive),'.local-debs/extracted'],check=True
 PY
 .venv/bin/python ops/build-gb10-llama.py
 .venv/bin/python -m playwright install chromium
-model_quant="${FURY_GB10_QUANT:-Q8_0}"
+profile_quant="$(.venv/bin/python -c 'import json; print(json.load(open("config/gb10.json"))["lanes"]["text"]["quant"])')"
+model_quant="${FURY_GB10_QUANT:-$profile_quant}"
 .venv/bin/python ops/download-models.py --profile gb10 --quant "$model_quant"
-echo 'GB10 preparation complete. Run the measured qualification before selecting a stage profile.'
+.venv/bin/python ops/build-gb10-codecs.py
+echo 'GB10 preparation complete. Verify qualification and record this build before the show.'

@@ -202,18 +202,30 @@ class CreativeLane:
             began = time.monotonic()
             self.load_video()
             job['model_load_seconds'] = time.monotonic() - began
-        # GB10 allocator and checkpoint share the 10 GiB floor plus a 128 MiB guard. Fury retains 14 GiB.
-        # Existing text engines and their fractions/contexts/slots are untouched.
+        # The specified 10 GiB floor applies to Rush. The larger single Agent
+        # cover has a separate explicit reserve; its VAE peak was measured
+        # below 10 GiB even in the successful Gate 1 qualification.
+        reserve = 14
+        checkpoint_reserve = 11
+        if self.gb10:
+            plan = json.loads((ROOT / 'config/gb10.json').read_text()) if (ROOT / 'config/gb10.json').exists() else {}
+            agent_cover = options.get('width') == 1344 and options.get('height') == 768 and options.get('batch', 1) == 1
+            reserves = plan.get('creative_reserve_gib', {'agent_cover': 8.125, 'rush': 10.125})
+            reserve = checkpoint_reserve = reserves['agent_cover' if agent_cover else 'rush']
+            if reserve < (8.125 if agent_cover else 10.125):
+                raise ValueError('Creative reserve is below the qualified segment floor')
         torch.cuda.empty_cache()
         free, total = torch.cuda.mem_get_info()
         if self.gb10:
             free = unified_available()
-        budget = torch.cuda.memory_reserved() + free - (10.125 if self.gb10 else 14) * 1024 ** 3
+        budget = torch.cuda.memory_reserved() + free - reserve * 1024 ** 3
         if budget <= 0:
             raise RuntimeError('Insufficient unified memory above the creative reserve guard' if self.gb10 else 'Insufficient measured HBM above the creative reserve guard')
         torch.cuda.set_per_process_memory_fraction(min(.95, budget / total))
         torch.cuda.reset_peak_memory_stats()
         job['allocator_budget_bytes'] = budget
+        if self.gb10:
+            job['reserve_gib'] = reserve
         pipeline = (self.wan if options.get('reference') is not None else self.wan_text) if kind == 'video' else self.flux
         if kind == 'video':pipeline.enable_model_cpu_offload()
         steps = options.get('steps', 4 if VIDEO_PROFILE == 'longlive' else 50) if kind == 'video' else 4
@@ -224,8 +236,8 @@ class CreativeLane:
             if stop.is_set():
                 raise InterruptedError('Creative job cancelled')
             free_now = unified_available() if self.gb10 else torch.cuda.mem_get_info()[0]
-            if free_now < (10.125 if self.gb10 else 11) * 1024 ** 3:
-                raise InterruptedError('Creative guard stopped the job before the 10 GiB reserve')
+            if free_now < checkpoint_reserve * 1024 ** 3:
+                raise InterruptedError('Creative guard stopped the job before its segment reserve')
             job['steps_done'] = step + 1
             return kwargs
 

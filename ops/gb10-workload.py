@@ -80,6 +80,22 @@ def save(row):
     if previous and previous['started_at'] != row['started_at']:
         data.setdefault('workload_attempts', []).append(previous)
     data['workloads'][row['quant']] = row
+    if row.get('assessment'):
+        agents = [r for r in row['runs'] if r['segment'] == 'S1' and r['purpose'] == 'live']
+        rushes = [r for r in row['runs'] if r['segment'] == 'S3' and r['purpose'] == 'live']
+        prior = data.get('latest_assessment')
+        if prior and prior.get('source_started_at') != row['started_at']:
+            data.setdefault('assessment_history', []).append(prior)
+        data['latest_assessment'] = {
+            'source_started_at': row['started_at'], 'quant': row['quant'], 'assessment': row['assessment'],
+            'agent_p50_seconds': percentile([r['seconds'] for r in agents], .5) if agents else None,
+            'agent_p95_seconds': row.get('agent_p95_seconds'),
+            'rush_p50_seconds': percentile([r['seconds'] for r in rushes], .5) if rushes else None,
+            'rush_p95_seconds': percentile([r['seconds'] for r in rushes], .95) if rushes else None,
+            'rush_max_seconds': row.get('rush_max_seconds'),
+            'rush_min_available_gib': min(r['memory']['min_available_bytes'] for r in rushes) / 2**30 if rushes else None,
+            'rush_swap_in_pages': [r['memory']['swap_in_pages'] for r in rushes],
+            'rush_swap_out_pages': [r['memory']['swap_out_pages'] for r in rushes]}
     if row.get('passed'):
         data['status'] = 'gate_1_passed'
         data['decision'] = {'passed': True, 'quant': row['quant'], 'lead_loading': row['lead_loading'], 'text_loading': row['text_loading'],
@@ -88,6 +104,10 @@ def save(row):
                             'voice_device': row['voice_device'],
                             'context_per_slot': 16384, 'lead_slots': 2, 'text_slots': 3,
                             'reason': 'Actual resident stack, Agent and five six-job Rush runs meet every required threshold'}
+    elif row.get('assessment'):
+        data['status'] = 'gate_1_blocked'
+        data['decision'] = {'passed': False, 'quant': row['quant'], 'reason': 'The current candidate did not meet every required threshold',
+                            'checks': row['assessment']['checks']}
     public.write_text(json.dumps(data, indent=2) + '\n')
 
 
@@ -239,7 +259,7 @@ async def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--quant', choices=['Q8_0', 'Q6_K', 'Q4_K_XL'], required=True)
+    parser.add_argument('--quant', choices=['Q8_0', 'Q6_K', 'Q4_K_XL', 'Q4_K_M'], required=True)
     parser.add_argument('--resident', action='store_true', help='Use only the already verified, owned resident stack')
     parser.add_argument('--warmups', type=int, default=2)
     parser.add_argument('--agent-runs', type=int, default=5)
