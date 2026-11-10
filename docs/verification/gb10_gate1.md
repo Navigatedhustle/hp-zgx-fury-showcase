@@ -6,18 +6,18 @@ The original gpt-oss-120b MXFP4 and Qwen3.6 UD Q4_K_XL identities remain selecte
 
 | Measurement | Actual | Required |
 |---|---:|---:|
-| Agent p50 / p95 | 38.913 / 41.799 s | p95 at most75 s |
-| Rush p50 / p95 / maximum | 49.248 / 50.442 / 50.677 s | maximum at most60 s |
-| Minimum Rush MemAvailable | 10.590 GiB | at least10 GiB |
-| Rush jobs | 6 of6 in all five runs | 6 of6 |
+| Agent p50 / p95 | 38.913 / 41.799 s | p95 at most 75 s |
+| Rush p50 / p95 / maximum | 49.248 / 50.442 / 50.677 s | maximum at most 60 s |
+| Minimum Rush MemAvailable | 10.590 GiB | at least 10 GiB |
+| Rush jobs | 6 of 6 in all five runs | 6 of 6 |
 | Global swap input / output | 0 pages | 0 during Rush |
 | OOM | none | none |
 | Original model identities | all resident | all resident |
 
-Two exact S1/S2/S3 warm passes preceded five measured Agents and five measured Rushes. Every cover and all four Rush images were generated live by FLUX and reviewed locally by the pinned Qwen vision lane before publication. The calculator is still model-written HTML and JavaScript, checked against four real browser arithmetic cases with networking denied; the trusted stage supplies its layout. Removing redundant model-generated CSS corrected the earlier60.773 second timing miss. The failed trial is retained in the history.
+Two exact S1/S2/S3 warm passes preceded five measured Agents and five measured Rushes. Every cover and all four Rush images were generated live by FLUX and reviewed locally by the pinned Qwen vision lane before publication. The calculator is still model-written HTML and JavaScript, checked against four real browser arithmetic cases with networking denied; the trusted stage supplies its layout. Removing redundant model-generated CSS corrected the earlier 60.773 second timing miss. The failed trial is retained in the history.
 
 The owner cleared old swapped pages and re-enabled swap before qualification. Global swap remained enabled, while the owned model scope had MemorySwapMax=0. Independent global counters recorded zero activity throughout this trial. No model was silently substituted and no context or slot floor was reduced.
 
-Per-process GB10 allocator settings limit glibc arenas and use128 KiB mmap/trim thresholds. [The official allocator manual](https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation-Tunables.html) documents these controls; [actual identical-pixel load comparisons](gb10_allocator.json) record their evaluation. No system library or global setting changed. The larger Agent cover uses an8.125 GiB creative guard; Rush retains10.125 GiB, with a required actual minimum of10 GiB.
+Per-process GB10 allocator settings limit glibc arenas and use 128 KiB mmap/trim thresholds. [The official allocator manual](https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation-Tunables.html) documents these controls; [actual identical-pixel load comparisons](gb10_allocator.json) record their evaluation. No system library or global setting changed. The larger Agent cover uses an 8.125 GiB creative guard; Rush retains 10.125 GiB, with a required actual minimum of 10 GiB.
 
 [Full measurement history](gb10_memory_plan.json), [actual image review verification](gb10_text_free_images.json) and [separate stage development attempts](gb10_stage_development.json) preserve the evidence. Stage readiness still requires current backups and successful rehearsal, offline, chaos and idle proof.

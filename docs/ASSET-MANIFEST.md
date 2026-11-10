@@ -174,4 +174,4 @@ The selected GB10 stage quant remains Q4_K_XL after the bounded allocator clean-
 
 ### GB10 generated artwork text policy
 
-Cover and Rush artwork use fixed wordless abstract landscape prompts and the already pinned Qwen vision lane to review original pixels before publication. No additional third party asset or checkpoint is introduced. `docs/verification/gb10_text_free_images.json` records real positive-control rejection, five accepted live renders and their SHA256 values. Runtime candidates, accepted images and backup footage stay excluded from Git and releases.
+Cover and Rush artwork use fixed wordless abstract landscape prompts and the already pinned Qwen vision lane to review original pixels before publication. No additional third party asset or checkpoint is introduced. `docs/verification/gb10_text_free_images.json` records real positive-control rejection, five accepted live renders and their SHA256 values. Standalone runtime candidates, accepted image files and backup footage stay excluded from Git and releases. The reviewed screenshots of this fictional stage show are the explicit documentation exception.

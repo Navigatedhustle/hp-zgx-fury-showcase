@@ -1,5 +1,5 @@
 {
-  "status": "final_timed_proof_in_progress",
+  "status": "stage_ready_p0",
   "scope": "Actual GB10 native HDMI kiosk; mocks and source fixtures are not hardware acceptance.",
   "runtime_build": "5e14dc4dcf76a8fe4f7f8f67cc26782c0aac3b340d657b28c60bb184458f219f",
   "controls": {
@@ -76,15 +76,644 @@
     ]
   },
   "final_idle_and_ten_show_proof": {
-    "status": "new_consecutive_sequence_in_progress",
-    "mode": "final",
-    "required_idle_minutes": 45,
-    "required_consecutive_shows": 10,
-    "show_pacing_minutes": 5,
-    "socket_capture_scope": "All host sockets captured; only verified owned stage process trees are included in the loopback application claim.",
-    "idle_gate_passed": true,
-    "post_idle_full_show_passed": true,
-    "post_idle_show_is_part_of_final_consecutive_sequence": false
+    "passed": true,
+    "consecutive_live_shows": 10,
+    "failovers": 0,
+    "idle_seconds": 2701.0010688600014,
+    "post_idle_show_is_first_of_ten": false,
+    "post_idle_show_completed_live": true,
+    "session_totals_unchanged_during_idle": true,
+    "offline_full_shows_with_all_socket_capture": 10,
+    "socket_samples": 4526,
+    "network_scope": "All host TCP, UDP and Unix sockets captured. Owned stage process trees used loopback network connections and local Unix IPC only. Existing SSH and unrelated host processes are outside the application claim.",
+    "segments": {
+      "S0": {
+        "p50": 0.06512737274169922,
+        "p95": 0.09582104682922361
+      },
+      "S1": {
+        "p50": 43.42735314369202,
+        "p95": 43.59173413515091
+      },
+      "S2": {
+        "p50": 7.145969748497009,
+        "p95": 7.192514002323151
+      },
+      "S3": {
+        "p50": 47.459673047065735,
+        "p95": 47.61984533071518
+      },
+      "S4": {
+        "p50": 0.04900860786437988,
+        "p95": 0.10538364648818968
+      }
+    },
+    "minimum_session_available_gib": 8.76123046875,
+    "minimum_rush_available_gib": 10.67342758178711,
+    "reset_max_seconds": 5.695369338995079,
+    "show_max_wall_seconds": 302.2652155209944,
+    "runs": [
+      {
+        "run": 1,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.10584092140197754,
+            "minimum_memavailable_bytes": 14248906752,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.62323260307312,
+            "minimum_memavailable_bytes": 9407299584,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.1114420890808105,
+            "minimum_memavailable_bytes": 14168842240,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.22746205329895,
+            "minimum_memavailable_bytes": 11554848768,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.04337143898010254,
+            "minimum_memavailable_bytes": 14083354624,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 302.2652155209944,
+        "reset_seconds": 4.673470064997673,
+        "totals": {
+          "input_tokens": 20539,
+          "output_tokens": 4084,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.68957656172774
+        }
+      },
+      {
+        "run": 2,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.07184410095214844,
+            "minimum_memavailable_bytes": 14166261760,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.428553104400635,
+            "minimum_memavailable_bytes": 9482743808,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.158202886581421,
+            "minimum_memavailable_bytes": 14318452736,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.40977597236633,
+            "minimum_memavailable_bytes": 11502604288,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.11374044418334961,
+            "minimum_memavailable_bytes": 14073909248,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.61069995799335,
+        "reset_seconds": 5.62754907499766,
+        "totals": {
+          "input_tokens": 20664,
+          "output_tokens": 4027,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.09329094937906
+        }
+      },
+      {
+        "run": 3,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.08357453346252441,
+            "minimum_memavailable_bytes": 14115344384,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.432239294052124,
+            "minimum_memavailable_bytes": 9495244800,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.169590950012207,
+            "minimum_memavailable_bytes": 14267117568,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.426323890686035,
+            "minimum_memavailable_bytes": 11478261760,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.06085014343261719,
+            "minimum_memavailable_bytes": 14019293184,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.27433635700436,
+        "reset_seconds": 5.695369338995079,
+        "totals": {
+          "input_tokens": 20665,
+          "output_tokens": 4031,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.12083957491387
+        }
+      },
+      {
+        "run": 4,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.04314303398132324,
+            "minimum_memavailable_bytes": 14130589696,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.4261531829834,
+            "minimum_memavailable_bytes": 9492672512,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.124686002731323,
+            "minimum_memavailable_bytes": 14269005824,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.48727226257324,
+            "minimum_memavailable_bytes": 11470622720,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.049375295639038086,
+            "minimum_memavailable_bytes": 14073348096,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.49708884400025,
+        "reset_seconds": 5.6505196139914915,
+        "totals": {
+          "input_tokens": 20664,
+          "output_tokens": 4031,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.11666310632908
+        }
+      },
+      {
+        "run": 5,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.03374052047729492,
+            "minimum_memavailable_bytes": 14168498176,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.55323600769043,
+            "minimum_memavailable_bytes": 9496338432,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.094748258590698,
+            "minimum_memavailable_bytes": 14269685760,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.46954083442688,
+            "minimum_memavailable_bytes": 11499769856,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.04864192008972168,
+            "minimum_memavailable_bytes": 14018904064,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.3939534430101,
+        "reset_seconds": 5.613714282997535,
+        "totals": {
+          "input_tokens": 20665,
+          "output_tokens": 4033,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.103768117474644
+        }
+      },
+      {
+        "run": 6,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.04317975044250488,
+            "minimum_memavailable_bytes": 14140784640,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.29251003265381,
+            "minimum_memavailable_bytes": 9496649728,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.186438083648682,
+            "minimum_memavailable_bytes": 14265913344,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.368064403533936,
+            "minimum_memavailable_bytes": 11476135936,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.04300189018249512,
+            "minimum_memavailable_bytes": 14031155200,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.4474525300029,
+        "reset_seconds": 5.66847889800556,
+        "totals": {
+          "input_tokens": 20663,
+          "output_tokens": 4028,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.16630540133668
+        }
+      },
+      {
+        "run": 7,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.08352208137512207,
+            "minimum_memavailable_bytes": 14083465216,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.33887028694153,
+            "minimum_memavailable_bytes": 9458225152,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.148299932479858,
+            "minimum_memavailable_bytes": 14236549120,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.60052132606506,
+            "minimum_memavailable_bytes": 11487625216,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.04501938819885254,
+            "minimum_memavailable_bytes": 14058307584,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.60627488899627,
+        "reset_seconds": 5.602597389006405,
+        "totals": {
+          "input_tokens": 20666,
+          "output_tokens": 4035,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.13665982371335
+        }
+      },
+      {
+        "run": 8,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.0341949462890625,
+            "minimum_memavailable_bytes": 14096666624,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.26368832588196,
+            "minimum_memavailable_bytes": 9471983616,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.1032328605651855,
+            "minimum_memavailable_bytes": 14220283904,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.550042390823364,
+            "minimum_memavailable_bytes": 11460505600,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.050249338150024414,
+            "minimum_memavailable_bytes": 14036840448,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.3857465350011,
+        "reset_seconds": 5.620554455003003,
+        "totals": {
+          "input_tokens": 20665,
+          "output_tokens": 4033,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.18796021301647
+        }
+      },
+      {
+        "run": 9,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.060842275619506836,
+            "minimum_memavailable_bytes": 14107435008,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.247979402542114,
+            "minimum_memavailable_bytes": 9512980480,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.1974852085113525,
+            "minimum_memavailable_bytes": 14258061312,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.635655879974365,
+            "minimum_memavailable_bytes": 11467780096,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.04182600975036621,
+            "minimum_memavailable_bytes": 14016348160,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.40923707699403,
+        "reset_seconds": 5.5808940550050465,
+        "totals": {
+          "input_tokens": 20665,
+          "output_tokens": 4030,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.08843760985227
+        }
+      },
+      {
+        "run": 10,
+        "segments": [
+          {
+            "segment": "S0",
+            "seconds": 0.0694124698638916,
+            "minimum_memavailable_bytes": 14090719232,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S1",
+            "seconds": 43.45460653305054,
+            "minimum_memavailable_bytes": 9479004160,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S2",
+            "seconds": 7.14363956451416,
+            "minimum_memavailable_bytes": 14256869376,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S3",
+            "seconds": 47.44980525970459,
+            "minimum_memavailable_bytes": 11483049984,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          },
+          {
+            "segment": "S4",
+            "seconds": 0.0951697826385498,
+            "minimum_memavailable_bytes": 14054555648,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "failover": false,
+            "status": "complete"
+          }
+        ],
+        "wall_seconds": 300.33284067299974,
+        "reset_seconds": 5.585197795997374,
+        "totals": {
+          "input_tokens": 20664,
+          "output_tokens": 4031,
+          "images": 5,
+          "pages": 4,
+          "images_analyzed": 7,
+          "tokens_per_second": 41.11249478392761
+        }
+      }
+    ]
   },
   "source_validation": {
     "fury_source_suite": {
@@ -106,5 +735,92 @@
     "Optional live camera input disabled",
     "Audio off for all stage acceptance; physical HDMI audio decision remains with the AV team"
   ],
-  "evidence_policy": "Raw sessions, owned process identities, private socket logs, artwork and recordings stay under ignored state/. Only reviewed fictional-data screenshots and numeric aggregates are published."
+  "evidence_policy": "Raw sessions, owned process identities, private socket logs, artwork and recordings stay under ignored state/. Only reviewed fictional-data screenshots and numeric aggregates are published.",
+  "verified_at_utc": "2026-11-10T02:37:04.898385+00:00",
+  "backups": [
+    {
+      "file": "state/stage/backup/S0.mp4",
+      "mtime_utc": "2026-11-10T00:33:18.418130+00:00",
+      "sha256": "3454501b7e4bf08b2820e1c23e98c00d65935e740a667d573588a98d0a1ea121",
+      "bytes": 4350830,
+      "verified": {
+        "decode": true,
+        "width": 1920,
+        "height": 1080,
+        "duration": 39.966667,
+        "seek_media_time": 20.033333,
+        "decoded_frames": 5
+      }
+    },
+    {
+      "file": "state/stage/backup/S1.mp4",
+      "mtime_utc": "2026-11-10T00:34:18.400183+00:00",
+      "sha256": "421cd5d7f5a97547c0c35db63601d0f34556993a6df1fbf998815bdf15100d57",
+      "bytes": 23255356,
+      "verified": {
+        "decode": true,
+        "width": 1920,
+        "height": 1080,
+        "duration": 110,
+        "seek_media_time": 55.033333,
+        "decoded_frames": 6
+      }
+    },
+    {
+      "file": "state/stage/backup/S2.mp4",
+      "mtime_utc": "2026-11-10T00:34:44.528249+00:00",
+      "sha256": "2c2f1668826964394d62b429370d76bdd301591dddacf9f27f81ed26df946cbd",
+      "bytes": 8684361,
+      "verified": {
+        "decode": true,
+        "width": 1920,
+        "height": 1080,
+        "duration": 49.966667,
+        "seek_media_time": 25.033333,
+        "decoded_frames": 5
+      }
+    },
+    {
+      "file": "state/stage/backup/S3.mp4",
+      "mtime_utc": "2026-11-10T00:35:23.597730+00:00",
+      "sha256": "24ef270eae68208e0761ceafdf1c93c39e88eeb09aaa47572f9b1633ba5d9b61",
+      "bytes": 13001115,
+      "verified": {
+        "decode": true,
+        "width": 1920,
+        "height": 1080,
+        "duration": 76.966667,
+        "seek_media_time": 38.533333,
+        "decoded_frames": 20
+      }
+    },
+    {
+      "file": "state/stage/backup/S4.mp4",
+      "mtime_utc": "2026-11-10T00:35:41.452940+00:00",
+      "sha256": "c9ac90a0b8cd4637c974ca6542c0f0c7061efc388a551e69af56f7a5c2740496",
+      "bytes": 3559998,
+      "verified": {
+        "decode": true,
+        "width": 1920,
+        "height": 1080,
+        "duration": 40,
+        "seek_media_time": 20.033333,
+        "decoded_frames": 5
+      }
+    }
+  ],
+  "image_policy_proof": {
+    "accepted_images_reviewed_locally": 50,
+    "physical_images_generated": 50,
+    "lettering_rejections": 0,
+    "all_published_candidates_passed": true
+  },
+  "rehearsed_plan_runs": [],
+  "earlier_attempts": [
+    {
+      "scope": "Combined idle and rehearsal driver",
+      "outcome": "45 minute idle and its full live show passed; sequence stopped after two completed shows by a test synchronization race before the third Agent state was observed.",
+      "fix": "Wait for the expected state after one actual keypress; do not resend keys. Ten new consecutive shows are counted separately."
+    }
+  ]
 }

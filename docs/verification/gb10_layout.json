@@ -1,0 +1,451 @@
+{
+  "passed": true,
+  "scope": "Native 1920x1080 screenshots from actual full show one; responsive layout replays of the actual final show states, not model acceptance. S4 metrics replay uses presentation elapsed10s; every count/artifact is measured.",
+  "resolution_count": 4,
+  "beat_layout_count": 20,
+  "rows": [
+    {
+      "beat": "S0",
+      "width": 1280,
+      "height": 720,
+      "body_px": 18.72,
+      "headline_px": 48.96,
+      "metric_px": [
+        43.2,
+        43.2,
+        43.2,
+        43.2,
+        43.2,
+        32,
+        32,
+        32
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S1",
+      "width": 1280,
+      "height": 720,
+      "body_px": 18.72,
+      "headline_px": 48.96,
+      "metric_px": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S2",
+      "width": 1280,
+      "height": 720,
+      "body_px": 18.72,
+      "headline_px": 48.96,
+      "metric_px": [
+        32,
+        32,
+        32
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S3",
+      "width": 1280,
+      "height": 720,
+      "body_px": 18.72,
+      "headline_px": 48.96,
+      "metric_px": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": [],
+      "calculator": {
+        "overflow": false,
+        "clipped_elements": [],
+        "body_scroll_exceeds_client": true,
+        "viewport_overflow_hidden": true,
+        "body_px": 21.556,
+        "metric_px": 30.1784,
+        "net": "1000.00",
+        "roi": "200.00%"
+      }
+    },
+    {
+      "beat": "S4",
+      "width": 1280,
+      "height": 720,
+      "body_px": 18.72,
+      "headline_px": 48.96,
+      "metric_px": [
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S0",
+      "width": 1920,
+      "height": 1080,
+      "body_px": 28.08,
+      "headline_px": 73.44,
+      "metric_px": [
+        64.8,
+        64.8,
+        64.8,
+        64.8,
+        64.8,
+        45.36,
+        45.36,
+        45.36
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S1",
+      "width": 1920,
+      "height": 1080,
+      "body_px": 28.08,
+      "headline_px": 73.44,
+      "metric_px": [
+        45.36,
+        45.36,
+        45.36,
+        45.36
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S2",
+      "width": 1920,
+      "height": 1080,
+      "body_px": 28.08,
+      "headline_px": 73.44,
+      "metric_px": [
+        45.36,
+        45.36,
+        45.36
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S3",
+      "width": 1920,
+      "height": 1080,
+      "body_px": 28.08,
+      "headline_px": 73.44,
+      "metric_px": [
+        45.36,
+        45.36,
+        45.36,
+        45.36
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": [],
+      "calculator": {
+        "overflow": false,
+        "clipped_elements": [],
+        "body_scroll_exceeds_client": true,
+        "viewport_overflow_hidden": true,
+        "body_px": 32.64,
+        "metric_px": 45.696,
+        "net": "1000.00",
+        "roi": "200.00%"
+      }
+    },
+    {
+      "beat": "S4",
+      "width": 1920,
+      "height": 1080,
+      "body_px": 28.08,
+      "headline_px": 73.44,
+      "metric_px": [
+        45.36,
+        45.36,
+        45.36,
+        45.36,
+        45.36
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S0",
+      "width": 1920,
+      "height": 1200,
+      "body_px": 31.2,
+      "headline_px": 81.6,
+      "metric_px": [
+        72,
+        72,
+        72,
+        72,
+        72,
+        50.4,
+        50.4,
+        50.4
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S1",
+      "width": 1920,
+      "height": 1200,
+      "body_px": 31.2,
+      "headline_px": 81.6,
+      "metric_px": [
+        50.4,
+        50.4,
+        50.4,
+        50.4
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S2",
+      "width": 1920,
+      "height": 1200,
+      "body_px": 31.2,
+      "headline_px": 81.6,
+      "metric_px": [
+        50.4,
+        50.4,
+        50.4
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S3",
+      "width": 1920,
+      "height": 1200,
+      "body_px": 31.2,
+      "headline_px": 81.6,
+      "metric_px": [
+        50.4,
+        50.4,
+        50.4,
+        50.4
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": [],
+      "calculator": {
+        "overflow": false,
+        "clipped_elements": [],
+        "body_scroll_exceeds_client": true,
+        "viewport_overflow_hidden": true,
+        "body_px": 36.312,
+        "metric_px": 50.8368,
+        "net": "1000.00",
+        "roi": "200.00%"
+      }
+    },
+    {
+      "beat": "S4",
+      "width": 1920,
+      "height": 1200,
+      "body_px": 31.2,
+      "headline_px": 81.6,
+      "metric_px": [
+        50.4,
+        50.4,
+        50.4,
+        50.4,
+        50.4
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S0",
+      "width": 3840,
+      "height": 2160,
+      "body_px": 56.16,
+      "headline_px": 146.88,
+      "metric_px": [
+        129.6,
+        129.6,
+        129.6,
+        129.6,
+        129.6,
+        90.72,
+        90.72,
+        90.72
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S1",
+      "width": 3840,
+      "height": 2160,
+      "body_px": 56.16,
+      "headline_px": 146.88,
+      "metric_px": [
+        90.72,
+        90.72,
+        90.72,
+        90.72
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S2",
+      "width": 3840,
+      "height": 2160,
+      "body_px": 56.16,
+      "headline_px": 146.88,
+      "metric_px": [
+        90.72,
+        90.72,
+        90.72
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    },
+    {
+      "beat": "S3",
+      "width": 3840,
+      "height": 2160,
+      "body_px": 56.16,
+      "headline_px": 146.88,
+      "metric_px": [
+        90.72,
+        90.72,
+        90.72,
+        90.72
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": [],
+      "calculator": {
+        "overflow": false,
+        "clipped_elements": [],
+        "body_scroll_exceeds_client": true,
+        "viewport_overflow_hidden": true,
+        "body_px": 65.756,
+        "metric_px": 92.0584,
+        "net": "1000.00",
+        "roi": "200.00%"
+      }
+    },
+    {
+      "beat": "S4",
+      "width": 3840,
+      "height": 2160,
+      "body_px": 56.16,
+      "headline_px": 146.88,
+      "metric_px": [
+        90.72,
+        90.72,
+        90.72,
+        90.72,
+        90.72
+      ],
+      "overflow": [],
+      "outside": [],
+      "css_scale": []
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "docs/screenshots/nano_stage/ModelHub-1280x720.png",
+      "sha256": "7070f045e84c67668e6254db2115ef05a807d9697e42e1f268c0c1df3a99ba55"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/ModelHub-1920x1080.png",
+      "sha256": "8568404e6e8f2b05f3dd5fb61f798f2ac90c11943ff0172955177773bc2996a6"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/Ready-1280x720.png",
+      "sha256": "9a4a31dd7e1d6a9c6e0098a1eaaef03d2f28161970d617d5e503be4e0a7d11cd"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/Ready-1920x1080.png",
+      "sha256": "cb9db7564dbcd29616014b47f742f39125182ef5bf4ccc2a76759d44d003dde0"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S0-1280x720.png",
+      "sha256": "58337eafb78e3e0ea23eb878c10f95c193d44f11b3342ebe37067509ed02cd0f"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S0-1920x1080.png",
+      "sha256": "719bb3d5bcd7c135bca3e785ed9bb541dab2c4a7db348a3d48e9c9871d3c4f3d"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S1-1280x720.png",
+      "sha256": "6a939cd97a4835adb10ec6dab7f9657e2616b940b2db02b1a6772d43c00480f4"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S1-1920x1080.png",
+      "sha256": "84adc6b6339b5265d308bd91faab28f9d68852990618fcc0fadd1e7364573a91"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S2-1280x720.png",
+      "sha256": "32be0c98714253a77637689fa13ae26707d37662a06d0085b0df2600f0fecff1"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S2-1920x1080.png",
+      "sha256": "67f5001b42d813eb8c780f6ab8421bb742f463bc0aa6b0df247a55fd93b544ea"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S3-1280x720.png",
+      "sha256": "9280c115013210b8a012b627676c55e19f239b21b56f92f6b488fdcd44f45d27"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S3-1920x1080.png",
+      "sha256": "235cf1201388fd6e4fd8e70138edf783daf88f5fccb756935b42e4565d5af7d4"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S4-1280x720.png",
+      "sha256": "d6a093530cc2a8bb26a65487d4af41bbf7b6e622b90ee5e6af87325d2044ae06"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S4-1920x1080.png",
+      "sha256": "f11106858fb18d04cbb78e18a8e4137c4057d03694a30bb8040ef06c0c13797e"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S4-metrics-1280x720.png",
+      "sha256": "7994ed3a1af262079b6e6e6d21bed2a73e821c490bac869a072523a5377263db"
+    },
+    {
+      "file": "docs/screenshots/nano_stage/S4-metrics-1920x1080.png",
+      "sha256": "589d66eb55c570148c74c3ea1c1520e6bb5646f3b9e3a962dac92c51edac382a"
+    }
+  ],
+  "manual_visual_inspection": "Native Agent and Rush at1080p, Agent and Rush at720p, close metrics at720p, Ready at720p, Model Hub at1080p and the one page landscape presenter card inspected for clipped text; none observed."
+}
