@@ -96,6 +96,7 @@
     "fresh_application_environment": "Pinned application requirements installed in a new venv; pip check clean and all 217 Nano/controller/API tests passed",
     "fresh_model_environment": "Pinned model requirements installed in a new venv; missing setuptools pin found and added at the installed tested version; final pip check clean; CUDA, FLUX dependencies, Kokoro package and actual English phonemizer passed without loading model weights.",
     "model_downloads": "Immutable revisions and SHA256 file manifest; existing installed weights reused for same-host runtime validation; no second stack started",
-    "guide": "Seven-page public PDF exported from the guide HTML using local sandboxed Chromium after the connected PDF service returned an internal error."
+    "guide": "Seven-page public PDF exported from the guide HTML using local sandboxed Chromium after the connected PDF service returned an internal error.",
+    "ci_environment": "GitHub workflow now creates and uses .venv, matching the launcher and packaging fixture. The initial global-Python workflow ran 216 tests successfully but one existing packaging fixture could not find .venv/bin/python; no runtime change was required."
   }
 }

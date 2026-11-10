@@ -1,11 +1,11 @@
 # HP ZGX Nano Collective
 ## Complete installation, launch and presenter guide
 
-**Public Nano preview: v3.2.0-nano.1 · 10 November 2026**
+**Public Nano preview: v3.2.0-nano.2 · 10 November 2026**
 
 Repository: https://github.com/Navigatedhustle/hp-zgx-fury-showcase/tree/nano_exec
 
-Release and downloadable source: https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.1
+Release and downloadable source: https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.2
 
 This guide covers the seven-experience Nano Collective hub and the five-scene Executive Stage. Both share one local four-model stack. This is a community demonstration, not an officially supported or endorsed HP or NVIDIA product. HP trademarks remain HP property. All supplied business examples are fictional.
 
@@ -24,7 +24,7 @@ For the automatic browser window, sign in to the Nano's local desktop. HDMI is r
 Run on the Nano:
 
 ```bash
-git clone --branch v3.2.0-nano.1 --depth 1 \
+git clone --branch v3.2.0-nano.2 --depth 1 \
   https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git hp-zgx-nano
 cd hp-zgx-nano
 ./install.sh
@@ -220,7 +220,7 @@ git fetch --tags origin
 ./launch.sh free
 ```
 
-The guide's clone command pins v3.2.0-nano.1 for reproducibility. A future update should name an explicit reviewed Nano tag in `git switch --detach TAG` between fetch and install. To roll back, stop and select the prior known-good Nano tag, then rerun its installer. Existing Fury releases are for different hardware profiles and are not an automatic Nano rollback target.
+The guide's clone command pins v3.2.0-nano.2 for reproducibility. A future update should name an explicit reviewed Nano tag in `git switch --detach TAG` between fetch and install. To roll back, stop and select the prior known-good Nano tag, then rerun its installer. Existing Fury releases are for different hardware profiles and are not an automatic Nano rollback target.
 
 Do not copy process registries between installations. Recreate the desktop shortcut after moving the installation. Keep recordings matched to their build. Do not delete model files merely to free memory; stop unused workloads instead.
 

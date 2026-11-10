@@ -14,8 +14,12 @@ jobs:
           python-version: '3.12'
       - run: bash ops/scan-secrets.sh
       - run: python ops/check-source.py
-      - run: python ops/package-release.py --version v3.2.0-nano.1
-      - run: pip install -r ops/apps-requirements.lock
+      - run: python ops/package-release.py --version v3.2.0-nano.2
+      - name: Install the same isolated application environment used by the launcher
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --no-deps -r ops/apps-requirements.lock
+          .venv/bin/python -m pip check
       - name: Hardware-independent controller and API failure fixtures
-        run: python -m pytest -q ops/tests ops/acceptance/test_gateway.py ops/acceptance/test_booth.py
+        run: .venv/bin/python -m pytest -q ops/tests ops/acceptance/test_gateway.py ops/acceptance/test_booth.py
       # GPU/browser/namespace/model generation acceptance is intentionally separate.

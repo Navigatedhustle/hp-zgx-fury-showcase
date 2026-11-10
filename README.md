@@ -2,10 +2,10 @@
 
 Seven interactive local AI experiences and a fast-starting Executive Stage on the HP ZGX Nano / NVIDIA GB10, with the supplied official HP logo, original robot artwork and the complete portable installer.
 
-**Nano preview v3.2.0-nano.1** · Ubuntu 24.04 ARM64 · 128 GB unified memory · working NVIDIA driver/CUDA toolkit · 200 GiB free installation space. Selected model files: about 95.9 GiB. This is a community demonstration, not an officially supported or endorsed HP or NVIDIA product.
+**Nano preview v3.2.0-nano.2** · Ubuntu 24.04 ARM64 · 128 GB unified memory · working NVIDIA driver/CUDA toolkit · 200 GiB free installation space. Selected model files: about 95.9 GiB. This is a community demonstration, not an officially supported or endorsed HP or NVIDIA product.
 
 ```bash
-git clone --branch v3.2.0-nano.1 --depth 1 \
+git clone --branch v3.2.0-nano.2 --depth 1 \
   https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git hp-zgx-nano
 cd hp-zgx-nano
 ./install.sh
@@ -16,7 +16,7 @@ Open **http://127.0.0.1:18808/free**, or use the installed **HP ZGX Nano Experie
 
 `./install.sh --check` inspects prerequisites; `./install.sh --no-desktop` supports headless preparation. Setup downloads pinned dependencies and model files and verifies their recorded hashes. It never replaces a driver, changes networking or disables a sandbox. Only one model stack should run on this GPU.
 
-[Complete install and presenter guide](docs/NANO_GUIDE.md) · [Download the guide PDF](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.2.0-nano.1/HP-ZGX-Nano-Complete-Guide.pdf) · [Public Nano release](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.1) · [Capabilities](docs/FREE_MODE.md) · [Verification and limits](docs/verification/nano_collective_ui.json)
+[Complete install and presenter guide](docs/NANO_GUIDE.md) · [Download the guide PDF](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.2.0-nano.2/HP-ZGX-Nano-Complete-Guide.pdf) · [Public Nano release](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.2) · [Capabilities](docs/FREE_MODE.md) · [Verification and limits](docs/verification/nano_collective_ui.json)
 
 ![Nano Collective experience center](docs/screenshots/nano-collective.png)
 
