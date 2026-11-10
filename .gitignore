@@ -80,3 +80,6 @@ dist/
 # Customer branding and presenter credentials are runtime-only.
 /state/skin/
 /state/skin-presenter.pin
+
+# Public fictional presenter handout, explicitly included by publication policy.
+!docs/stage/PRESENTER_CARD.pdf

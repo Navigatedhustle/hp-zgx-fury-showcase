@@ -2,12 +2,24 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 export HF_HOME="$PWD/.cache/huggingface" HF_HUB_DISABLE_IMPLICIT_TOKEN=1 PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright"
-export XDG_CACHE_HOME="$PWD/.cache" FURY_PROFILE=frankfurt
+export XDG_CACHE_HOME="$PWD/.cache"
+if [[ "${FURY_PROFILE:-}" == gb10 ]] || [[ "${FURY_PROFILE:-}" != gb300 && "$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || true)" == *GB10* ]]; then
+ export FURY_PROFILE=gb10
+else
+ export FURY_PROFILE=frankfurt
+fi
 # Use local caches even if the launching user has personal global inference settings.
 unset VLLM_CACHE_ROOT VLLM_CONFIG_ROOT
 export VLLM_CACHE_ROOT="$PWD/.cache/vllm" VLLM_CONFIG_ROOT="$PWD/.cache/vllm-config"
 command="${1:-start}"
+if [[ "$FURY_PROFILE" == gb10 && "$command" != stage ]]; then
+ case "$command" in
+  start|status|stop) exec .venv/bin/python ops/gb10-stage.py "$command" ;;
+  setup) exec bash ops/bootstrap-gb10.sh ;;
+ esac
+fi
 case "$command" in
+ stage) shift; export FURY_PROFILE=gb10; exec .venv/bin/python ops/gb10-stage.py "${@:-start}" ;;
  setup) exec bash ops/bootstrap.sh ;;
  stop|status|restart) shift || true; exec ./showcase "$command" "$@" ;;
  diagnostics) exec python3 ops/diagnostics.py ;;

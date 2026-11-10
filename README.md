@@ -85,3 +85,13 @@ git switch --detach v2.2.0
 For archive installs, keep the previous release directory and its own environments/output. Stop the current installation through its own launcher, then launch the previous one. Do not copy process registries between directories. Back up outputs first; this UI release changes no application database schema.
 
 V2.0 predates Guided demonstration. Use a fresh browser profile when presenting a prior release; retained recorded artifacts remain recorded and must not be described as newly generated.
+
+## Nano Executive Stage Mode
+
+On GB10, `./launch.sh stage` loads the four pinned local models, warms the exact show inputs twice, checks readiness and opens the local HDMI kiosk at `http://127.0.0.1:18808/stage`. `FURY_PROFILE=gb10` selects the Nano explicitly. The existing Fury profile remains separate.
+
+Prepare actual current backups with `./launch.sh stage record` at native 1920×1080. Normal stage mode blocks until all five backups are current and verified. Use `./launch.sh stage reset`, `./launch.sh stage status` and `./launch.sh stage stop` for the show session. The stage runs entirely from local assets with the Hugging Face and Transformers offline variables enforced.
+
+Generated cover and gallery images use wordless abstract art direction. Each real render is checked by the local vision lane before display; rejected lettering is never published. The P0 show keeps optional openers and camera segments disabled.
+
+See [the run of show](docs/stage/RUN_OF_SHOW.md), [the checklist](docs/stage/STAGE_CHECKLIST.md) and [the memory qualification](docs/verification/gb10_gate1.md). Full rehearsal readiness is established separately by actual Nano acceptance evidence. Event settings, recordings, outputs and optional private branding stay in ignored `state/` and are excluded from source distributions.
