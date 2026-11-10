@@ -1,22 +1,24 @@
 {
   "schema": 1,
   "hardware": "NVIDIA GB10",
-  "status": "gate_1_passed",
+  "status": "gate_1_blocked",
   "decision": {
-    "passed": true,
+    "passed": false,
     "quant": "Q4_K_XL",
-    "lead_loading": "direct",
-    "text_loading": "direct",
-    "flux_encoder": "fp8",
-    "cpu_prompt_cache_limit_mib_per_server": 0,
-    "batch_tokens": 512,
-    "microbatch_tokens": 128,
-    "process_swap_limit_bytes": 0,
-    "voice_device": "cpu",
-    "context_per_slot": 16384,
-    "lead_slots": 2,
-    "text_slots": 3,
-    "reason": "Actual resident stack, Agent and five six-job Rush runs meet every required threshold"
+    "reason": "The current candidate did not meet every required threshold",
+    "checks": {
+      "two_full_warm_passes": true,
+      "five_agent_samples": true,
+      "five_rush_samples": false,
+      "all_jobs_complete": false,
+      "all_lanes_resident": false,
+      "agent_p95_at_most_75_seconds": true,
+      "rush_at_most_60_seconds": true,
+      "rush_minimum_10_gib_available": true,
+      "rush_zero_global_swap": false,
+      "no_kernel_oom": true,
+      "runtime_scope_swap_zero": true
+    }
   },
   "measurement": "MemAvailable deltas and 100 ms /proc/meminfo sampling; /proc/vmstat swap deltas; native llama.cpp timings and observed SSE TTFT",
   "preexisting_workloads_present": true,
@@ -13477,46 +13479,46 @@
       "voice_device": "cpu",
       "text_loading": "direct",
       "lead_loading": "direct",
-      "started_at": 1794269531.3598037,
-      "status": "passed",
-      "passed": true,
+      "started_at": 1794284028.20413,
+      "status": "failed",
+      "passed": false,
       "runs": [
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_warmup_1_1794269579",
+          "run_id": "qual_Q4_K_XL_S1_warmup_1_1794284076",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 41.426419440002064,
+          "seconds": 43.38655124300567,
           "memory": {
             "baseline": {
-              "time": 1794269579.986688,
+              "time": 1794284076.5853732,
               "total_bytes": 130596188160,
-              "available_bytes": 16881565696,
-              "free_bytes": 13351940096,
-              "file_cache_bytes": 5621506048,
-              "anonymous_bytes": 5724717056,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 17109381120,
+              "free_bytes": 12632059904,
+              "file_cache_bytes": 6485315584,
+              "anonymous_bytes": 5250719744,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269621.255491,
+              "time": 1794284119.8160331,
               "total_bytes": 130596188160,
-              "available_bytes": 14482468864,
-              "free_bytes": 11302936576,
-              "file_cache_bytes": 5628862464,
-              "anonymous_bytes": 7584374784,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 15319257088,
+              "free_bytes": 10789416960,
+              "file_cache_bytes": 6543679488,
+              "anonymous_bytes": 7130927104,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 9890607104,
-            "min_free_bytes": 6712377344,
-            "max_file_cache_bytes": 5628887040,
-            "peak_memory_used_bytes": 120705581056,
+            "min_available_bytes": 10665582592,
+            "min_free_bytes": 6136700928,
+            "max_file_cache_bytes": 6543679488,
+            "peak_memory_used_bytes": 119930605568,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -13525,131 +13527,131 @@
           "tool_seconds": [
             {
               "tool": "list_files",
-              "seconds": 9.852799121290445e-05,
+              "seconds": 8.907000301405787e-05,
               "status": "complete"
             },
             {
               "tool": "read_file",
-              "seconds": 8.819199865683913e-05,
+              "seconds": 8.579100540373474e-05,
               "status": "complete"
             },
             {
               "tool": "build_deck",
-              "seconds": 21.662509669011342,
+              "seconds": 23.47010828900966,
               "status": "complete"
             },
             {
               "tool": "draft_email",
-              "seconds": 0.00016496000171173364,
+              "seconds": 0.00017791699792724103,
               "status": "complete"
             },
             {
               "tool": "translate",
-              "seconds": 14.953799166003591,
+              "seconds": 14.92829253799573,
               "status": "complete"
             },
             {
               "tool": "generate_image",
-              "seconds": 14.040706814994337,
+              "seconds": 14.19667308901262,
               "status": "complete"
             }
           ],
-          "output_tokens": 1554,
-          "aggregate_output_tokens_per_second": 37.51229338684846,
+          "output_tokens": 1647,
+          "aggregate_output_tokens_per_second": 37.961072102164664,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8223940608,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8394366976,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S2",
-          "run_id": "qual_Q4_K_XL_S2_warmup_1_1794269621",
+          "run_id": "qual_Q4_K_XL_S2_warmup_1_1794284119",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 6.71085425199999,
+          "seconds": 6.733409027001471,
           "memory": {
             "baseline": {
-              "time": 1794269621.52811,
+              "time": 1794284120.0946972,
               "total_bytes": 130596188160,
-              "available_bytes": 14482485248,
-              "free_bytes": 11302772736,
-              "file_cache_bytes": 5629042688,
-              "anonymous_bytes": 7590428672,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 15317041152,
+              "free_bytes": 10786975744,
+              "file_cache_bytes": 6543904768,
+              "anonymous_bytes": 7136186368,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269628.0735579,
+              "time": 1794284126.6704547,
               "total_bytes": 130596188160,
-              "available_bytes": 14324555776,
-              "free_bytes": 11144564736,
-              "file_cache_bytes": 5629206528,
-              "anonymous_bytes": 7695798272,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 15230013440,
+              "free_bytes": 10699337728,
+              "file_cache_bytes": 6544388096,
+              "anonymous_bytes": 7234322432,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 14321094656,
-            "min_free_bytes": 11141103616,
-            "max_file_cache_bytes": 5629214720,
-            "peak_memory_used_bytes": 116275093504,
+            "min_available_bytes": 15210483712,
+            "min_free_bytes": 10680336384,
+            "max_file_cache_bytes": 6544404480,
+            "peak_memory_used_bytes": 115385704448,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
           },
           "output_tokens": 234,
-          "aggregate_output_tokens_per_second": 34.86888423038879,
+          "aggregate_output_tokens_per_second": 34.752084577313305,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8331939840,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8497213440,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S3",
-          "run_id": "qual_Q4_K_XL_S3_warmup_1_1794269628",
+          "run_id": "qual_Q4_K_XL_S3_warmup_1_1794284126",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 50.42069755299599,
+          "seconds": 50.69701061099477,
           "memory": {
             "baseline": {
-              "time": 1794269628.3336942,
+              "time": 1794284126.9350574,
               "total_bytes": 130596188160,
-              "available_bytes": 14327209984,
-              "free_bytes": 11147161600,
-              "file_cache_bytes": 5629231104,
-              "anonymous_bytes": 7697248256,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 15232192512,
+              "free_bytes": 10701484032,
+              "file_cache_bytes": 6544408576,
+              "anonymous_bytes": 7234031616,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269678.6008778,
+              "time": 1794284177.4743505,
               "total_bytes": 130596188160,
-              "available_bytes": 14090592256,
-              "free_bytes": 10906288128,
-              "file_cache_bytes": 5632122880,
-              "anonymous_bytes": 7996973056,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14956199936,
+              "free_bytes": 10420613120,
+              "file_cache_bytes": 6547689472,
+              "anonymous_bytes": 7532253184,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 11585208320,
-            "min_free_bytes": 8402853888,
-            "max_file_cache_bytes": 5640769536,
-            "peak_memory_used_bytes": 119010979840,
+            "min_available_bytes": 12458471424,
+            "min_free_bytes": 7925051392,
+            "max_file_cache_bytes": 6557671424,
+            "peak_memory_used_bytes": 118137716736,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -13658,80 +13660,80 @@
             "risks": {
               "name": "risks",
               "status": "complete",
-              "seconds": 14.622531921995687
+              "seconds": 14.6234418630047
             },
             "app": {
               "name": "app",
               "status": "complete",
-              "seconds": 20.463146651993156
+              "seconds": 20.55919917600113
             },
             "images": {
               "name": "images",
               "status": "complete",
-              "seconds": 37.324127646992565
+              "seconds": 37.4072506359953
             },
             "chart": {
               "name": "chart",
               "status": "complete",
-              "seconds": 15.11816677499155
+              "seconds": 15.04800818899821
             },
             "translation": {
               "name": "translation",
               "status": "complete",
-              "seconds": 50.21822181699099
+              "seconds": 50.48856405100378
             },
             "summary": {
               "name": "summary",
               "status": "complete",
-              "seconds": 16.45868434899603
+              "seconds": 16.39489591399615
             }
           },
-          "output_tokens": 2171,
-          "aggregate_output_tokens_per_second": 43.05771449746632,
+          "output_tokens": 2177,
+          "aggregate_output_tokens_per_second": 42.94138793911193,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8638681088,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8802738176,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_warmup_2_1794269678",
+          "run_id": "qual_Q4_K_XL_S1_warmup_2_1794284177",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 43.37096810300136,
+          "seconds": 42.46940650299075,
           "memory": {
             "baseline": {
-              "time": 1794269678.8661697,
+              "time": 1794284177.7646735,
               "total_bytes": 130596188160,
-              "available_bytes": 14085513216,
-              "free_bytes": 10901131264,
-              "file_cache_bytes": 5632212992,
-              "anonymous_bytes": 8001400832,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14948749312,
+              "free_bytes": 10413162496,
+              "file_cache_bytes": 6547689472,
+              "anonymous_bytes": 7537250304,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269722.0765069,
+              "time": 1794284220.0795248,
               "total_bytes": 130596188160,
-              "available_bytes": 13991387136,
-              "free_bytes": 10805825536,
-              "file_cache_bytes": 5632794624,
-              "anonymous_bytes": 8074956800,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14865678336,
+              "free_bytes": 10327683072,
+              "file_cache_bytes": 6549504000,
+              "anonymous_bytes": 7637450752,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 8978321408,
-            "min_free_bytes": 5792374784,
-            "max_file_cache_bytes": 5633691648,
-            "peak_memory_used_bytes": 121617866752,
+            "min_available_bytes": 9875537920,
+            "min_free_bytes": 5338537984,
+            "max_file_cache_bytes": 6549520384,
+            "peak_memory_used_bytes": 120720650240,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -13740,131 +13742,131 @@
           "tool_seconds": [
             {
               "tool": "list_files",
-              "seconds": 0.00013686400779988617,
+              "seconds": 9.116699220612645e-05,
               "status": "complete"
             },
             {
               "tool": "read_file",
-              "seconds": 0.00012529600644484162,
+              "seconds": 0.00011329400877002627,
               "status": "complete"
             },
             {
               "tool": "build_deck",
-              "seconds": 24.638724230011576,
+              "seconds": 23.444317146000685,
               "status": "complete"
             },
             {
               "tool": "generate_image",
-              "seconds": 14.648221556999488,
+              "seconds": 12.564253583012032,
               "status": "complete"
             },
             {
               "tool": "draft_email",
-              "seconds": 0.00026713599800132215,
+              "seconds": 0.0001470700080972165,
               "status": "complete"
             },
             {
               "tool": "translate",
-              "seconds": 16.840567936000298,
+              "seconds": 15.274045038997428,
               "status": "complete"
             }
           ],
-          "output_tokens": 1586,
-          "aggregate_output_tokens_per_second": 36.56824067734484,
+          "output_tokens": 1606,
+          "aggregate_output_tokens_per_second": 37.81545663669454,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8711974912,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8893173760,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S2",
-          "run_id": "qual_Q4_K_XL_S2_warmup_2_1794269722",
+          "run_id": "qual_Q4_K_XL_S2_warmup_2_1794284220",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 7.156383506007842,
+          "seconds": 7.1871849019953515,
           "memory": {
             "baseline": {
-              "time": 1794269722.339418,
+              "time": 1794284220.3504004,
               "total_bytes": 130596188160,
-              "available_bytes": 13991227392,
-              "free_bytes": 10805698560,
-              "file_cache_bytes": 5632761856,
-              "anonymous_bytes": 8076320768,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14864732160,
+              "free_bytes": 10326732800,
+              "file_cache_bytes": 6549508096,
+              "anonymous_bytes": 7639162880,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269729.3381095,
+              "time": 1794284227.3746934,
               "total_bytes": 130596188160,
-              "available_bytes": 14307848192,
-              "free_bytes": 11121807360,
-              "file_cache_bytes": 5633118208,
-              "anonymous_bytes": 7760289792,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 15187099648,
+              "free_bytes": 10648379392,
+              "file_cache_bytes": 6550118400,
+              "anonymous_bytes": 7328153600,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 13991227392,
-            "min_free_bytes": 10805698560,
-            "max_file_cache_bytes": 5633130496,
-            "peak_memory_used_bytes": 116604960768,
+            "min_available_bytes": 14864732160,
+            "min_free_bytes": 10326732800,
+            "max_file_cache_bytes": 6550126592,
+            "peak_memory_used_bytes": 115731456000,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
           },
           "output_tokens": 254,
-          "aggregate_output_tokens_per_second": 35.4927876331341,
+          "aggregate_output_tokens_per_second": 35.34067976037223,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8397791232,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8576495616,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S3",
-          "run_id": "qual_Q4_K_XL_S3_warmup_2_1794269729",
+          "run_id": "qual_Q4_K_XL_S3_warmup_2_1794284227",
           "purpose": "warmup",
           "audio": false,
           "status": "complete",
-          "seconds": 46.196804894003435,
+          "seconds": 46.08621194399893,
           "memory": {
             "baseline": {
-              "time": 1794269729.5974264,
+              "time": 1794284227.641322,
               "total_bytes": 130596188160,
-              "available_bytes": 14308020224,
-              "free_bytes": 11121983488,
-              "file_cache_bytes": 5633122304,
-              "anonymous_bytes": 7762288640,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 15178854400,
+              "free_bytes": 10640134144,
+              "file_cache_bytes": 6550118400,
+              "anonymous_bytes": 7329964032,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269775.6391232,
+              "time": 1794284273.5718615,
               "total_bytes": 130596188160,
-              "available_bytes": 13983842304,
-              "free_bytes": 10794135552,
-              "file_cache_bytes": 5635432448,
-              "anonymous_bytes": 8040132608,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14956478464,
+              "free_bytes": 10413142016,
+              "file_cache_bytes": 6553432064,
+              "anonymous_bytes": 7568474112,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 11426627584,
-            "min_free_bytes": 8238477312,
-            "max_file_cache_bytes": 5645275136,
-            "peak_memory_used_bytes": 119169560576,
+            "min_available_bytes": 12393652224,
+            "min_free_bytes": 7852486656,
+            "max_file_cache_bytes": 6561284096,
+            "peak_memory_used_bytes": 118202535936,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -13873,80 +13875,80 @@
             "risks": {
               "name": "risks",
               "status": "complete",
-              "seconds": 14.678878269987763
+              "seconds": 14.30428446699807
             },
             "app": {
               "name": "app",
               "status": "complete",
-              "seconds": 20.678058834004332
+              "seconds": 20.435634047011263
             },
             "images": {
               "name": "images",
               "status": "complete",
-              "seconds": 38.01268163899658
+              "seconds": 37.779374114004895
             },
             "chart": {
               "name": "chart",
               "status": "complete",
-              "seconds": 15.05559455799812
+              "seconds": 14.847645432993886
             },
             "translation": {
               "name": "translation",
               "status": "complete",
-              "seconds": 45.99016298199422
+              "seconds": 45.87844501899963
             },
             "summary": {
               "name": "summary",
               "status": "complete",
-              "seconds": 16.505532529990887
+              "seconds": 16.30345662200125
             }
           },
-          "output_tokens": 2146,
-          "aggregate_output_tokens_per_second": 46.45342908289662,
+          "output_tokens": 2141,
+          "aggregate_output_tokens_per_second": 46.45641092397892,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8677199872,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8838549504,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_live_1_1794269775",
+          "run_id": "qual_Q4_K_XL_S1_live_1_1794284273",
           "purpose": "live",
           "audio": false,
           "status": "complete",
-          "seconds": 42.20570183999371,
+          "seconds": 42.298934872989776,
           "memory": {
             "baseline": {
-              "time": 1794269775.9037158,
+              "time": 1794284273.8467379,
               "total_bytes": 130596188160,
-              "available_bytes": 13981409280,
-              "free_bytes": 10791657472,
-              "file_cache_bytes": 5635477504,
-              "anonymous_bytes": 8042283008,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14948687872,
+              "free_bytes": 10405343232,
+              "file_cache_bytes": 6553444352,
+              "anonymous_bytes": 7570292736,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269817.950056,
+              "time": 1794284315.9857352,
               "total_bytes": 130596188160,
-              "available_bytes": 13944963072,
-              "free_bytes": 10753286144,
-              "file_cache_bytes": 5636743168,
-              "anonymous_bytes": 8108695552,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14891769856,
+              "free_bytes": 10346422272,
+              "file_cache_bytes": 6554910720,
+              "anonymous_bytes": 7629737984,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 8905531392,
-            "min_free_bytes": 5714702336,
-            "max_file_cache_bytes": 5636759552,
-            "peak_memory_used_bytes": 121690656768,
+            "min_available_bytes": 9856471040,
+            "min_free_bytes": 5312016384,
+            "max_file_cache_bytes": 6554931200,
+            "peak_memory_used_bytes": 120739717120,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -13955,81 +13957,81 @@
           "tool_seconds": [
             {
               "tool": "list_files",
-              "seconds": 8.90079973032698e-05,
+              "seconds": 8.404700201936066e-05,
               "status": "complete"
             },
             {
               "tool": "read_file",
-              "seconds": 0.00011854399053845555,
+              "seconds": 7.53110070945695e-05,
               "status": "complete"
             },
             {
               "tool": "build_deck",
-              "seconds": 23.24760864498967,
+              "seconds": 23.515311163006118,
               "status": "complete"
             },
             {
               "tool": "generate_image",
-              "seconds": 12.838158735001343,
+              "seconds": 12.866086836002069,
               "status": "complete"
             },
             {
               "tool": "draft_email",
-              "seconds": 0.00027401601255405694,
+              "seconds": 0.00015142199117690325,
               "status": "complete"
             },
             {
               "tool": "translate",
-              "seconds": 15.475317896998604,
+              "seconds": 15.411856976003037,
               "status": "complete"
             }
           ],
-          "output_tokens": 1586,
-          "aggregate_output_tokens_per_second": 37.577861067509176,
+          "output_tokens": 1606,
+          "aggregate_output_tokens_per_second": 37.967859115656374,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8746184704,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8896925696,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_live_2_1794269818",
+          "run_id": "qual_Q4_K_XL_S1_live_2_1794284316",
           "purpose": "live",
           "audio": false,
           "status": "complete",
-          "seconds": 40.16969973099185,
+          "seconds": 40.59351482600323,
           "memory": {
             "baseline": {
-              "time": 1794269818.240181,
+              "time": 1794284316.2488575,
               "total_bytes": 130596188160,
-              "available_bytes": 13945200640,
-              "free_bytes": 10753347584,
-              "file_cache_bytes": 5636935680,
-              "anonymous_bytes": 8109862912,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14896099328,
+              "free_bytes": 10350714880,
+              "file_cache_bytes": 6554939392,
+              "anonymous_bytes": 7630192640,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269858.2553453,
+              "time": 1794284356.6926088,
               "total_bytes": 130596188160,
-              "available_bytes": 14020927488,
-              "free_bytes": 10826354688,
-              "file_cache_bytes": 5638823936,
-              "anonymous_bytes": 8039129088,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14953623552,
+              "free_bytes": 10405982208,
+              "file_cache_bytes": 6556602368,
+              "anonymous_bytes": 7573319680,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 9102667776,
-            "min_free_bytes": 5908901888,
-            "max_file_cache_bytes": 5638828032,
-            "peak_memory_used_bytes": 121493520384,
+            "min_available_bytes": 10083774464,
+            "min_free_bytes": 5536632832,
+            "max_file_cache_bytes": 6556622848,
+            "peak_memory_used_bytes": 120512413696,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14038,81 +14040,81 @@
           "tool_seconds": [
             {
               "tool": "list_files",
-              "seconds": 8.169599459506571e-05,
+              "seconds": 8.489500032737851e-05,
               "status": "complete"
             },
             {
               "tool": "read_file",
-              "seconds": 7.771200034767389e-05,
+              "seconds": 8.646301284898072e-05,
               "status": "complete"
             },
             {
               "tool": "build_deck",
-              "seconds": 21.519120732002193,
+              "seconds": 21.979196265994688,
               "status": "complete"
             },
             {
               "tool": "draft_email",
-              "seconds": 0.00014983999426476657,
+              "seconds": 0.0001557100040372461,
               "status": "complete"
             },
             {
               "tool": "translate",
-              "seconds": 12.198666794996825,
+              "seconds": 12.170726413998636,
               "status": "complete"
             },
             {
               "tool": "generate_image",
-              "seconds": 10.477890554990154,
+              "seconds": 10.613547478002147,
               "status": "complete"
             }
           ],
-          "output_tokens": 1618,
-          "aggregate_output_tokens_per_second": 40.27911612074301,
+          "output_tokens": 1637,
+          "aggregate_output_tokens_per_second": 40.32663855339221,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8679333888,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8828092416,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_live_3_1794269858",
+          "run_id": "qual_Q4_K_XL_S1_live_3_1794284356",
           "purpose": "live",
           "audio": false,
           "status": "complete",
-          "seconds": 38.01170480399742,
+          "seconds": 39.129876750012045,
           "memory": {
             "baseline": {
-              "time": 1794269858.5548558,
+              "time": 1794284356.958187,
               "total_bytes": 130596188160,
-              "available_bytes": 14025818112,
-              "free_bytes": 10831093760,
-              "file_cache_bytes": 5638979584,
-              "anonymous_bytes": 8039669760,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14946766848,
+              "free_bytes": 10399141888,
+              "file_cache_bytes": 6556585984,
+              "anonymous_bytes": 7573327872,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269896.407351,
+              "time": 1794284395.937032,
               "total_bytes": 130596188160,
-              "available_bytes": 14000189440,
-              "free_bytes": 10803458048,
-              "file_cache_bytes": 5640396800,
-              "anonymous_bytes": 8051314688,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14933442560,
+              "free_bytes": 10383351808,
+              "file_cache_bytes": 6558490624,
+              "anonymous_bytes": 7588237312,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 9103237120,
-            "min_free_bytes": 5907324928,
-            "max_file_cache_bytes": 5640421376,
-            "peak_memory_used_bytes": 121492951040,
+            "min_available_bytes": 10076872704,
+            "min_free_bytes": 5527760896,
+            "max_file_cache_bytes": 6558490624,
+            "peak_memory_used_bytes": 120519315456,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14121,81 +14123,81 @@
           "tool_seconds": [
             {
               "tool": "list_files",
-              "seconds": 8.627200440969318e-05,
+              "seconds": 0.00014825401012785733,
               "status": "complete"
             },
             {
               "tool": "read_file",
-              "seconds": 8.172799425665289e-05,
+              "seconds": 0.00012763099221047014,
               "status": "complete"
             },
             {
               "tool": "build_deck",
-              "seconds": 20.332127929999842,
+              "seconds": 21.109324962992105,
               "status": "complete"
             },
             {
               "tool": "generate_image",
-              "seconds": 10.441522428998724,
+              "seconds": 10.553059988000314,
               "status": "complete"
             },
             {
               "tool": "draft_email",
-              "seconds": 0.0002512960054446012,
+              "seconds": 0.0002495969965821132,
               "status": "complete"
             },
             {
               "tool": "translate",
-              "seconds": 11.46949493799184,
+              "seconds": 11.360552355996333,
               "status": "complete"
             }
           ],
-          "output_tokens": 1518,
-          "aggregate_output_tokens_per_second": 39.935067575300195,
+          "output_tokens": 1551,
+          "aggregate_output_tokens_per_second": 39.63723192661276,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8694591488,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8837783552,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_live_4_1794269896",
+          "run_id": "qual_Q4_K_XL_S1_live_4_1794284396",
           "purpose": "live",
           "audio": false,
           "status": "complete",
-          "seconds": 38.91281112699653,
+          "seconds": 39.67042741799378,
           "memory": {
             "baseline": {
-              "time": 1794269896.6724699,
+              "time": 1794284396.2315848,
               "total_bytes": 130596188160,
-              "available_bytes": 13996584960,
-              "free_bytes": 10799652864,
-              "file_cache_bytes": 5640597504,
-              "anonymous_bytes": 8052211712,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14934884352,
+              "free_bytes": 10384822272,
+              "file_cache_bytes": 6558461952,
+              "anonymous_bytes": 7586873344,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269935.4241717,
+              "time": 1794284435.7481122,
               "total_bytes": 130596188160,
-              "available_bytes": 14016290816,
-              "free_bytes": 10817437696,
-              "file_cache_bytes": 5641957376,
-              "anonymous_bytes": 8055898112,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14941208576,
+              "free_bytes": 10389475328,
+              "file_cache_bytes": 6559584256,
+              "anonymous_bytes": 7592923136,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 9101041664,
-            "min_free_bytes": 5903048704,
-            "max_file_cache_bytes": 5641977856,
-            "peak_memory_used_bytes": 121495146496,
+            "min_available_bytes": 10052255744,
+            "min_free_bytes": 5501353984,
+            "max_file_cache_bytes": 6559604736,
+            "peak_memory_used_bytes": 120543932416,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14204,81 +14206,81 @@
           "tool_seconds": [
             {
               "tool": "list_files",
-              "seconds": 7.919999188743532e-05,
+              "seconds": 8.731099660508335e-05,
               "status": "complete"
             },
             {
               "tool": "read_file",
-              "seconds": 0.00012316799256950617,
+              "seconds": 7.753500540275127e-05,
               "status": "complete"
             },
             {
               "tool": "build_deck",
-              "seconds": 20.970578591994126,
+              "seconds": 21.2550852830027,
               "status": "complete"
             },
             {
               "tool": "generate_image",
-              "seconds": 10.385419101992738,
+              "seconds": 10.570674322007108,
               "status": "complete"
             },
             {
               "tool": "draft_email",
-              "seconds": 0.00015518399595748633,
+              "seconds": 0.00026267000066582114,
               "status": "complete"
             },
             {
               "tool": "translate",
-              "seconds": 11.416428750002524,
+              "seconds": 11.42643090398633,
               "status": "complete"
             }
           ],
-          "output_tokens": 1594,
-          "aggregate_output_tokens_per_second": 40.96337308548061,
+          "output_tokens": 1589,
+          "aggregate_output_tokens_per_second": 40.055025958184125,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8696422400,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8830717952,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S1",
-          "run_id": "qual_Q4_K_XL_S1_live_5_1794269935",
+          "run_id": "qual_Q4_K_XL_S1_live_5_1794284435",
           "purpose": "live",
           "audio": false,
           "status": "complete",
-          "seconds": 36.78721485499409,
+          "seconds": 36.81534671499685,
           "memory": {
             "baseline": {
-              "time": 1794269935.6909544,
+              "time": 1794284436.0372624,
               "total_bytes": 130596188160,
-              "available_bytes": 14016274432,
-              "free_bytes": 10817396736,
-              "file_cache_bytes": 5641981952,
-              "anonymous_bytes": 8056352768,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14950031360,
+              "free_bytes": 10398121984,
+              "file_cache_bytes": 6559801344,
+              "anonymous_bytes": 7592992768,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269972.3259764,
+              "time": 1794284472.6967638,
               "total_bytes": 130596188160,
-              "available_bytes": 14000025600,
-              "free_bytes": 10799202304,
-              "file_cache_bytes": 5643440128,
-              "anonymous_bytes": 8055623680,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14942429184,
+              "free_bytes": 10389176320,
+              "file_cache_bytes": 6560653312,
+              "anonymous_bytes": 7602085888,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 9100005376,
-            "min_free_bytes": 5899976704,
-            "max_file_cache_bytes": 5643460608,
-            "peak_memory_used_bytes": 121496182784,
+            "min_available_bytes": 10083917824,
+            "min_free_bytes": 5531197440,
+            "max_file_cache_bytes": 6560673792,
+            "peak_memory_used_bytes": 120512270336,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14287,82 +14289,82 @@
           "tool_seconds": [
             {
               "tool": "list_files",
-              "seconds": 8.659200102556497e-05,
+              "seconds": 8.740699558984488e-05,
               "status": "complete"
             },
             {
               "tool": "read_file",
-              "seconds": 7.809599628672004e-05,
+              "seconds": 7.308700878638774e-05,
               "status": "complete"
             },
             {
               "tool": "build_deck",
-              "seconds": 19.56770698299806,
+              "seconds": 19.684787851991132,
               "status": "complete"
             },
             {
               "tool": "generate_image",
-              "seconds": 10.420261125997058,
+              "seconds": 10.586891434999416,
               "status": "complete"
             },
             {
               "tool": "draft_email",
-              "seconds": 0.00013630400644615293,
+              "seconds": 0.00015707100101280957,
               "status": "complete"
             },
             {
               "tool": "translate",
-              "seconds": 10.536678770993603,
+              "seconds": 10.597622493995004,
               "status": "complete"
             }
           ],
-          "output_tokens": 1442,
-          "aggregate_output_tokens_per_second": 39.198401011982014,
+          "output_tokens": 1451,
+          "aggregate_output_tokens_per_second": 39.4129114478482,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8701382656,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8831787008,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S3",
-          "run_id": "qual_Q4_K_XL_S3_live_1_1794269972",
+          "run_id": "qual_Q4_K_XL_S3_live_1_1794284472",
           "purpose": "live",
           "audio": false,
           "status": "complete",
-          "seconds": 50.67650041799061,
+          "seconds": 50.70925120600441,
           "memory": {
             "baseline": {
-              "time": 1794269972.5906532,
+              "time": 1794284472.9726036,
               "total_bytes": 130596188160,
-              "available_bytes": 14000193536,
-              "free_bytes": 10799247360,
-              "file_cache_bytes": 5643587584,
-              "anonymous_bytes": 8055169024,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14939799552,
+              "free_bytes": 10386542592,
+              "file_cache_bytes": 6560645120,
+              "anonymous_bytes": 7602540544,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794270023.1093466,
+              "time": 1794284523.5241308,
               "total_bytes": 130596188160,
-              "available_bytes": 13990367232,
-              "free_bytes": 10785255424,
-              "file_cache_bytes": 5646577664,
-              "anonymous_bytes": 8060190720,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14916440064,
+              "free_bytes": 10358788096,
+              "file_cache_bytes": 6563459072,
+              "anonymous_bytes": 7634808832,
+              "swap_used_bytes": 229376000,
+              "pswpin": 780315,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 11421872128,
-            "min_free_bytes": 8218697728,
-            "max_file_cache_bytes": 5655969792,
-            "peak_memory_used_bytes": 119174316032,
-            "swap_in_pages": 0,
+            "min_available_bytes": 12383883264,
+            "min_free_bytes": 7828209664,
+            "max_file_cache_bytes": 6573072384,
+            "peak_memory_used_bytes": 118212304896,
+            "swap_in_pages": 4,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
           },
@@ -14370,80 +14372,80 @@
             "risks": {
               "name": "risks",
               "status": "complete",
-              "seconds": 14.601580881004338
+              "seconds": 14.5424757199944
             },
             "app": {
               "name": "app",
               "status": "complete",
-              "seconds": 20.617496058010147
+              "seconds": 20.536130142994807
             },
             "images": {
               "name": "images",
               "status": "complete",
-              "seconds": 37.34241219199612
+              "seconds": 37.53287054899556
             },
             "chart": {
               "name": "chart",
               "status": "complete",
-              "seconds": 15.151552266004728
+              "seconds": 15.074585087990272
             },
             "translation": {
               "name": "translation",
               "status": "complete",
-              "seconds": 50.46773087000474
+              "seconds": 50.50134155800333
             },
             "summary": {
               "name": "summary",
               "status": "complete",
-              "seconds": 16.508491465006955
+              "seconds": 16.43200993500068
             }
           },
-          "output_tokens": 2173,
-          "aggregate_output_tokens_per_second": 42.879835467655255,
+          "output_tokens": 2175,
+          "aggregate_output_tokens_per_second": 42.89158187653265,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8709390336,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8843145216,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S3",
-          "run_id": "qual_Q4_K_XL_S3_live_2_1794270023",
+          "run_id": "qual_Q4_K_XL_S3_live_2_1794284523",
           "purpose": "live",
           "audio": false,
           "status": "complete",
-          "seconds": 49.24767993300338,
+          "seconds": 49.022061455005314,
           "memory": {
             "baseline": {
-              "time": 1794270023.397583,
+              "time": 1794284523.7866688,
               "total_bytes": 130596188160,
-              "available_bytes": 13986234368,
-              "free_bytes": 10781093888,
-              "file_cache_bytes": 5646598144,
-              "anonymous_bytes": 8064028672,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14914568192,
+              "free_bytes": 10356924416,
+              "file_cache_bytes": 6563450880,
+              "anonymous_bytes": 7637536768,
+              "swap_used_bytes": 229376000,
+              "pswpin": 780315,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794270072.487578,
+              "time": 1794284572.6533625,
               "total_bytes": 130596188160,
-              "available_bytes": 13977894912,
-              "free_bytes": 10768371712,
-              "file_cache_bytes": 5649678336,
-              "anonymous_bytes": 8071245824,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14941540352,
+              "free_bytes": 10379988992,
+              "file_cache_bytes": 6566060032,
+              "anonymous_bytes": 7646629888,
+              "swap_used_bytes": 229376000,
+              "pswpin": 780315,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 11447496704,
-            "min_free_bytes": 8239771648,
-            "max_file_cache_bytes": 5659525120,
-            "peak_memory_used_bytes": 119148691456,
+            "min_available_bytes": 12424744960,
+            "min_free_bytes": 7864963072,
+            "max_file_cache_bytes": 6575521792,
+            "peak_memory_used_bytes": 118171443200,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14452,81 +14454,81 @@
             "risks": {
               "name": "risks",
               "status": "complete",
-              "seconds": 12.245663902998785
+              "seconds": 12.18924672799767
             },
             "app": {
               "name": "app",
               "status": "complete",
-              "seconds": 19.520144748996245
+              "seconds": 19.588637591004954
             },
             "images": {
               "name": "images",
               "status": "complete",
-              "seconds": 36.325354104003054
+              "seconds": 36.7175427559996
             },
             "chart": {
               "name": "chart",
               "status": "complete",
-              "seconds": 13.70806009999069
+              "seconds": 13.654903136004577
             },
             "translation": {
               "name": "translation",
               "status": "complete",
-              "seconds": 49.03971668599115
+              "seconds": 48.81558181699074
             },
             "summary": {
               "name": "summary",
               "status": "complete",
-              "seconds": 15.067886755001382
+              "seconds": 15.028059303003829
             }
           },
           "output_tokens": 2193,
-          "aggregate_output_tokens_per_second": 44.53001649993178,
+          "aggregate_output_tokens_per_second": 44.73496085049046,
           "lanes_resident": true,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8726032384,
-            "memory_peak_bytes": 30135463936
+            "memory_current_bytes": 8844480512,
+            "memory_peak_bytes": 30123175936
           }
         },
         {
           "segment": "S3",
-          "run_id": "qual_Q4_K_XL_S3_live_3_1794270072",
+          "run_id": "qual_Q4_K_XL_S3_live_3_1794284572",
           "purpose": "live",
           "audio": false,
-          "status": "complete",
-          "seconds": 49.50341311200464,
+          "status": "failed",
+          "seconds": 37.660707307994016,
           "memory": {
             "baseline": {
-              "time": 1794270072.794558,
+              "time": 1794284572.95486,
               "total_bytes": 130596188160,
-              "available_bytes": 13972799488,
-              "free_bytes": 10763304960,
-              "file_cache_bytes": 5649649664,
-              "anonymous_bytes": 8075382784,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 14937890816,
+              "free_bytes": 10376347648,
+              "file_cache_bytes": 6566076416,
+              "anonymous_bytes": 7647080448,
+              "swap_used_bytes": 229376000,
+              "pswpin": 780315,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794270122.12874,
+              "time": 1794284610.4592147,
               "total_bytes": 130596188160,
-              "available_bytes": 13995094016,
-              "free_bytes": 10782126080,
-              "file_cache_bytes": 5651927040,
-              "anonymous_bytes": 8081301504,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 15175483392,
+              "free_bytes": 10611793920,
+              "file_cache_bytes": 6566912000,
+              "anonymous_bytes": 7410388992,
+              "swap_used_bytes": 229203968,
+              "pswpin": 780348,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 11435991040,
-            "min_free_bytes": 8224559104,
-            "max_file_cache_bytes": 5661827072,
-            "peak_memory_used_bytes": 119160197120,
-            "swap_in_pages": 0,
+            "min_available_bytes": 12385386496,
+            "min_free_bytes": 7821631488,
+            "max_file_cache_bytes": 6576074752,
+            "peak_memory_used_bytes": 118210801664,
+            "swap_in_pages": 33,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
           },
@@ -14534,242 +14536,81 @@
             "risks": {
               "name": "risks",
               "status": "complete",
-              "seconds": 12.393740453990176
+              "seconds": 12.415168572988478
             },
             "app": {
               "name": "app",
               "status": "complete",
-              "seconds": 19.098271498995018
+              "seconds": 19.11628603700956
             },
             "images": {
               "name": "images",
-              "status": "complete",
-              "seconds": 35.60377054399578
+              "status": "failed",
+              "seconds": 29.41685950399551,
+              "error": "RuntimeError"
             },
             "chart": {
               "name": "chart",
               "status": "complete",
-              "seconds": 13.733892770003877
+              "seconds": 13.700132486992516
             },
             "translation": {
               "name": "translation",
-              "status": "complete",
-              "seconds": 49.284415461996105
+              "status": "failed",
+              "seconds": 37.45369307299552,
+              "error": "ConnectError"
             },
             "summary": {
               "name": "summary",
               "status": "complete",
-              "seconds": 15.095157750998624
+              "seconds": 15.04622687799565
             }
           },
-          "output_tokens": 2173,
-          "aggregate_output_tokens_per_second": 43.895963195172996,
-          "lanes_resident": true,
+          "output_tokens": 1698,
+          "aggregate_output_tokens_per_second": 45.08677933511821,
+          "lanes_resident": false,
           "runtime_memory": {
             "swap_limit": "0",
             "swap_current_bytes": 0,
-            "memory_current_bytes": 8728793088,
-            "memory_peak_bytes": 30135463936
-          }
-        },
-        {
-          "segment": "S3",
-          "run_id": "qual_Q4_K_XL_S3_live_4_1794270122",
-          "purpose": "live",
-          "audio": false,
-          "status": "complete",
-          "seconds": 49.145846282001,
-          "memory": {
-            "baseline": {
-              "time": 1794270122.3856962,
-              "total_bytes": 130596188160,
-              "available_bytes": 13995384832,
-              "free_bytes": 10782384128,
-              "file_cache_bytes": 5651955712,
-              "anonymous_bytes": 8081756160,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
-              "oom_kill": 0
-            },
-            "after": {
-              "time": 1794270171.3777282,
-              "total_bytes": 130596188160,
-              "available_bytes": 13989675008,
-              "free_bytes": 10773377024,
-              "file_cache_bytes": 5654274048,
-              "anonymous_bytes": 8086814720,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
-              "oom_kill": 0
-            },
-            "min_available_bytes": 11370524672,
-            "min_free_bytes": 8155787264,
-            "max_file_cache_bytes": 5660860416,
-            "peak_memory_used_bytes": 119225663488,
-            "swap_in_pages": 0,
-            "swap_out_pages": 0,
-            "sample_interval_ms": 100
+            "memory_current_bytes": 8582545408,
+            "memory_peak_bytes": 30123175936
           },
-          "jobs": {
-            "risks": {
-              "name": "risks",
-              "status": "complete",
-              "seconds": 12.243827593993046
-            },
-            "app": {
-              "name": "app",
-              "status": "complete",
-              "seconds": 19.57816230499884
-            },
-            "images": {
-              "name": "images",
-              "status": "complete",
-              "seconds": 36.267159291004646
-            },
-            "chart": {
-              "name": "chart",
-              "status": "complete",
-              "seconds": 13.704143056995235
-            },
-            "translation": {
-              "name": "translation",
-              "status": "complete",
-              "seconds": 48.94130873499671
-            },
-            "summary": {
-              "name": "summary",
-              "status": "complete",
-              "seconds": 15.078246695993585
-            }
-          },
-          "output_tokens": 2193,
-          "aggregate_output_tokens_per_second": 44.62228582689309,
-          "lanes_resident": true,
-          "runtime_memory": {
-            "swap_limit": "0",
-            "swap_current_bytes": 0,
-            "memory_current_bytes": 8734236672,
-            "memory_peak_bytes": 30135463936
-          }
-        },
-        {
-          "segment": "S3",
-          "run_id": "qual_Q4_K_XL_S3_live_5_1794270171",
-          "purpose": "live",
-          "audio": false,
-          "status": "complete",
-          "seconds": 49.140053658993565,
-          "memory": {
-            "baseline": {
-              "time": 1794270171.6820133,
-              "total_bytes": 130596188160,
-              "available_bytes": 13985558528,
-              "free_bytes": 10769252352,
-              "file_cache_bytes": 5654282240,
-              "anonymous_bytes": 8087724032,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
-              "oom_kill": 0
-            },
-            "after": {
-              "time": 1794270220.6647482,
-              "total_bytes": 130596188160,
-              "available_bytes": 13979488256,
-              "free_bytes": 10759946240,
-              "file_cache_bytes": 5656530944,
-              "anonymous_bytes": 8101314560,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
-              "oom_kill": 0
-            },
-            "min_available_bytes": 11439620096,
-            "min_free_bytes": 8221679616,
-            "max_file_cache_bytes": 5666160640,
-            "peak_memory_used_bytes": 119156568064,
-            "swap_in_pages": 0,
-            "swap_out_pages": 0,
-            "sample_interval_ms": 100
-          },
-          "jobs": {
-            "risks": {
-              "name": "risks",
-              "status": "complete",
-              "seconds": 12.444359332992462
-            },
-            "app": {
-              "name": "app",
-              "status": "complete",
-              "seconds": 19.20092221799132
-            },
-            "images": {
-              "name": "images",
-              "status": "complete",
-              "seconds": 35.96438572400075
-            },
-            "chart": {
-              "name": "chart",
-              "status": "complete",
-              "seconds": 13.737160554999718
-            },
-            "translation": {
-              "name": "translation",
-              "status": "complete",
-              "seconds": 48.93242449600075
-            },
-            "summary": {
-              "name": "summary",
-              "status": "complete",
-              "seconds": 15.100651633998496
-            }
-          },
-          "output_tokens": 2169,
-          "aggregate_output_tokens_per_second": 44.139145940941226,
-          "lanes_resident": true,
-          "runtime_memory": {
-            "swap_limit": "0",
-            "swap_current_bytes": 0,
-            "memory_current_bytes": 8749817856,
-            "memory_peak_bytes": 30135463936
-          }
+          "error": "ResidentLaneIdentityChanged"
         }
       ],
       "loads": [
         {
           "lane": "image",
-          "seconds": 15.44630619599775,
+          "seconds": 15.422404979995918,
           "memory": {
             "baseline": {
-              "time": 1794269531.3884292,
+              "time": 1794284028.2336218,
               "total_bytes": 130596188160,
-              "available_bytes": 126453821440,
-              "free_bytes": 122900062208,
-              "file_cache_bytes": 4285440000,
-              "anonymous_bytes": 1152348160,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 126725808128,
+              "free_bytes": 122602635264,
+              "file_cache_bytes": 4770881536,
+              "anonymous_bytes": 946847744,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269546.8362758,
+              "time": 1794284043.6576278,
               "total_bytes": 130596188160,
-              "available_bytes": 110206164992,
-              "free_bytes": 106653949952,
-              "file_cache_bytes": 4328112128,
-              "anonymous_bytes": 3675643904,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 111091912704,
+              "free_bytes": 106965045248,
+              "file_cache_bytes": 4818833408,
+              "anonymous_bytes": 3213524992,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 107124797440,
-            "min_free_bytes": 87608430592,
-            "max_file_cache_bytes": 20292321280,
-            "peak_memory_used_bytes": 23471390720,
+            "min_available_bytes": 107561472000,
+            "min_free_bytes": 87470997504,
+            "max_file_cache_bytes": 20783050752,
+            "peak_memory_used_bytes": 23034716160,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14777,36 +14618,36 @@
         },
         {
           "lane": "tts",
-          "seconds": 5.431010542000877,
+          "seconds": 5.430617036996409,
           "memory": {
             "baseline": {
-              "time": 1794269546.855689,
+              "time": 1794284043.6776545,
               "total_bytes": 130596188160,
-              "available_bytes": 110208466944,
-              "free_bytes": 106656305152,
-              "file_cache_bytes": 4328058880,
-              "anonymous_bytes": 3679883264,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 111084109824,
+              "free_bytes": 106957238272,
+              "file_cache_bytes": 4818837504,
+              "anonymous_bytes": 3218071552,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269552.287943,
+              "time": 1794284049.108955,
               "total_bytes": 130596188160,
-              "available_bytes": 108402712576,
-              "free_bytes": 104873189376,
-              "file_cache_bytes": 4349382656,
-              "anonymous_bytes": 5053956096,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 108782657536,
+              "free_bytes": 104306327552,
+              "file_cache_bytes": 5212303360,
+              "anonymous_bytes": 4592390144,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 108402712576,
-            "min_free_bytes": 104873189376,
-            "max_file_cache_bytes": 4349382656,
-            "peak_memory_used_bytes": 22193475584,
+            "min_available_bytes": 108782657536,
+            "min_free_bytes": 104306327552,
+            "max_file_cache_bytes": 5212303360,
+            "peak_memory_used_bytes": 21813530624,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14814,36 +14655,36 @@
         },
         {
           "lane": "text",
-          "seconds": 6.982735079989652,
+          "seconds": 7.13845109900285,
           "memory": {
             "baseline": {
-              "time": 1794269552.318606,
+              "time": 1794284049.1275291,
               "total_bytes": 130596188160,
-              "available_bytes": 108400246784,
-              "free_bytes": 104870739968,
-              "file_cache_bytes": 4349366272,
-              "anonymous_bytes": 5053956096,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 108782596096,
+              "free_bytes": 104306266112,
+              "file_cache_bytes": 5212299264,
+              "anonymous_bytes": 4592394240,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269559.3023882,
+              "time": 1794284056.266784,
               "total_bytes": 130596188160,
-              "available_bytes": 82646466560,
-              "free_bytes": 79116943360,
-              "file_cache_bytes": 4947513344,
-              "anonymous_bytes": 5380730880,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 82976206848,
+              "free_bytes": 78499930112,
+              "file_cache_bytes": 5810360320,
+              "anonymous_bytes": 4915187712,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 82626707456,
-            "min_free_bytes": 78186844160,
-            "max_file_cache_bytes": 5857943552,
-            "peak_memory_used_bytes": 47969480704,
+            "min_available_bytes": 82951024640,
+            "min_free_bytes": 77564362752,
+            "max_file_cache_bytes": 6720786432,
+            "peak_memory_used_bytes": 47645163520,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14851,36 +14692,36 @@
         },
         {
           "lane": "lead",
-          "seconds": 14.895322356998804,
+          "seconds": 14.556884259000071,
           "memory": {
             "baseline": {
-              "time": 1794269559.333561,
+              "time": 1794284056.2856388,
               "total_bytes": 130596188160,
-              "available_bytes": 82640576512,
-              "free_bytes": 79111053312,
-              "file_cache_bytes": 4947501056,
-              "anonymous_bytes": 5381529600,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 82972598272,
+              "free_bytes": 78496317440,
+              "file_cache_bytes": 5810364416,
+              "anonymous_bytes": 4915642368,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269574.229761,
+              "time": 1794284070.8433237,
               "total_bytes": 130596188160,
-              "available_bytes": 16807366656,
-              "free_bytes": 13277790208,
-              "file_cache_bytes": 5621460992,
-              "anonymous_bytes": 5678739456,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 17069027328,
+              "free_bytes": 12592701440,
+              "file_cache_bytes": 6484320256,
+              "anonymous_bytes": 5205155840,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 16777072640,
-            "min_free_bytes": 13234253824,
-            "max_file_cache_bytes": 5888811008,
-            "peak_memory_used_bytes": 113819115520,
+            "min_available_bytes": 17034166272,
+            "min_free_bytes": 12546166784,
+            "max_file_cache_bytes": 6751666176,
+            "peak_memory_used_bytes": 113562021888,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14888,36 +14729,36 @@
         },
         {
           "lane": "gateway",
-          "seconds": 5.493222763005178,
+          "seconds": 5.494909166998696,
           "memory": {
             "baseline": {
-              "time": 1794269574.2610734,
+              "time": 1794284070.8623285,
               "total_bytes": 130596188160,
-              "available_bytes": 16799248384,
-              "free_bytes": 13269688320,
-              "file_cache_bytes": 5621440512,
-              "anonymous_bytes": 5679546368,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 17065492480,
+              "free_bytes": 12589174784,
+              "file_cache_bytes": 6484312064,
+              "anonymous_bytes": 5205409792,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
             "after": {
-              "time": 1794269579.7550254,
+              "time": 1794284076.3578887,
               "total_bytes": 130596188160,
-              "available_bytes": 16881876992,
-              "free_bytes": 13352255488,
-              "file_cache_bytes": 5621501952,
-              "anonymous_bytes": 5717852160,
-              "swap_used_bytes": 0,
-              "pswpin": 780061,
-              "pswpout": 3795983,
+              "available_bytes": 17113575424,
+              "free_bytes": 12636270592,
+              "file_cache_bytes": 6485299200,
+              "anonymous_bytes": 5244985344,
+              "swap_used_bytes": 229380096,
+              "pswpin": 780311,
+              "pswpout": 3849246,
               "oom_kill": 0
             },
-            "min_available_bytes": 16761827328,
-            "min_free_bytes": 13232214016,
-            "max_file_cache_bytes": 5621501952,
-            "peak_memory_used_bytes": 113834360832,
+            "min_available_bytes": 17021820928,
+            "min_free_bytes": 12544524288,
+            "max_file_cache_bytes": 6485299200,
+            "peak_memory_used_bytes": 113574367232,
             "swap_in_pages": 0,
             "swap_out_pages": 0,
             "sample_interval_ms": 100
@@ -14930,7 +14771,7 @@
         "weight_file_cache_advice": true,
         "global_swap_enabled": true
       },
-      "predicted_memavailable_bytes": 16468717568,
+      "predicted_memavailable_bytes": 16740704256,
       "isolated_inputs": [
         {
           "lane": "lead",
@@ -14954,69 +14795,70 @@
         }
       ],
       "resident_memory": {
-        "time": 1794269579.7742085,
+        "time": 1794284076.3773344,
         "total_bytes": 130596188160,
-        "available_bytes": 16881856512,
-        "free_bytes": 13352255488,
-        "file_cache_bytes": 5621481472,
-        "anonymous_bytes": 5717852160,
-        "swap_used_bytes": 0,
-        "pswpin": 780061,
-        "pswpout": 3795983,
+        "available_bytes": 17113481216,
+        "free_bytes": 12636184576,
+        "file_cache_bytes": 6485291008,
+        "anonymous_bytes": 5244850176,
+        "swap_used_bytes": 229380096,
+        "pswpin": 780311,
+        "pswpout": 3849246,
         "oom_kill": 0
       },
       "memory": {
         "baseline": {
-          "time": 1794269579.7923028,
+          "time": 1794284076.3955965,
           "total_bytes": 130596188160,
-          "available_bytes": 16881856512,
-          "free_bytes": 13352255488,
-          "file_cache_bytes": 5621481472,
-          "anonymous_bytes": 5717852160,
-          "swap_used_bytes": 0,
-          "pswpin": 780061,
-          "pswpout": 3795983,
+          "available_bytes": 17113481216,
+          "free_bytes": 12636184576,
+          "file_cache_bytes": 6485291008,
+          "anonymous_bytes": 5244710912,
+          "swap_used_bytes": 229380096,
+          "pswpin": 780311,
+          "pswpout": 3849246,
           "oom_kill": 0
         },
         "after": {
-          "time": 1794270220.7838285,
+          "time": 1794284610.5617464,
           "total_bytes": 130596188160,
-          "available_bytes": 13979488256,
-          "free_bytes": 10759946240,
-          "file_cache_bytes": 5656530944,
-          "anonymous_bytes": 8101769216,
-          "swap_used_bytes": 0,
-          "pswpin": 780061,
-          "pswpout": 3795983,
+          "available_bytes": 15224221696,
+          "free_bytes": 10660495360,
+          "file_cache_bytes": 6567026688,
+          "anonymous_bytes": 7394562048,
+          "swap_used_bytes": 229203968,
+          "pswpin": 780348,
+          "pswpout": 3849246,
           "oom_kill": 0
         },
-        "min_available_bytes": 8905986048,
-        "min_free_bytes": 5714702336,
-        "max_file_cache_bytes": 5666226176,
-        "peak_memory_used_bytes": 121690202112,
-        "swap_in_pages": 0,
+        "min_available_bytes": 9856471040,
+        "min_free_bytes": 5312016384,
+        "max_file_cache_bytes": 6578556928,
+        "peak_memory_used_bytes": 120739717120,
+        "swap_in_pages": 37,
         "swap_out_pages": 0,
         "sample_interval_ms": 100
       },
-      "agent_p95_seconds": 41.79850141819334,
-      "rush_max_seconds": 50.67650041799061,
+      "agent_p95_seconds": 41.95785086359247,
+      "rush_max_seconds": 50.70925120600441,
       "assessment": {
-        "passed": true,
+        "passed": false,
         "checks": {
           "two_full_warm_passes": true,
           "five_agent_samples": true,
-          "five_rush_samples": true,
-          "all_jobs_complete": true,
-          "all_lanes_resident": true,
+          "five_rush_samples": false,
+          "all_jobs_complete": false,
+          "all_lanes_resident": false,
           "agent_p95_at_most_75_seconds": true,
           "rush_at_most_60_seconds": true,
           "rush_minimum_10_gib_available": true,
-          "rush_zero_global_swap": true,
+          "rush_zero_global_swap": false,
           "no_kernel_oom": true,
           "runtime_scope_swap_zero": true
         }
       },
-      "ended_at": 1794270220.7865388
+      "ended_at": 1794284610.5637586,
+      "operator_stop_reason": "Stopped the remaining trial through the verified owned controller after four global swap-ins were observed in the first measured Rush. The model scope had zero swap, Rush completed in 50.709 seconds with 11.533 GiB available, and kernel OOM stayed zero. Old inactive system swap pages require an owner baseline reset before a fresh complete trial; interruption-related incomplete sample/residency checks are expected."
     },
     "Q4_K_M": {
       "quant": "Q4_K_M",
@@ -29844,44 +29686,1587 @@
         }
       },
       "ended_at": 1794269487.2438192
+    },
+    {
+      "quant": "Q4_K_XL",
+      "flux_encoder": "fp8",
+      "voice_device": "cpu",
+      "text_loading": "direct",
+      "lead_loading": "direct",
+      "started_at": 1794269531.3598037,
+      "status": "passed",
+      "passed": true,
+      "runs": [
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_warmup_1_1794269579",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 41.426419440002064,
+          "memory": {
+            "baseline": {
+              "time": 1794269579.986688,
+              "total_bytes": 130596188160,
+              "available_bytes": 16881565696,
+              "free_bytes": 13351940096,
+              "file_cache_bytes": 5621506048,
+              "anonymous_bytes": 5724717056,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269621.255491,
+              "total_bytes": 130596188160,
+              "available_bytes": 14482468864,
+              "free_bytes": 11302936576,
+              "file_cache_bytes": 5628862464,
+              "anonymous_bytes": 7584374784,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 9890607104,
+            "min_free_bytes": 6712377344,
+            "max_file_cache_bytes": 5628887040,
+            "peak_memory_used_bytes": 120705581056,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 9.852799121290445e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 8.819199865683913e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 21.662509669011342,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00016496000171173364,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 14.953799166003591,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 14.040706814994337,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1554,
+          "aggregate_output_tokens_per_second": 37.51229338684846,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8223940608,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S2",
+          "run_id": "qual_Q4_K_XL_S2_warmup_1_1794269621",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 6.71085425199999,
+          "memory": {
+            "baseline": {
+              "time": 1794269621.52811,
+              "total_bytes": 130596188160,
+              "available_bytes": 14482485248,
+              "free_bytes": 11302772736,
+              "file_cache_bytes": 5629042688,
+              "anonymous_bytes": 7590428672,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269628.0735579,
+              "total_bytes": 130596188160,
+              "available_bytes": 14324555776,
+              "free_bytes": 11144564736,
+              "file_cache_bytes": 5629206528,
+              "anonymous_bytes": 7695798272,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 14321094656,
+            "min_free_bytes": 11141103616,
+            "max_file_cache_bytes": 5629214720,
+            "peak_memory_used_bytes": 116275093504,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "output_tokens": 234,
+          "aggregate_output_tokens_per_second": 34.86888423038879,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8331939840,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_warmup_1_1794269628",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 50.42069755299599,
+          "memory": {
+            "baseline": {
+              "time": 1794269628.3336942,
+              "total_bytes": 130596188160,
+              "available_bytes": 14327209984,
+              "free_bytes": 11147161600,
+              "file_cache_bytes": 5629231104,
+              "anonymous_bytes": 7697248256,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269678.6008778,
+              "total_bytes": 130596188160,
+              "available_bytes": 14090592256,
+              "free_bytes": 10906288128,
+              "file_cache_bytes": 5632122880,
+              "anonymous_bytes": 7996973056,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11585208320,
+            "min_free_bytes": 8402853888,
+            "max_file_cache_bytes": 5640769536,
+            "peak_memory_used_bytes": 119010979840,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 14.622531921995687
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 20.463146651993156
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 37.324127646992565
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 15.11816677499155
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 50.21822181699099
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 16.45868434899603
+            }
+          },
+          "output_tokens": 2171,
+          "aggregate_output_tokens_per_second": 43.05771449746632,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8638681088,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_warmup_2_1794269678",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 43.37096810300136,
+          "memory": {
+            "baseline": {
+              "time": 1794269678.8661697,
+              "total_bytes": 130596188160,
+              "available_bytes": 14085513216,
+              "free_bytes": 10901131264,
+              "file_cache_bytes": 5632212992,
+              "anonymous_bytes": 8001400832,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269722.0765069,
+              "total_bytes": 130596188160,
+              "available_bytes": 13991387136,
+              "free_bytes": 10805825536,
+              "file_cache_bytes": 5632794624,
+              "anonymous_bytes": 8074956800,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 8978321408,
+            "min_free_bytes": 5792374784,
+            "max_file_cache_bytes": 5633691648,
+            "peak_memory_used_bytes": 121617866752,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 0.00013686400779988617,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 0.00012529600644484162,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 24.638724230011576,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 14.648221556999488,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00026713599800132215,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 16.840567936000298,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1586,
+          "aggregate_output_tokens_per_second": 36.56824067734484,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8711974912,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S2",
+          "run_id": "qual_Q4_K_XL_S2_warmup_2_1794269722",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 7.156383506007842,
+          "memory": {
+            "baseline": {
+              "time": 1794269722.339418,
+              "total_bytes": 130596188160,
+              "available_bytes": 13991227392,
+              "free_bytes": 10805698560,
+              "file_cache_bytes": 5632761856,
+              "anonymous_bytes": 8076320768,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269729.3381095,
+              "total_bytes": 130596188160,
+              "available_bytes": 14307848192,
+              "free_bytes": 11121807360,
+              "file_cache_bytes": 5633118208,
+              "anonymous_bytes": 7760289792,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 13991227392,
+            "min_free_bytes": 10805698560,
+            "max_file_cache_bytes": 5633130496,
+            "peak_memory_used_bytes": 116604960768,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "output_tokens": 254,
+          "aggregate_output_tokens_per_second": 35.4927876331341,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8397791232,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_warmup_2_1794269729",
+          "purpose": "warmup",
+          "audio": false,
+          "status": "complete",
+          "seconds": 46.196804894003435,
+          "memory": {
+            "baseline": {
+              "time": 1794269729.5974264,
+              "total_bytes": 130596188160,
+              "available_bytes": 14308020224,
+              "free_bytes": 11121983488,
+              "file_cache_bytes": 5633122304,
+              "anonymous_bytes": 7762288640,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269775.6391232,
+              "total_bytes": 130596188160,
+              "available_bytes": 13983842304,
+              "free_bytes": 10794135552,
+              "file_cache_bytes": 5635432448,
+              "anonymous_bytes": 8040132608,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11426627584,
+            "min_free_bytes": 8238477312,
+            "max_file_cache_bytes": 5645275136,
+            "peak_memory_used_bytes": 119169560576,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 14.678878269987763
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 20.678058834004332
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 38.01268163899658
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 15.05559455799812
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 45.99016298199422
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 16.505532529990887
+            }
+          },
+          "output_tokens": 2146,
+          "aggregate_output_tokens_per_second": 46.45342908289662,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8677199872,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_1_1794269775",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 42.20570183999371,
+          "memory": {
+            "baseline": {
+              "time": 1794269775.9037158,
+              "total_bytes": 130596188160,
+              "available_bytes": 13981409280,
+              "free_bytes": 10791657472,
+              "file_cache_bytes": 5635477504,
+              "anonymous_bytes": 8042283008,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269817.950056,
+              "total_bytes": 130596188160,
+              "available_bytes": 13944963072,
+              "free_bytes": 10753286144,
+              "file_cache_bytes": 5636743168,
+              "anonymous_bytes": 8108695552,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 8905531392,
+            "min_free_bytes": 5714702336,
+            "max_file_cache_bytes": 5636759552,
+            "peak_memory_used_bytes": 121690656768,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 8.90079973032698e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 0.00011854399053845555,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 23.24760864498967,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 12.838158735001343,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00027401601255405694,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 15.475317896998604,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1586,
+          "aggregate_output_tokens_per_second": 37.577861067509176,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8746184704,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_2_1794269818",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 40.16969973099185,
+          "memory": {
+            "baseline": {
+              "time": 1794269818.240181,
+              "total_bytes": 130596188160,
+              "available_bytes": 13945200640,
+              "free_bytes": 10753347584,
+              "file_cache_bytes": 5636935680,
+              "anonymous_bytes": 8109862912,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269858.2553453,
+              "total_bytes": 130596188160,
+              "available_bytes": 14020927488,
+              "free_bytes": 10826354688,
+              "file_cache_bytes": 5638823936,
+              "anonymous_bytes": 8039129088,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 9102667776,
+            "min_free_bytes": 5908901888,
+            "max_file_cache_bytes": 5638828032,
+            "peak_memory_used_bytes": 121493520384,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 8.169599459506571e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 7.771200034767389e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 21.519120732002193,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00014983999426476657,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 12.198666794996825,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 10.477890554990154,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1618,
+          "aggregate_output_tokens_per_second": 40.27911612074301,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8679333888,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_3_1794269858",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 38.01170480399742,
+          "memory": {
+            "baseline": {
+              "time": 1794269858.5548558,
+              "total_bytes": 130596188160,
+              "available_bytes": 14025818112,
+              "free_bytes": 10831093760,
+              "file_cache_bytes": 5638979584,
+              "anonymous_bytes": 8039669760,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269896.407351,
+              "total_bytes": 130596188160,
+              "available_bytes": 14000189440,
+              "free_bytes": 10803458048,
+              "file_cache_bytes": 5640396800,
+              "anonymous_bytes": 8051314688,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 9103237120,
+            "min_free_bytes": 5907324928,
+            "max_file_cache_bytes": 5640421376,
+            "peak_memory_used_bytes": 121492951040,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 8.627200440969318e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 8.172799425665289e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 20.332127929999842,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 10.441522428998724,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.0002512960054446012,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 11.46949493799184,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1518,
+          "aggregate_output_tokens_per_second": 39.935067575300195,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8694591488,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_4_1794269896",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 38.91281112699653,
+          "memory": {
+            "baseline": {
+              "time": 1794269896.6724699,
+              "total_bytes": 130596188160,
+              "available_bytes": 13996584960,
+              "free_bytes": 10799652864,
+              "file_cache_bytes": 5640597504,
+              "anonymous_bytes": 8052211712,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269935.4241717,
+              "total_bytes": 130596188160,
+              "available_bytes": 14016290816,
+              "free_bytes": 10817437696,
+              "file_cache_bytes": 5641957376,
+              "anonymous_bytes": 8055898112,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 9101041664,
+            "min_free_bytes": 5903048704,
+            "max_file_cache_bytes": 5641977856,
+            "peak_memory_used_bytes": 121495146496,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 7.919999188743532e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 0.00012316799256950617,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 20.970578591994126,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 10.385419101992738,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00015518399595748633,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 11.416428750002524,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1594,
+          "aggregate_output_tokens_per_second": 40.96337308548061,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8696422400,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S1",
+          "run_id": "qual_Q4_K_XL_S1_live_5_1794269935",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 36.78721485499409,
+          "memory": {
+            "baseline": {
+              "time": 1794269935.6909544,
+              "total_bytes": 130596188160,
+              "available_bytes": 14016274432,
+              "free_bytes": 10817396736,
+              "file_cache_bytes": 5641981952,
+              "anonymous_bytes": 8056352768,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269972.3259764,
+              "total_bytes": 130596188160,
+              "available_bytes": 14000025600,
+              "free_bytes": 10799202304,
+              "file_cache_bytes": 5643440128,
+              "anonymous_bytes": 8055623680,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 9100005376,
+            "min_free_bytes": 5899976704,
+            "max_file_cache_bytes": 5643460608,
+            "peak_memory_used_bytes": 121496182784,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "rehearsed_plan": false,
+          "tool_seconds": [
+            {
+              "tool": "list_files",
+              "seconds": 8.659200102556497e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "read_file",
+              "seconds": 7.809599628672004e-05,
+              "status": "complete"
+            },
+            {
+              "tool": "build_deck",
+              "seconds": 19.56770698299806,
+              "status": "complete"
+            },
+            {
+              "tool": "generate_image",
+              "seconds": 10.420261125997058,
+              "status": "complete"
+            },
+            {
+              "tool": "draft_email",
+              "seconds": 0.00013630400644615293,
+              "status": "complete"
+            },
+            {
+              "tool": "translate",
+              "seconds": 10.536678770993603,
+              "status": "complete"
+            }
+          ],
+          "output_tokens": 1442,
+          "aggregate_output_tokens_per_second": 39.198401011982014,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8701382656,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_1_1794269972",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 50.67650041799061,
+          "memory": {
+            "baseline": {
+              "time": 1794269972.5906532,
+              "total_bytes": 130596188160,
+              "available_bytes": 14000193536,
+              "free_bytes": 10799247360,
+              "file_cache_bytes": 5643587584,
+              "anonymous_bytes": 8055169024,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794270023.1093466,
+              "total_bytes": 130596188160,
+              "available_bytes": 13990367232,
+              "free_bytes": 10785255424,
+              "file_cache_bytes": 5646577664,
+              "anonymous_bytes": 8060190720,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11421872128,
+            "min_free_bytes": 8218697728,
+            "max_file_cache_bytes": 5655969792,
+            "peak_memory_used_bytes": 119174316032,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 14.601580881004338
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 20.617496058010147
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 37.34241219199612
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 15.151552266004728
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 50.46773087000474
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 16.508491465006955
+            }
+          },
+          "output_tokens": 2173,
+          "aggregate_output_tokens_per_second": 42.879835467655255,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8709390336,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_2_1794270023",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 49.24767993300338,
+          "memory": {
+            "baseline": {
+              "time": 1794270023.397583,
+              "total_bytes": 130596188160,
+              "available_bytes": 13986234368,
+              "free_bytes": 10781093888,
+              "file_cache_bytes": 5646598144,
+              "anonymous_bytes": 8064028672,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794270072.487578,
+              "total_bytes": 130596188160,
+              "available_bytes": 13977894912,
+              "free_bytes": 10768371712,
+              "file_cache_bytes": 5649678336,
+              "anonymous_bytes": 8071245824,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11447496704,
+            "min_free_bytes": 8239771648,
+            "max_file_cache_bytes": 5659525120,
+            "peak_memory_used_bytes": 119148691456,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 12.245663902998785
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 19.520144748996245
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 36.325354104003054
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 13.70806009999069
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 49.03971668599115
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 15.067886755001382
+            }
+          },
+          "output_tokens": 2193,
+          "aggregate_output_tokens_per_second": 44.53001649993178,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8726032384,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_3_1794270072",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 49.50341311200464,
+          "memory": {
+            "baseline": {
+              "time": 1794270072.794558,
+              "total_bytes": 130596188160,
+              "available_bytes": 13972799488,
+              "free_bytes": 10763304960,
+              "file_cache_bytes": 5649649664,
+              "anonymous_bytes": 8075382784,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794270122.12874,
+              "total_bytes": 130596188160,
+              "available_bytes": 13995094016,
+              "free_bytes": 10782126080,
+              "file_cache_bytes": 5651927040,
+              "anonymous_bytes": 8081301504,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11435991040,
+            "min_free_bytes": 8224559104,
+            "max_file_cache_bytes": 5661827072,
+            "peak_memory_used_bytes": 119160197120,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 12.393740453990176
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 19.098271498995018
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 35.60377054399578
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 13.733892770003877
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 49.284415461996105
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 15.095157750998624
+            }
+          },
+          "output_tokens": 2173,
+          "aggregate_output_tokens_per_second": 43.895963195172996,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8728793088,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_4_1794270122",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 49.145846282001,
+          "memory": {
+            "baseline": {
+              "time": 1794270122.3856962,
+              "total_bytes": 130596188160,
+              "available_bytes": 13995384832,
+              "free_bytes": 10782384128,
+              "file_cache_bytes": 5651955712,
+              "anonymous_bytes": 8081756160,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794270171.3777282,
+              "total_bytes": 130596188160,
+              "available_bytes": 13989675008,
+              "free_bytes": 10773377024,
+              "file_cache_bytes": 5654274048,
+              "anonymous_bytes": 8086814720,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11370524672,
+            "min_free_bytes": 8155787264,
+            "max_file_cache_bytes": 5660860416,
+            "peak_memory_used_bytes": 119225663488,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 12.243827593993046
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 19.57816230499884
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 36.267159291004646
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 13.704143056995235
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 48.94130873499671
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 15.078246695993585
+            }
+          },
+          "output_tokens": 2193,
+          "aggregate_output_tokens_per_second": 44.62228582689309,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8734236672,
+            "memory_peak_bytes": 30135463936
+          }
+        },
+        {
+          "segment": "S3",
+          "run_id": "qual_Q4_K_XL_S3_live_5_1794270171",
+          "purpose": "live",
+          "audio": false,
+          "status": "complete",
+          "seconds": 49.140053658993565,
+          "memory": {
+            "baseline": {
+              "time": 1794270171.6820133,
+              "total_bytes": 130596188160,
+              "available_bytes": 13985558528,
+              "free_bytes": 10769252352,
+              "file_cache_bytes": 5654282240,
+              "anonymous_bytes": 8087724032,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794270220.6647482,
+              "total_bytes": 130596188160,
+              "available_bytes": 13979488256,
+              "free_bytes": 10759946240,
+              "file_cache_bytes": 5656530944,
+              "anonymous_bytes": 8101314560,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 11439620096,
+            "min_free_bytes": 8221679616,
+            "max_file_cache_bytes": 5666160640,
+            "peak_memory_used_bytes": 119156568064,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          },
+          "jobs": {
+            "risks": {
+              "name": "risks",
+              "status": "complete",
+              "seconds": 12.444359332992462
+            },
+            "app": {
+              "name": "app",
+              "status": "complete",
+              "seconds": 19.20092221799132
+            },
+            "images": {
+              "name": "images",
+              "status": "complete",
+              "seconds": 35.96438572400075
+            },
+            "chart": {
+              "name": "chart",
+              "status": "complete",
+              "seconds": 13.737160554999718
+            },
+            "translation": {
+              "name": "translation",
+              "status": "complete",
+              "seconds": 48.93242449600075
+            },
+            "summary": {
+              "name": "summary",
+              "status": "complete",
+              "seconds": 15.100651633998496
+            }
+          },
+          "output_tokens": 2169,
+          "aggregate_output_tokens_per_second": 44.139145940941226,
+          "lanes_resident": true,
+          "runtime_memory": {
+            "swap_limit": "0",
+            "swap_current_bytes": 0,
+            "memory_current_bytes": 8749817856,
+            "memory_peak_bytes": 30135463936
+          }
+        }
+      ],
+      "loads": [
+        {
+          "lane": "image",
+          "seconds": 15.44630619599775,
+          "memory": {
+            "baseline": {
+              "time": 1794269531.3884292,
+              "total_bytes": 130596188160,
+              "available_bytes": 126453821440,
+              "free_bytes": 122900062208,
+              "file_cache_bytes": 4285440000,
+              "anonymous_bytes": 1152348160,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269546.8362758,
+              "total_bytes": 130596188160,
+              "available_bytes": 110206164992,
+              "free_bytes": 106653949952,
+              "file_cache_bytes": 4328112128,
+              "anonymous_bytes": 3675643904,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 107124797440,
+            "min_free_bytes": 87608430592,
+            "max_file_cache_bytes": 20292321280,
+            "peak_memory_used_bytes": 23471390720,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "lane": "tts",
+          "seconds": 5.431010542000877,
+          "memory": {
+            "baseline": {
+              "time": 1794269546.855689,
+              "total_bytes": 130596188160,
+              "available_bytes": 110208466944,
+              "free_bytes": 106656305152,
+              "file_cache_bytes": 4328058880,
+              "anonymous_bytes": 3679883264,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269552.287943,
+              "total_bytes": 130596188160,
+              "available_bytes": 108402712576,
+              "free_bytes": 104873189376,
+              "file_cache_bytes": 4349382656,
+              "anonymous_bytes": 5053956096,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 108402712576,
+            "min_free_bytes": 104873189376,
+            "max_file_cache_bytes": 4349382656,
+            "peak_memory_used_bytes": 22193475584,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "lane": "text",
+          "seconds": 6.982735079989652,
+          "memory": {
+            "baseline": {
+              "time": 1794269552.318606,
+              "total_bytes": 130596188160,
+              "available_bytes": 108400246784,
+              "free_bytes": 104870739968,
+              "file_cache_bytes": 4349366272,
+              "anonymous_bytes": 5053956096,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269559.3023882,
+              "total_bytes": 130596188160,
+              "available_bytes": 82646466560,
+              "free_bytes": 79116943360,
+              "file_cache_bytes": 4947513344,
+              "anonymous_bytes": 5380730880,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 82626707456,
+            "min_free_bytes": 78186844160,
+            "max_file_cache_bytes": 5857943552,
+            "peak_memory_used_bytes": 47969480704,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "lane": "lead",
+          "seconds": 14.895322356998804,
+          "memory": {
+            "baseline": {
+              "time": 1794269559.333561,
+              "total_bytes": 130596188160,
+              "available_bytes": 82640576512,
+              "free_bytes": 79111053312,
+              "file_cache_bytes": 4947501056,
+              "anonymous_bytes": 5381529600,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269574.229761,
+              "total_bytes": 130596188160,
+              "available_bytes": 16807366656,
+              "free_bytes": 13277790208,
+              "file_cache_bytes": 5621460992,
+              "anonymous_bytes": 5678739456,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 16777072640,
+            "min_free_bytes": 13234253824,
+            "max_file_cache_bytes": 5888811008,
+            "peak_memory_used_bytes": 113819115520,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        },
+        {
+          "lane": "gateway",
+          "seconds": 5.493222763005178,
+          "memory": {
+            "baseline": {
+              "time": 1794269574.2610734,
+              "total_bytes": 130596188160,
+              "available_bytes": 16799248384,
+              "free_bytes": 13269688320,
+              "file_cache_bytes": 5621440512,
+              "anonymous_bytes": 5679546368,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "after": {
+              "time": 1794269579.7550254,
+              "total_bytes": 130596188160,
+              "available_bytes": 16881876992,
+              "free_bytes": 13352255488,
+              "file_cache_bytes": 5621501952,
+              "anonymous_bytes": 5717852160,
+              "swap_used_bytes": 0,
+              "pswpin": 780061,
+              "pswpout": 3795983,
+              "oom_kill": 0
+            },
+            "min_available_bytes": 16761827328,
+            "min_free_bytes": 13232214016,
+            "max_file_cache_bytes": 5621501952,
+            "peak_memory_used_bytes": 113834360832,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0,
+            "sample_interval_ms": 100
+          }
+        }
+      ],
+      "runtime_policy": {
+        "process_swap_limit_bytes": 0,
+        "transient_user_scope": true,
+        "weight_file_cache_advice": true,
+        "global_swap_enabled": true
+      },
+      "predicted_memavailable_bytes": 16468717568,
+      "isolated_inputs": [
+        {
+          "lane": "lead",
+          "started_at": 1794265300.2062113,
+          "resident_memavailable_drop_bytes": 66134171648
+        },
+        {
+          "lane": "text",
+          "started_at": 1794265374.9251456,
+          "resident_memavailable_drop_bytes": 25771798528
+        },
+        {
+          "lane": "image",
+          "started_at": 1794265432.6237223,
+          "resident_memavailable_drop_bytes": 16146903040
+        },
+        {
+          "lane": "voice",
+          "started_at": 1794265488.312332,
+          "resident_memavailable_drop_bytes": 1932230656
+        }
+      ],
+      "resident_memory": {
+        "time": 1794269579.7742085,
+        "total_bytes": 130596188160,
+        "available_bytes": 16881856512,
+        "free_bytes": 13352255488,
+        "file_cache_bytes": 5621481472,
+        "anonymous_bytes": 5717852160,
+        "swap_used_bytes": 0,
+        "pswpin": 780061,
+        "pswpout": 3795983,
+        "oom_kill": 0
+      },
+      "memory": {
+        "baseline": {
+          "time": 1794269579.7923028,
+          "total_bytes": 130596188160,
+          "available_bytes": 16881856512,
+          "free_bytes": 13352255488,
+          "file_cache_bytes": 5621481472,
+          "anonymous_bytes": 5717852160,
+          "swap_used_bytes": 0,
+          "pswpin": 780061,
+          "pswpout": 3795983,
+          "oom_kill": 0
+        },
+        "after": {
+          "time": 1794270220.7838285,
+          "total_bytes": 130596188160,
+          "available_bytes": 13979488256,
+          "free_bytes": 10759946240,
+          "file_cache_bytes": 5656530944,
+          "anonymous_bytes": 8101769216,
+          "swap_used_bytes": 0,
+          "pswpin": 780061,
+          "pswpout": 3795983,
+          "oom_kill": 0
+        },
+        "min_available_bytes": 8905986048,
+        "min_free_bytes": 5714702336,
+        "max_file_cache_bytes": 5666226176,
+        "peak_memory_used_bytes": 121690202112,
+        "swap_in_pages": 0,
+        "swap_out_pages": 0,
+        "sample_interval_ms": 100
+      },
+      "agent_p95_seconds": 41.79850141819334,
+      "rush_max_seconds": 50.67650041799061,
+      "assessment": {
+        "passed": true,
+        "checks": {
+          "two_full_warm_passes": true,
+          "five_agent_samples": true,
+          "five_rush_samples": true,
+          "all_jobs_complete": true,
+          "all_lanes_resident": true,
+          "agent_p95_at_most_75_seconds": true,
+          "rush_at_most_60_seconds": true,
+          "rush_minimum_10_gib_available": true,
+          "rush_zero_global_swap": true,
+          "no_kernel_oom": true,
+          "runtime_scope_swap_zero": true
+        }
+      },
+      "ended_at": 1794270220.7865388
     }
   ],
   "swap_diagnostics": {},
   "latest_assessment": {
-    "source_started_at": 1794269531.3598037,
+    "source_started_at": 1794284028.20413,
     "quant": "Q4_K_XL",
     "assessment": {
-      "passed": true,
+      "passed": false,
       "checks": {
         "two_full_warm_passes": true,
         "five_agent_samples": true,
-        "five_rush_samples": true,
-        "all_jobs_complete": true,
-        "all_lanes_resident": true,
+        "five_rush_samples": false,
+        "all_jobs_complete": false,
+        "all_lanes_resident": false,
         "agent_p95_at_most_75_seconds": true,
         "rush_at_most_60_seconds": true,
         "rush_minimum_10_gib_available": true,
-        "rush_zero_global_swap": true,
+        "rush_zero_global_swap": false,
         "no_kernel_oom": true,
         "runtime_scope_swap_zero": true
       }
     },
-    "agent_p50_seconds": 38.91281112699653,
-    "agent_p95_seconds": 41.79850141819334,
-    "rush_p50_seconds": 49.24767993300338,
-    "rush_p95_seconds": 50.441882956793414,
-    "rush_max_seconds": 50.67650041799061,
-    "rush_min_available_gib": 10.58962631225586,
+    "agent_p50_seconds": 39.67042741799378,
+    "agent_p95_seconds": 41.95785086359247,
+    "rush_p50_seconds": 49.022061455005314,
+    "rush_p95_seconds": 50.5405322309045,
+    "rush_max_seconds": 50.70925120600441,
+    "rush_min_available_gib": 11.533390045166016,
     "rush_swap_in_pages": [
+      4,
       0,
-      0,
-      0,
-      0,
-      0
+      33
     ],
     "rush_swap_out_pages": [
-      0,
-      0,
       0,
       0,
       0
@@ -29991,6 +31376,46 @@
       "rush_p95_seconds": 60.31038574000413,
       "rush_max_seconds": 60.77292077100719,
       "rush_min_available_gib": 12.516132354736328,
+      "rush_swap_in_pages": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "rush_swap_out_pages": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "source_started_at": 1794269531.3598037,
+      "quant": "Q4_K_XL",
+      "assessment": {
+        "passed": true,
+        "checks": {
+          "two_full_warm_passes": true,
+          "five_agent_samples": true,
+          "five_rush_samples": true,
+          "all_jobs_complete": true,
+          "all_lanes_resident": true,
+          "agent_p95_at_most_75_seconds": true,
+          "rush_at_most_60_seconds": true,
+          "rush_minimum_10_gib_available": true,
+          "rush_zero_global_swap": true,
+          "no_kernel_oom": true,
+          "runtime_scope_swap_zero": true
+        }
+      },
+      "agent_p50_seconds": 38.91281112699653,
+      "agent_p95_seconds": 41.79850141819334,
+      "rush_p50_seconds": 49.24767993300338,
+      "rush_p95_seconds": 50.441882956793414,
+      "rush_max_seconds": 50.67650041799061,
+      "rush_min_available_gib": 10.58962631225586,
       "rush_swap_in_pages": [
         0,
         0,

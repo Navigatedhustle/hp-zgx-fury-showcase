@@ -144,12 +144,15 @@ def write_deck(data, folder):
     sys.path.insert(0, str(ROOT / 'build/sources/html_builder-main/backend'))
     from app.assemble import DeckInput, DeckSlide, assemble
     from app.spec import SlideSpec, SpecMeta
-    specs = []
+    from showcase_app.gb10_deck_design import slide_svg
+    specs, previews = [], []
     for index, slide in enumerate(data['slides'], 1):
-        points = ''.join('<li>' + html.escape(point) + '</li>' for point in slide['points'])
-        markup = '<section class="nano-deck"><p class="tag">HP ZGX NANO / ' + str(index) + '</p><h1>' + html.escape(slide['title']) + '</h1><p class="subtitle">' + html.escape(slide['subtitle']) + '</p><ul>' + points + '</ul><footer>Fictional account notes · source date 2026-11-08</footer></section>'
-        css = '.nano-deck{height:100%;box-sizing:border-box;padding:68px 80px;background:#0A0D14;color:white;font-family:Arial,Helvetica,"Liberation Sans",sans-serif}.nano-deck h1{font-size:72px;color:#D1DDF1;border-bottom:3px solid #004BDF;padding-bottom:22px;margin:36px 0}.nano-deck .tag{font-size:28px;letter-spacing:3px;color:#73A1FF}.nano-deck .subtitle{font-size:36px;color:#D1DDF1}.nano-deck li{font-size:36px;line-height:1.4;margin:20px 0}.nano-deck footer{position:absolute;bottom:40px;font-size:28px;color:#B4C1D7}'
-        css += '.nano-deck,.nano-deck *{font-family:Arial,Helvetica,"Liberation Sans",Arimo,sans-serif!important}'
+        vector = slide_svg(slide, index)
+        name = 'slide-' + str(index) + '.svg'
+        (folder / name).write_text(vector)
+        previews.append(name)
+        markup = '<section class="nano-deck">' + vector + '</section>'
+        css = '.nano-deck{height:100%;width:100%;margin:0;overflow:hidden;background:#0A0D14}.nano-deck>svg{display:block;width:100%;height:100%}'
         spec = SlideSpec(meta=SpecMeta(title=slide['title'], theme='dark', notes=[slide['notes']],
                          sources='Original fictional sample account notes, 2026-11-08'), html=markup, css=css)
         specs.append(DeckSlide(id='nano-' + str(index), spec=spec))
@@ -159,7 +162,7 @@ def write_deck(data, folder):
     document = re.sub(r'@font-face\s*\{[^}]*\}', '', document)
     (folder / 'briefing.html').write_text(document)
     (folder / 'briefing.json').write_text(json.dumps(data, ensure_ascii=False, indent=2))
-    return {'file': 'briefing.html', 'data_file': 'briefing.json', 'title': data['title'], 'slides': data['slides']}
+    return {'file': 'briefing.html', 'data_file': 'briefing.json', 'title': data['title'], 'slides': data['slides'], 'previews': previews}
 
 
 class NanoAgent:
@@ -246,7 +249,7 @@ class NanoAgent:
             self.event('artifact', artifact='email_en', data=arguments)
             return {'artifact': 'email-en', 'draft_only': True}
         if name == 'build_deck':
-            messages = [{'role': 'system', 'content': 'Author exactly five concise executive briefing slides from the fictional source. JSON only matching the schema. Each slide has a short title, subtitle, two or three short points, and notes. Use operational language about priorities, pilot scope, owners, measures and next actions. Speaker notes use the same operational topics. Ground every statement in the source. No invented statistics, legal or certification terminology, assurances, customer claims, HTML or URLs.'},
+            messages = [{'role': 'system', 'content': 'Author exactly five concise executive briefing slides from the fictional source. JSON only matching the schema. Each slide has a decisive headline of at most seven words, a concise subtitle, two or three points of at most sixteen words each, and notes. Follow this five-slide story: account context, priorities, bounded pilot, risks, next actions. Each slide should make one clear executive point. Preserve owners and dates when the source supplies them. Use operational language about priorities, pilot scope, owners, measures and next actions. Speaker notes use the same operational topics. Ground every statement in the source. No invented statistics, legal or certification terminology, assurances, customer claims, HTML or URLs.'},
                         {'role': 'user', 'content': context + '\nBrief: ' + arguments['brief']}]
             for attempt in range(2):
                 result = await infer(messages, run_id=self.run_id, purpose=self.purpose,

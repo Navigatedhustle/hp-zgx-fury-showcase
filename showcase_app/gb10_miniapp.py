@@ -11,19 +11,19 @@ CSP = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'
 # Keep the model's controls, outputs and JavaScript; give those same DOM nodes
 # the fixed stage layout before validating the actual arithmetic again.
 STAGE_LAYOUT = r'''<style id="nano-stage-style">
-body{margin:0!important;padding:12px!important;height:100vh!important;overflow:hidden!important;display:block!important;background:#101a2b!important;color:white!important;font:clamp(18px,6.8vh,64px)/1.15 Arial,Helvetica,"Liberation Sans",Arimo,sans-serif!important}
+html{background:#0d1523!important}body{box-sizing:border-box!important;margin:0!important;padding:16px!important;height:100vh!important;overflow:hidden!important;display:block!important;background:#0d1523!important;color:white!important;font:clamp(18px,6.8vh,64px)/1.15 Arial,Helvetica,"Liberation Sans",Arimo,sans-serif!important}
 body *{box-sizing:border-box!important;font-family:Arial,Helvetica,"Liberation Sans",Arimo,sans-serif!important;box-shadow:none!important}
-.nano-stage-roi{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:grid!important;gap:.25em!important;align-content:start!important;background:transparent!important;border:0!important}
+.nano-stage-roi{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:grid!important;gap:.35em!important;align-content:start!important;background:transparent!important;border:0!important}
 .nano-stage-roi h1{font:700 1.08em/1.1 Arial,Helvetica,sans-serif!important;margin:0!important;color:#d1ddf1!important;border-bottom:2px solid #7da5ff!important;padding:0 0 .2em!important}
 .nano-stage-fields{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.4em!important}
 .nano-stage-field{display:flex!important;flex-direction:column!important;gap:.1em!important;font:inherit!important;color:white!important}
-.nano-stage-field input{width:100%!important;min-width:0!important;max-width:100%!important;height:1.4em!important;margin:0!important;padding:.15em!important;border:2px solid #7da5ff!important;border-radius:3px!important;background:#0a0d14!important;color:white!important;font:inherit!important;position:static!important}
+.nano-stage-field input{width:100%!important;min-width:0!important;max-width:100%!important;height:1.5em!important;margin:0!important;padding:.2em .3em!important;border:2px solid #3e587d!important;border-radius:3px!important;background:#111f34!important;color:white!important;font:inherit!important;position:static!important}
 .nano-stage-roi #calculate{width:100%!important;margin:0!important;padding:.25em!important;height:1.7em!important;border:0!important;border-radius:3px!important;background:#004bdf!important;color:white!important;font:inherit!important;position:static!important}
 .nano-stage-values{display:grid!important;grid-template-columns:1fr 1fr!important;gap:.5em!important}
-.nano-stage-value{background:#0a0d14!important;padding:.25em!important;min-width:0!important}
-.nano-stage-value small,.nano-stage-roi footer{display:block!important;font-size:.65em!important;color:#b4c1d7!important;margin:0!important;padding:0!important}
+.nano-stage-value{background:#111f34!important;padding:.25em!important;min-width:0!important}
+.nano-stage-value small,.nano-stage-roi footer{display:block!important;font-size:.62em!important;color:#b4c1d7!important;margin:0!important;padding:0!important}
 .nano-stage-roi #net,.nano-stage-roi #roi{display:block!important;font:700 1.4em/1.15 Arial,Helvetica,sans-serif!important;color:#d1ddf1!important;margin:0!important;padding:0!important;position:static!important}
-@media(min-height:400px){body{font-size:max(28px,6.8vh)!important}.nano-stage-roi #net,.nano-stage-roi #roi{font-size:max(44px,1.4em)!important}}
+@media(min-width:680px){body{font-size:max(28px,6.8vh)!important}.nano-stage-roi #net,.nano-stage-roi #roi{font-size:max(44px,1.4em)!important}}
 </style><script>
 (()=>{const skin=document.getElementById('nano-stage-style');if(skin)document.head.append(skin);function stageLayout(){const controls=['hourly','hours','cost'].map(id=>document.getElementById(id)),button=document.getElementById('calculate'),net=document.getElementById('net'),roi=document.getElementById('roi');if(controls.some(x=>!x)||!button||!net||!roi)return;const originalForm=button.closest('form'),root=originalForm||document.createElement('div');root.classList.add('nano-stage-roi');const heading=document.createElement('h1');heading.textContent='ROI calculator';const fields=document.createElement('div');fields.className='nano-stage-fields';controls.forEach((input,i)=>{const label=document.createElement('label');label.className='nano-stage-field';label.textContent=['Rate $ / h','Hours / mo','Cost $ / mo'][i];label.append(input);fields.append(label);});const values=document.createElement('div');values.className='nano-stage-values';[net,roi].forEach((output,i)=>{const box=document.createElement('div');box.className='nano-stage-value';const label=document.createElement('small');label.textContent=i?'Return on cost':'Net monthly value';box.append(label,output);values.append(box);});const foot=document.createElement('footer');foot.textContent='Fictional inputs · source 2026-11-08';root.replaceChildren(heading,fields,button,values,foot);document.body.replaceChildren(root);}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',stageLayout,{once:true});else stageLayout();})();
 </script>'''
@@ -44,7 +44,7 @@ def secure_html(source):
     ReferenceCheck().feed(source)
     if re.search(r'url\s*\(|https?://|file://', source, re.I):
         raise ValueError('Generated calculator contains a URL')
-    return '<meta http-equiv="Content-Security-Policy" content="' + html.escape(CSP, quote=True) + '">' + source
+    return '<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="' + html.escape(CSP, quote=True) + '">' + source
 
 
 def preview_document(source):

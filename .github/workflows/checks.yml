@@ -14,7 +14,7 @@ jobs:
           python-version: '3.12'
       - run: bash ops/scan-secrets.sh
       - run: python ops/check-source.py
-      - run: python ops/package-release.py --version v2.3.0
+      - run: python ops/package-release.py --version v3.2.0-nano.1
       - run: pip install -r ops/apps-requirements.lock
       - name: Hardware-independent controller and API failure fixtures
         run: python -m pytest -q ops/tests ops/acceptance/test_gateway.py ops/acceptance/test_booth.py

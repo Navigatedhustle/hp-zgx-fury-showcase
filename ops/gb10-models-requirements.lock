@@ -113,3 +113,6 @@ weasel==1.0.1
 wrapt==2.5.2
 zipp==4.1.2
 torchao @ https://files.pythonhosted.org/packages/c4/4d/485477bb8f05bd501016059c6d8abd742f830cb1b24ab7704e086c7cc35a/torchao-0.18.0-py3-none-any.whl#sha256=5c2b4485341bf28b7fed2c4fc95b9f298e209f41685350f067de85527a05585e
+
+# Required by the pinned Torch/spaCy/thinc stack on Python 3.12 venvs.
+setuptools==78.1.0

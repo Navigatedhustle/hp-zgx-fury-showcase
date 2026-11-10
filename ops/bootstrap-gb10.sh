@@ -5,6 +5,9 @@ cd "$(dirname "$0")/.."
 [[ "$(uname -m)" == aarch64 ]] || { echo 'GB10 preparation requires Linux ARM64.' >&2; exit 1; }
 [[ -x /usr/bin/python3.12 ]] || { echo 'Install Python3.12 and venv support before preparation.' >&2; exit 1; }
 export FURY_PROFILE=gb10
+export HF_HOME="$PWD/.cache/huggingface" HF_HUB_DISABLE_IMPLICIT_TOKEN=1
+export PATH="/usr/local/cuda/bin:$PATH"
+unset HF_HUB_OFFLINE TRANSFORMERS_OFFLINE
 export PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright"
 mkdir -p state .cache .local-debs
 exec 9>state/gb10-setup.lock
@@ -35,4 +38,5 @@ profile_quant="$(.venv/bin/python -c 'import json; print(json.load(open("config/
 model_quant="${FURY_GB10_QUANT:-$profile_quant}"
 .venv/bin/python ops/download-models.py --profile gb10 --quant "$model_quant"
 .venv/bin/python ops/build-gb10-codecs.py
-echo 'GB10 preparation complete. Verify qualification and record this build before the show.'
+.venv/bin/python ops/nano-setup-smoke.py
+echo 'GB10 setup complete. Launch ./launch.sh free; full event qualification and backup recording remain separate.'

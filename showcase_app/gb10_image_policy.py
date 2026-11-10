@@ -9,17 +9,25 @@ from PIL import Image
 from showcase_app.gb10_client import infer, WORKER, json_content
 from showcase_app.gb10_accounting import validated_counts
 
-COVER_PROMPT = 'Original minimalist editorial landscape of gently rolling cobalt blue dunes and pale periwinkle hills. Smooth matte unmarked surfaces, soft studio light, plain light background. Purely abstract visual artwork.'
-RUSH_PROMPT = 'Original minimalist abstract landscape of flowing cobalt blue waves and softly layered pale periwinkle hills. Smooth matte unmarked surfaces, soft studio light, plain light background. Purely visual artwork.'
+COVER_PROMPT = 'Original architectural studio still life: a single sweeping cobalt blue anodized aluminum ribbon suspended between two solid precision-machined silver blocks on an obsidian plinth. Monumental sculptural composition, beautifully controlled broad reflections, fine brushed-metal grain, unmarked surfaces, deep midnight navy studio, pale periwinkle rim light, confident negative space. Museum-quality product photography of an abstract sculpture, exquisitely detailed physical materials.'
+RUSH_PROMPTS = (
+    'Original studio material study: one continuous cobalt blue anodized metal ribbon folding through a polished silver arch. Strong sculptural silhouette, unmarked surfaces, obsidian stage, deep navy background, broad softbox reflections, meticulous product photography.',
+    'Original studio material study: a monumental matte cobalt blue ceramic ring with a brushed silver sphere resting inside its aperture. Asymmetric editorial composition, unmarked surfaces, dark navy studio, pale periwinkle edge light, refined physical material detail.',
+    'Original studio material study: three cantilevered solid slabs of cobalt anodized aluminum and satin ivory ceramic, balanced with architectural precision above an obsidian base. Unmarked surfaces, deep navy studio, controlled grazing light, exquisite machined edges.',
+    'Original studio material study: two interlocking sculptural arches, one cobalt blue ceramic and one brushed silver aluminum, a clean continuous silhouette. Unmarked surfaces, dark navy stage, broad studio reflections, restrained periwinkle edge light, extraordinary material realism.',
+)
+RUSH_PROMPT = RUSH_PROMPTS[0]
 NO_LETTERING = ' Every surface is blank and unmarked. Absolutely no text, letters, numbers, words, captions, labels, symbols, logos, signatures, watermarks or fake writing in any language, even tiny or unreadable. No screens, keyboards, cards, documents, signs, charts, packaging or printed objects. No people.'
 TEXT_SCHEMA = {'type': 'object', 'properties': {'text': {'type': 'boolean'}}, 'required': ['text'], 'additionalProperties': False}
 
 
-def stage_prompt(batch):
+def stage_prompt(batch, index=0):
     """The trusted stage tool applies this documented house art direction."""
     if batch not in (1, 4):
         raise ValueError('Unsupported stage artwork batch')
-    return (COVER_PROMPT if batch == 1 else RUSH_PROMPT) + NO_LETTERING
+    if not 0 <= index < batch:
+        raise ValueError('Invalid artwork index')
+    return (COVER_PROMPT if batch == 1 else RUSH_PROMPTS[index]) + NO_LETTERING
 
 
 def vision_payload(path):

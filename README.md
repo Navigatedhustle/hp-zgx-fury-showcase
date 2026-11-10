@@ -1,4 +1,30 @@
-# HP ZGX Fury — V3 Mission Control
+# HP ZGX Nano Collective
+
+Seven interactive local AI experiences and a fast-starting Executive Stage on the HP ZGX Nano / NVIDIA GB10, with the supplied official HP logo, original robot artwork and the complete portable installer.
+
+**Nano preview v3.2.0-nano.1** · Ubuntu 24.04 ARM64 · 128 GB unified memory · working NVIDIA driver/CUDA toolkit · 200 GiB free installation space. Selected model files: about 95.9 GiB. This is a community demonstration, not an officially supported or endorsed HP or NVIDIA product.
+
+```bash
+git clone --branch v3.2.0-nano.1 --depth 1 \
+  https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git hp-zgx-nano
+cd hp-zgx-nano
+./install.sh
+./launch.sh free
+```
+
+Open **http://127.0.0.1:18808/free**, or use the installed **HP ZGX Nano Experience** desktop/application shortcut. Switch to Presenter Mode from the sidebar, or run `./launch.sh stage`. With models already resident, measured functional preparation was about 5.6–7.1 seconds; cold install/model loading is separate. Full rehearsal and verified-recording protection remain available explicitly.
+
+`./install.sh --check` inspects prerequisites; `./install.sh --no-desktop` supports headless preparation. Setup downloads pinned dependencies and model files and verifies their recorded hashes. It never replaces a driver, changes networking or disables a sandbox. Only one model stack should run on this GPU.
+
+[Complete install and presenter guide](docs/NANO_GUIDE.md) · [Download the guide PDF](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.2.0-nano.1/HP-ZGX-Nano-Complete-Guide.pdf) · [Public Nano release](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.1) · [Capabilities](docs/FREE_MODE.md) · [Verification and limits](docs/verification/nano_collective_ui.json)
+
+![Nano Collective experience center](docs/screenshots/nano-collective.png)
+
+This is a functional Nano preview, not full keynote qualification. One actual live five-scene show passed; no ten-show, 45-minute idle or zero-swap claim is made. The full Fury/GB300 profile below is separate and requires its documented hardware capacity.
+
+---
+
+# Fury / GB300 reference
 
 Eight local AI experiences share one GB300 workstation, with real model routing, visible queues and measured hardware telemetry. V3 is a review branch; no V3 tag or release is published. Existing releases remain immutable.
 
@@ -88,10 +114,20 @@ V2.0 predates Guided demonstration. Use a fresh browser profile when presenting 
 
 ## Nano Executive Stage Mode
 
-On GB10, `./launch.sh stage` loads the four pinned local models, warms the exact show inputs twice, checks readiness and opens the local HDMI kiosk at `http://127.0.0.1:18808/stage`. `FURY_PROFILE=gb10` selects the Nano explicitly. The existing Fury profile remains separate.
+On GB10, `./launch.sh stage` loads the four pinned local models, runs short measured language, vision, image and voice checks, and opens the local HDMI kiosk at `http://127.0.0.1:18808/stage`. `FURY_PROFILE=gb10` selects the Nano explicitly. The existing Fury profile remains separate.
 
-Prepare actual current backups with `./launch.sh stage record` at native 1920×1080. Normal stage mode blocks until all five backups are current and verified. Use `./launch.sh stage reset`, `./launch.sh stage status` and `./launch.sh stage stop` for the show session. The stage runs entirely from local assets with the Hugging Face and Transformers offline variables enforced.
+Prepare actual current backups with `./launch.sh stage record` at native 1920×1080. Fast live start does not require recordings. Enable **Require verified backups** on the Ready screen for a protected show; it blocks until all five backups match this build. Backup creation still runs the complete two-pass rehearsal. `./launch.sh stage rehearse` runs that full rehearsal on demand. Use `./launch.sh stage reset`, `./launch.sh stage status` and `./launch.sh stage stop` for the show session. The stage runs entirely from local assets with the Hugging Face and Transformers offline variables enforced.
 
 Generated cover and gallery images use wordless abstract art direction. Each real render is checked by the local vision lane before display; rejected lettering is never published. The P0 show keeps optional openers and camera segments disabled.
 
 See [the run of show](docs/stage/RUN_OF_SHOW.md), [the checklist](docs/stage/STAGE_CHECKLIST.md) and [the memory qualification](docs/verification/gb10_gate1.md). The [native stage proof](docs/verification/gb10_stage_gate_report.json) records ten consecutive live shows, offline socket capture, all five controlled failovers and the 45 minute idle check. Event settings, recordings, outputs and optional private branding stay in ignored `state/` and are excluded from source distributions.
+
+The Nano Collective skin uses the unchanged owner-supplied HP Electric Blue keyline logo, cyan-lit navy panels, original robot agent illustrations, the bundled decorative robot hero, and five original briefing slide compositions. The hero is supplied interface artwork, not a demo-model inference output. Every candidate image is checked locally before display; lettering rejection is visible and bounded. The full briefing and its previews use the same escaped vector layouts.
+
+## Nano Free Mode
+
+Run `./launch.sh free` and open **http://127.0.0.1:18808/free** for a Fury V3-style interactive hub alongside the sequential presenter workflow. Atlas, Presentations, Agent Factory, Image Studio, Vision Lab and Translate Desk accept your own inputs; Voice Studio exposes local Kokoro narration. Retained workspaces, live progress, a shared queue, Model Hub, editable PowerPoint, downloads and six-workflow Nano Rush use the same resident Nano models.
+
+Free Mode adapts the original experiences to the Nano: Atlas is an account-grounded assistant and Factory builds self-contained browser apps. Video Studio and Action Trailer are excluded because no video model is loaded. Modes share one stack and reject overlapping presenter/free workloads. Return to Presenter Mode from the sidebar after jobs finish; the short functional checks run again before readiness. [Controls, capability differences and limits](docs/FREE_MODE.md).
+
+The [Nano Collective UI verification](docs/verification/nano_collective_ui.json) records functional startup timing, responsive and accessibility checks, and one live five-beat run. This is distinct from full event qualification.

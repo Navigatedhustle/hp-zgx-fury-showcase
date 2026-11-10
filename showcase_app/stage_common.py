@@ -14,7 +14,7 @@ def profile():
 
 
 def local_settings():
-    defaults = {'audio': False, 'projector_boost': False, 'customer_skin': False,
+    defaults = {'audio': False, 'projector_boost': False, 'require_backups': False, 'customer_skin': False,
                 'presenter_poster': False, 'live_camera': False}
     path = STATE / 'stage.local.json'
     if path.exists():
@@ -29,11 +29,12 @@ def local_settings():
 
 
 def build_identity():
-    files = [*ROOT.glob('showcase_app/*.py'), *ROOT.glob('showcase_app/stage/*'),
+    files = [*ROOT.glob('showcase_app/*.py'), *ROOT.glob('showcase_app/stage/*'), *ROOT.glob('showcase_app/free_mode/*'),
              *ROOT.glob('ops/*gb10*'), ROOT / 'ops/control.py', ROOT / 'ops/runtime.py',
              ROOT / 'launch.sh', ROOT / 'config/gb10.json', ROOT / 'config/gb10-build.json',
              ROOT / 'config/model-files.json', ROOT / 'config/event-pricing.json',
-             *ROOT.glob('samples/stage/**/*')]
+             *ROOT.glob('samples/stage/**/*'), ROOT / 'showcase_app/assets/nano-agent.png',
+             ROOT / 'showcase_app/assets/hp-logo-keyline.png']
     digest = hashlib.sha256()
     for path in sorted(p for p in files if p.is_file()):
         digest.update(str(path.relative_to(ROOT)).encode() + b'\0' + path.read_bytes())

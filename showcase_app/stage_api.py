@@ -60,6 +60,7 @@ class Show:
         self.full_warm_complete = False
         self.resetting = False
         self.warm_error = ''
+        self.preparation = {'kind': 'functional', 'status': 'idle', 'steps': []}
         self.health = {}
         self.telemetry = {}
         self.viewport = {}
@@ -67,12 +68,14 @@ class Show:
         self.recording = os.getenv('FURY_STAGE_RECORD') == '1'
         self.keepalive_at = 0
         self.stopping = False
+        self.maintenance = False
         self.unresponsive_since = {}
         self.journal('session', build=self.build['id'])
 
     def warm_signature(self):
         digest = hashlib.sha256()
-        for name in ('showcase_app/gb10_agent.py', 'showcase_app/gb10_rush.py', 'showcase_app/gb10_vision.py', 'showcase_app/gb10_client.py', 'showcase_app/gb10_image_policy.py', 'showcase_app/gb10_miniapp.py', 'config/gb10.json', 'config/model-files.json'):
+        digest.update(b'nano-functional-preparation-v2')
+        for name in ('showcase_app/gb10_agent.py', 'showcase_app/gb10_rush.py', 'showcase_app/gb10_vision.py', 'showcase_app/gb10_client.py', 'showcase_app/gb10_image_policy.py', 'showcase_app/gb10_deck_design.py', 'showcase_app/gb10_miniapp.py', 'config/gb10.json', 'config/model-files.json'):
             digest.update((ROOT / name).read_bytes())
         digest.update(str(bool(self.settings['audio'])).encode())
         return digest.hexdigest()
@@ -81,7 +84,7 @@ class Show:
         import control
         try:
             saved = json.loads((STATE / 'warm.json').read_text())
-            return saved['signature'] == self.warm_signature() and saved['passes'] == 2 and all(
+            return saved['signature'] == self.warm_signature() and saved.get('version') == 2 and (not self.recording or saved.get('kind') == 'rehearsal') and all(
                 control.unchanged(saved['identities'][name]) and control.identity(control.process(saved['identities'][name]['pid']), name) for name in CORE)
         except (OSError, ValueError, KeyError):
             return False
@@ -227,7 +230,7 @@ class Show:
         m = memory()
         checks = [
             {'label': 'Four models resident', 'ok': all(self.health.get(n, {}).get('ready') for n in CORE), 'fix': 'Run ./launch.sh stage to load the local lanes.'},
-            {'label': 'Models warmed', 'ok': self.warm, 'fix': self.warm_error or 'Warm-up is running. Wait for both passes to finish.'},
+            {'label': 'Models warmed', 'ok': self.warm, 'fix': self.warm_error or 'Checking language, vision, image and voice. Progress appears below.'},
             {'label': 'Unified memory reserve', 'ok': m['available'] >= CONFIG['minimum_memavailable_gib'] * 2**30, 'fix': 'Close unrelated applications, then run ./launch.sh stage reset.'},
             {'label': 'Local inference only', 'ok': all(os.getenv(k) == v for k, v in CONFIG['offline'].items()) and self.telemetry.get('cloud_bytes') == 0, 'fix': 'Restart with ./launch.sh stage so the offline profile is applied.'},
             {'label': 'Display ' + str(self.viewport.get('width', '?')) + ' × ' + str(self.viewport.get('height', '?')), 'ok': self.viewport.get('width', 0) >= 1280 and self.viewport.get('height', 0) >= 720, 'fix': 'Connect HDMI at its native resolution and open the stage kiosk.'},
@@ -236,9 +239,16 @@ class Show:
             {'label': 'Clock ' + time.strftime('%H:%M'), 'ok': time.time() > 1735689600, 'fix': 'Check the desktop clock before the show.'},
         ]
         backups = self.backup_checks()
-        checks.extend(backups)
+        if self.settings.get('require_backups'):
+            checks.extend(backups)
+        manager = globals().get('free_mode')
+        if manager and (manager.active or manager.switching):
+            checks.insert(0, {'label': 'Presenter Mode', 'ok': False,
+                'fix': 'Finish or cancel Free Mode jobs, then select Presenter Mode in its sidebar.'})
         ready = all(check['ok'] for check in checks if not self.recording or check not in backups)
-        return {'ready': ready, 'checks': checks, 'recording': self.recording}
+        return {'ready': ready, 'checks': checks, 'recording': self.recording,
+                'backups': backups, 'protected': self.settings.get('require_backups', False),
+                'preparation': getattr(self, 'preparation', {})}
 
     def snapshot(self):
         row = self.current()
@@ -254,9 +264,13 @@ class Show:
         row = self.runs[segment]
         if row['backup']:
             return
-        if self.recording and not (STATE / 'backup' / (segment + '.mp4')).exists():
-            row.update(recording_error=reason, failure=reason)
-            self.journal('recording_failed', segment=segment, reason=reason)
+        verified = next((check['ok'] for check in self.backup_checks() if check['label'] == segment + ' backup'), False)
+        if not verified:
+            row.update(status='failed', failure=reason, backup_unavailable=True)
+            if self.recording:
+                row['recording_error'] = reason
+            self.pending = False
+            self.journal('live_failed_without_backup', segment=segment, reason=reason)
             return
         row.update(backup=True, failover_at=time.time(), failover_elapsed=time.time() - row['started'], failure=reason)
         self.journal('failover', segment=segment, run_id=row['id'], reason=reason, elapsed=row['failover_elapsed'])
@@ -318,7 +332,8 @@ class Show:
                 result = {'totals': self.totals(), 'cloud_bytes': self.telemetry.get('cloud_bytes')}
             row.update(status='complete', result=result)
         except asyncio.CancelledError:
-            row['status'] = 'interrupted'
+            if row['status'] != 'failed':
+                row['status'] = 'interrupted'
         except Exception as exc:
             logging.exception('Stage live run failed: %s', segment)
             row['status'] = 'failed'
@@ -404,46 +419,127 @@ class Show:
             async with httpx.AsyncClient(trust_env=False, timeout=12) as client:
                 response = await client.post(f'http://127.0.0.1:{PORTS["tts"]}/v1/audio/speech', json={'input': 'Ready.', 'voice': 'am_michael'})
                 response.raise_for_status()
-        results = await asyncio.gather(text(LEAD), text(WORKER), voice(),
-            image_job('A single original blue paper square, no text.', run_id, purpose, width=1024, height=576))
-        for name in results[-1]['files']:
+        await asyncio.gather(text(LEAD), text(WORKER), voice())
+        result = await image_job('A single original blue paper square, no text.', run_id, purpose, width=1344, height=768)
+        for name in result['files']:
             (STATE / 'creative' / name).unlink(missing_ok=True)
         self.journal('keepalive', purpose=purpose, elapsed=time.time())
 
-    async def warmup(self):
+    async def functional_warmup(self):
+        """Exercise each real inference path once without generating a full show."""
+        import base64
+        run_id = 'warm_' + uuid.uuid4().hex
+        steps = [{'name': name, 'status': 'waiting'} for name in
+                 ('Executive reasoning', 'Language & code', 'Vision', 'Image generation', 'Voice')]
+        self.preparation['steps'] = steps
+
+        async def language(model):
+            result = await infer([{'role': 'user', 'content': 'Reply with the single word Ready.'}],
+                model=model, caller='warmup', run_id=run_id, purpose='warmup', max_tokens=96 if model == LEAD else 24)
+            if not result['content'].strip() or result['finish_reason'] != 'stop':
+                raise RuntimeError('Language readiness probe was incomplete')
+
+        async def vision():
+            encoded = base64.b64encode((ROOT / 'samples/stage/vision/whiteboard.png').read_bytes()).decode()
+            result = await infer([{'role': 'user', 'content': [
+                {'type': 'image_url', 'image_url': {'url': 'data:image/png;base64,' + encoded}},
+                {'type': 'text', 'text': 'Does this image contain handwriting? Answer yes or no.'}]}],
+                model=WORKER, caller='warmup', run_id=run_id, purpose='warmup', role='vision_probe', max_tokens=24)
+            if not result['content'].strip() or result['finish_reason'] != 'stop':
+                raise RuntimeError('Vision readiness probe was incomplete')
+
+        async def image():
+            result = await image_job('A single blue ceramic sphere, no text.', run_id, 'warmup', width=1344, height=768)
+            for name in result['files']:
+                (STATE / 'creative' / name).unlink(missing_ok=True)
+
+        async def voice():
+            async with httpx.AsyncClient(trust_env=False, timeout=15) as client:
+                response = await client.post(f'http://127.0.0.1:{PORTS["tts"]}/v1/audio/speech',
+                                             json={'input': 'Ready.', 'voice': 'am_michael'})
+                response.raise_for_status()
+                if len(response.content) < 100:
+                    raise RuntimeError('Voice readiness probe returned no audio')
+
+        async def measured(index, operation):
+            step = steps[index]
+            step.update(status='running', started=time.time())
+            began = time.monotonic()
+            try:
+                await operation()
+                step.update(status='complete', seconds=round(time.monotonic() - began, 2))
+            except BaseException:
+                step['status'] = 'failed'
+                raise
+
+        async with asyncio.timeout(60):
+            # Language/vision and speech share a short bounded phase. Render the
+            # actual presenter cover shape afterward, preserving its measured
+            # reserve and avoiding simultaneous vision/image allocation peaks.
+            async with asyncio.TaskGroup() as group:
+                for index, operation in ((0, lambda: language(LEAD)), (1, lambda: language(WORKER)),
+                                         (2, vision), (4, voice)):
+                    group.create_task(measured(index, operation))
+            await measured(3, image)
+
+    async def warmup(self, full=False):
+        began = time.monotonic()
+        full = full or self.recording
+        self.warm = False
+        self.warm_error = ''
+        self.preparation = {'kind': 'rehearsal' if full else 'functional', 'status': 'running',
+                            'started': time.time(), 'steps': []}
         try:
-            for number in (1, 2):
-                for segment, runner in [('S1', lambda rid: NanoAgent(rid, purpose='warmup', audio=self.settings['audio'], emit=lambda event: self.journal('warm_event', event=event)).run()),
-                                        ('S2', lambda rid: run_vision(rid, 'warmup')),
-                                        ('S3', lambda rid: NanoRush(rid, purpose='warmup', audio=self.settings['audio']).run())]:
-                    result = await runner('warm_' + uuid.uuid4().hex)
-                    if segment == 'S3' and result['done'] != 6:
-                        raise RuntimeError('Rush warm-up did not complete all six jobs')
-                    self.journal('warmup', segment=segment, pass_number=number, seconds=result.get('seconds'))
-            await self.tiny_warm('warmup')
+            if full:
+                for number in (1, 2):
+                    for segment, runner in [('S1', lambda rid: NanoAgent(rid, purpose='warmup', audio=self.settings['audio'], emit=lambda event: self.journal('warm_event', event=event)).run()),
+                                            ('S2', lambda rid: run_vision(rid, 'warmup')),
+                                            ('S3', lambda rid: NanoRush(rid, purpose='warmup', audio=self.settings['audio']).run())]:
+                        result = await runner('warm_' + uuid.uuid4().hex)
+                        if segment == 'S3' and result['done'] != 6:
+                            raise RuntimeError('Rush warm-up did not complete all six jobs')
+                        self.journal('warmup', segment=segment, pass_number=number, seconds=result.get('seconds'))
+                await self.tiny_warm('warmup')
+            else:
+                await self.functional_warmup()
+            self.health = await self.fetch_health()
+            if not all(self.health.get(name, {}).get('ready') for name in CORE):
+                raise RuntimeError('A model lane became unavailable during preparation')
             self.warm = True
-            self.full_warm_complete = True
+            self.full_warm_complete = full
             self.keepalive_at = time.monotonic()
+            self.preparation.update(status='complete', seconds=round(time.monotonic() - began, 2))
             import control
             identities = {name: control.fingerprint(control.discover(name)) for name in CORE}
-            (STATE / 'warm.json').write_text(json.dumps({'signature': self.warm_signature(), 'passes': 2, 'identities': identities, 'at': time.time()}))
-            self.journal('warm_complete')
+            (STATE / 'warm.json').write_text(json.dumps({'version': 2, 'kind': self.preparation['kind'],
+                'signature': self.warm_signature(), 'passes': 2 if full else 0,
+                'identities': identities, 'seconds': self.preparation['seconds'], 'at': time.time()}))
+            self.journal('warm_complete', preparation=self.preparation)
+        except asyncio.CancelledError:
+            self.preparation['status'] = 'cancelled'
+            raise
         except Exception as exc:
-            logging.exception('Exact-input stage warm-up failed')
-            self.warm_error = 'Warm-up failed: ' + type(exc).__name__ + '. Run ./launch.sh stage reset.'
+            logging.exception('Stage preparation failed')
+            self.warm = self.full_warm_complete = False
+            self.preparation.update(status='failed', seconds=round(time.monotonic() - began, 2))
+            failed = ', '.join(step['name'] for step in self.preparation['steps'] if step['status'] == 'failed')
+            self.warm_error = 'Preparation failed' + (' at ' + failed if failed else ': ' + type(exc).__name__) + '. Run ./launch.sh stage reset.'
             self.journal('warm_failed', error=type(exc).__name__)
 
     async def keepalive(self):
         while not self.stopping:
             await asyncio.sleep(1)
-            if self.warm and self.view == -1 and time.monotonic() - self.keepalive_at >= 60:
+            if not free_mode.active and not free_mode.switching and self.warm and self.view == -1 and time.monotonic() - self.keepalive_at >= 60:
                 self.keepalive_at = time.monotonic()
+                self.maintenance = True
                 try:
                     await self.tiny_warm()
                 except Exception as exc:
                     self.warm = False
                     self.warm_error = 'Keep-alive failed. Run ./launch.sh stage reset.'
                     self.journal('keepalive_failed', error=type(exc).__name__)
+                finally:
+                    self.maintenance = False
 
     async def reset(self, segment=False):
         # A rejected concurrent reset must never clear the first reset's flag.
@@ -534,13 +630,19 @@ show = Show()
 async def lifespan(app):
     tasks = [asyncio.create_task(show.telemetry_loop()), asyncio.create_task(show.watchdog()),
              asyncio.create_task(show.keepalive()), asyncio.create_task(show.memory_sampler())]
-    if show.reuse_warm():
-        show.warm = show.full_warm_complete = True
+    if free_mode.active:
+        show.journal('free_mode_started')
+    elif show.reuse_warm():
+        saved = json.loads((STATE / 'warm.json').read_text())
+        show.warm = True
+        show.full_warm_complete = saved.get('kind') == 'rehearsal'
+        show.preparation = {'kind': saved.get('kind'), 'status': 'reused', 'steps': [], 'seconds': 0}
         show.journal('warm_reused', signature=show.warm_signature())
     else:
         show.warm_task = asyncio.create_task(show.warmup())
         tasks.append(show.warm_task)
     yield
+    await free_mode.close()
     show.stopping = True
     if show.task:
         show.task.cancel()
@@ -554,13 +656,18 @@ async def lifespan(app):
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
 app.add_middleware(StageRequestGuard, limit=65536)
 
+from showcase_app.free_mode_api import create_router
+free_router, free_mode = create_router(show)
+app.include_router(free_router)
+
 
 @app.middleware('http')
 async def headers(request, call_next):
     if request.headers.get('host') not in ('127.0.0.1:18808', 'localhost:18808'):
         return JSONResponse({'error': 'Only the local stage host is allowed'}, status_code=403)
     response = await call_next(request)
-    response.headers['Content-Security-Policy'] = APP_CSP if request.url.path.endswith('/calculator.html') else CSP
+    generated_app = request.url.path.endswith('/calculator.html') or (request.url.path.startswith('/free/files/') and request.url.path.endswith('/app.html'))
+    response.headers['Content-Security-Policy'] = APP_CSP if generated_app else CSP
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['Referrer-Policy'] = 'no-referrer'
     response.headers['Cache-Control'] = 'no-store'
@@ -601,15 +708,18 @@ async def events(request: Request):
 
 
 class Command(BaseModel):
-    action: Literal['next', 'back', 'backup', 'reset', 'reset_segment', 'settings', 'viewport']
+    action: Literal['next', 'back', 'backup', 'reset', 'reset_segment', 'rehearse', 'settings', 'viewport']
     audio: bool | None = None
     projector_boost: bool | None = None
+    require_backups: bool | None = None
     width: int = 0
     height: int = 0
 
 
 @app.post('/stage/api/control')
 async def control(command: Command):
+    if (free_mode.active or free_mode.switching) and command.action != 'viewport':
+        raise HTTPException(409, 'Free Mode owns the models. Return to Presenter Mode from the Free Mode navigation first.')
     show.journal('control', action=command.action)
     if command.action == 'next':
         await show.next()
@@ -624,6 +734,11 @@ async def control(command: Command):
                 await show.failover(BEATS[show.view], 'Presenter selected backup')
     elif command.action in ('reset', 'reset_segment'):
         await show.reset(command.action == 'reset_segment')
+    elif command.action == 'rehearse':
+        if show.view != -1 or show.resetting or (show.warm_task and not show.warm_task.done()):
+            raise HTTPException(409, 'Return to Ready and finish preparation before rehearsing')
+        show.warm = False
+        show.warm_task = asyncio.create_task(show.warmup(full=True))
     elif command.action == 'settings' and show.view == -1:
         if command.audio is not None and command.audio != show.settings['audio']:
             if not show.warm:
@@ -631,7 +746,7 @@ async def control(command: Command):
             show.settings['audio'] = command.audio
             show.warm = show.full_warm_complete = False
             show.warm_task = asyncio.create_task(show.warmup())
-        for key in ('audio', 'projector_boost'):
+        for key in ('audio', 'projector_boost', 'require_backups'):
             if (value := getattr(command, key)) is not None:
                 show.settings[key] = value
     elif command.action == 'viewport':
@@ -708,7 +823,7 @@ async def creative(name: str):
 
 @app.get('/stage/artifact/{run_id}/{segment}/{name}')
 async def artifact(run_id: str, segment: str, name: str):
-    if not re.fullmatch(r'[A-Za-z0-9_-]{1,100}', run_id) or segment not in BEATS or name not in ('calculator.html', 'briefing.html', 'calculator.png', 'summary.pcm', 'voice.pcm'):
+    if not re.fullmatch(r'[A-Za-z0-9_-]{1,100}', run_id) or segment not in BEATS or name not in ('calculator.html', 'briefing.html', 'calculator.png', 'summary.pcm', 'voice.pcm', 'slide-1.svg', 'slide-2.svg', 'slide-3.svg', 'slide-4.svg', 'slide-5.svg'):
         raise HTTPException(404)
     path = STATE / 'outputs' / run_id / segment / name
     if not path.is_file() or path.is_symlink():
@@ -718,7 +833,16 @@ async def artifact(run_id: str, segment: str, name: str):
 
 @app.get('/stage/logo')
 async def logo():
-    path = ROOT / 'state/brand/hp_logo.svg'
+    # Use the supplied HP keyline artwork, never a text approximation.
+    return FileResponse(ROOT / 'showcase_app/assets/hp-logo-keyline.png', media_type='image/png')
+
+
+@app.get('/stage/agent-art')
+async def agent_art():
+    path = ROOT / 'state/brand/nano-agent.png'
     if not path.is_file() or path.is_symlink():
-        raise HTTPException(404)
-    return FileResponse(path, media_type='image/svg+xml')
+        supplied = ROOT / 'showcase_app/assets/nano-agent.png'
+        if supplied.is_file():
+            return FileResponse(supplied, media_type='image/png')
+        return FileResponse(ROOT / 'showcase_app/free_mode/agent.svg', media_type='image/svg+xml')
+    return FileResponse(path, media_type='image/png')

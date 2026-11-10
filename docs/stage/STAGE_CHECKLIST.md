@@ -8,10 +8,10 @@ This is the GB10 profile. All stage services bind to loopback. The Nano drives t
 * Stop the owned stage stack before checking out any new commit, so the next start loads its actual backend code.
 * Use the tested `nano_exec` commit and the pinned, checksum verified local models. Do not update dependencies or models before rehearsal.
 * Run `./launch.sh stage record` on the Nano at native 1920×1080 to create five real H.264 backups. It warms exact segment inputs twice, records real work and decodes and seeks each backup. Recording bootstrap is preparation only. The command returns to normal stage mode afterward.
-* Run `./launch.sh stage` and inspect every Ready check. Normal mode blocks on a missing or outdated backup. A runtime source or model profile change requires new recordings.
+* Run `./launch.sh stage` and inspect every Ready check. For a protected event, enable **Require verified backups**. Fast live start runs the eight core checks without requiring recordings; the backup count and protection setting are visible. A runtime source or model profile change requires new recordings.
 * Use `/stage/keys` with the actual clicker. Verify Next, Back, blank and unblank. The key test displays both key press and release.
 * Rehearse the five beats and the three emergency moves on the local display. Audio starts off. Decide audio and HDMI routing with the AV team; do not assume the previous volume is suitable.
-* Keep the HP logo private at `state/brand/hp_logo.svg` if supplied by the brand portal. Without it, the stage uses the text wordmark.
+* The stage and Free Mode share the unchanged supplied official HP Electric Blue keyline PNG. The decorative robot hero is bundled at `showcase_app/assets/nano-agent.png`; an optional override under `state/brand/` stays private. The original vector companion is the fallback. Neither is reported as live model work.
 * Keep all event settings in `state/stage/stage.local.json`. Audio and projector boost default off. Live camera and both optional segments remain disabled in this P0 build. Do not put event or employee information into source files.
 
 ## Sixty minutes before
@@ -20,7 +20,7 @@ This is the GB10 profile. All stage services bind to loopback. The Nano drives t
 * Run `./launch.sh stage`. Wait for the two exact input warm passes and every Ready check to turn green.
 * Run `./launch.sh stage status` from the backstage terminal. Confirm every local process is owned and ready.
 * Test the clicker at `http://127.0.0.1:18808/stage/keys`, then return to `/stage`.
-* Make the audio decision with the AV team. Audio off is the rehearsed default. If enabled, select HDMI and allow the new exact audio warm passes to finish.
+* Make the audio decision with the AV team. Audio off is the rehearsed default. If enabled, select HDMI and allow the short preparation checks to finish.
 * Decide Projector boost on the actual screen. Use the default on an LED wall; toggle boost if the room projector washes out the panels.
 * Confirm all five backups are current. Never use a recording-bootstrap Ready screen for the show.
 
@@ -80,3 +80,9 @@ PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright" .venv/bin/python ops/accept
 ```
 
 The final command leaves Ready up for 45 minutes, verifies session totals stay unchanged, then runs ten actual five minute shows. The first starts directly from that idle state; resets separate the next nine. All ten capture host sockets and check that the owned stage processes use loopback and local IPC only, with the offline environment enforced. Existing SSH and unrelated host processes remain outside that application claim. Private evidence stays in `state/stage/proof/`. A failed check stops the proof; it never becomes a passing run by exclusion.
+
+## Fast live start
+
+With the models resident, switch from Free Mode to Presenter Mode. Preparation runs bounded language/vision and speech checks, followed by one real presenter-size image render. Every step shows actual progress and elapsed time. It does not rehearse the whole show. A page-service restart can reuse preparation only when its source signature, audio setting and all five owned process identities still match. Changing audio or returning from Free Mode runs preparation again.
+
+Use the visible **Start presentation** button or the existing clicker. Full two-pass preparation remains available through **Full rehearsal** or `./launch.sh stage rehearse`, and is mandatory for backup recording. Fast startup is functional readiness, not full event qualification. If a live workflow fails without a verified current clip, the error remains visible and no stale video is played.

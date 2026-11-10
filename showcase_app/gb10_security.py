@@ -24,7 +24,8 @@ class StageRequestGuard:
                     return
                 chunk = message.get('body', b'')
                 length += len(chunk)
-                if length > self.limit:
+                limit = 1000000 if scope.get('path') in ('/free/api/jobs', '/free/api/document', '/free/api/rush') else self.limit
+                if length > limit:
                     return await JSONResponse({'error': 'Stage control payload is too large'}, 413)(scope, receive, send)
                 chunks.append(chunk)
                 if not message.get('more_body', False):

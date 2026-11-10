@@ -55,3 +55,9 @@ TorchAO 0.18.0, https://github.com/pytorch/ao, BSD-3-Clause. Copyright 2023 Meta
 minih264 and minimp4 by lieff use CC0-1.0. stb_image by Sean Barrett uses the MIT license option. Immutable revisions and source/license SHA256 values are in `config/gb10-build.json` and `docs/ASSET-MANIFEST.md`. License texts remain beside the local downloaded headers. No codec binaries are packaged.
 
 The stage and presenter handout use the locally installed Liberation Sans font, version 2.1.5, under SIL Open Font License 1.1. The PDF embeds a subset; no separate font file is added to the source distribution. See docs/ASSET-MANIFEST.md for installed file and notice hashes.
+
+The Nano visual refresh adds original MIT licensed interface vectors and briefing slide compositions. Its slide typesetter uses the same installed Liberation Sans regular and bold fonts under OFL 1.1; no new third party template or image asset is distributed.
+
+## Nano Collective decorative artwork
+
+The robot hero at showcase_app/assets/nano-agent.png was created with imagegen for this interface and explicitly authorized by the owner for public distribution with the complete demo. It contains no visitor/customer data or generated HP logo. It is supplied decorative artwork, not a live inference result. Code-authored robot glyphs and the vector fallback are original project artwork. Existing HP trademark and model/dependency notices remain in force.

@@ -174,4 +174,14 @@ The selected GB10 stage quant remains Q4_K_XL after the bounded allocator clean-
 
 ### GB10 generated artwork text policy
 
-Cover and Rush artwork use fixed wordless abstract landscape prompts and the already pinned Qwen vision lane to review original pixels before publication. No additional third party asset or checkpoint is introduced. `docs/verification/gb10_text_free_images.json` records real positive-control rejection, five accepted live renders and their SHA256 values. Standalone runtime candidates, accepted image files and backup footage stay excluded from Git and releases. The reviewed screenshots of this fictional stage show are the explicit documentation exception.
+Cover and Rush artwork use fixed wordless studio material prompts with four distinct gallery compositions and the already pinned Qwen vision lane to review original pixels before publication. No additional third party asset or checkpoint is introduced. `docs/verification/gb10_text_free_images.json` records real positive-control rejection, five accepted live renders and their SHA256 values. Standalone runtime candidates, accepted image files and backup footage stay excluded from Git and releases. The reviewed screenshots of this fictional stage show are the explicit documentation exception.
+
+### Nano original design assets
+
+`showcase_app/gb10_deck_design.py` typesets five original slide compositions using the existing Presentations engine. Stage icons and the compact device outline are original inline SVG. These original assets use the root MIT license. No new third party template, image, font file, dependency or model is introduced. Both previews and the full briefing embed the same escaped local slide vectors. The already installed Liberation Sans Bold font SHA256 is `3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582`, with the same version and OFL notice recorded above.
+
+## Nano Collective public design and installer
+
+The owner authorized distribution of the complete Nano UI on 2026-11-10. The original decorative robot hero is included at `showcase_app/assets/nano-agent.png` with SHA-256 `6664617e5fc00d6a3880c1645bdc42aaaac212fff85e5bb55d5a16e96d5e4612`. This is supplied design artwork, not a live FLUX inference output. Original code-authored robot glyphs and the SVG fallback are included. The unchanged HP keyline logo retains its existing separate trademark notice.
+
+`install.sh`, the read-only Nano preflight, the existing pinned bootstrap plus post-setup smoke check, and portable browser/desktop helpers provide the Nano install/launch path. Model weights, credentials, compiled tools, profiles, private overrides, session outputs and recordings stay excluded; model downloads retain the exact revision/file-hash manifest. The complete public guide is `docs/NANO_GUIDE.md`; its PDF is a separate public release attachment.

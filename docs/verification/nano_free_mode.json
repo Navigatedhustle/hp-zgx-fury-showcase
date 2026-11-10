@@ -1,0 +1,209 @@
+{
+  "feature": "Nano Free Mode",
+  "verified_at_utc": "2026-11-10T04:09:29.656573+00:00",
+  "scope": "Live interactive Nano adaptation; separate from the executive-stage qualification and its playback backups.",
+  "source_tests": {
+    "command": ".venv/bin/python -m pytest -q ops/tests ops/acceptance/test_gateway.py ops/acceptance/test_booth.py",
+    "passed": 203
+  },
+  "ui": {
+    "viewports": [
+      [
+        1920,
+        1080
+      ],
+      [
+        1366,
+        768
+      ],
+      [
+        1280,
+        720
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "views_per_viewport": 10,
+    "horizontal_overflow": false,
+    "browser_errors": 0,
+    "retained_form_inputs": true,
+    "rush_current_input_preview": true
+  },
+  "individual_live_runs": [
+    {
+      "experience": "atlas",
+      "status": "complete",
+      "seconds": 17.286,
+      "actual_models": [
+        "gpt-oss-120b"
+      ],
+      "output_tokens": 836
+    },
+    {
+      "experience": "slides",
+      "status": "complete",
+      "seconds": 6.308,
+      "actual_models": [
+        "Qwen3.6-35B-A3B"
+      ],
+      "output_tokens": 330
+    },
+    {
+      "experience": "factory",
+      "status": "complete",
+      "seconds": 48.882,
+      "actual_models": [
+        "Qwen3.6-35B-A3B",
+        "gpt-oss-120b"
+      ],
+      "output_tokens": 2954
+    },
+    {
+      "experience": "images",
+      "status": "complete",
+      "seconds": 12.106,
+      "actual_models": [
+        "FLUX.2-klein-4B"
+      ],
+      "output_tokens": 0
+    },
+    {
+      "experience": "vision",
+      "status": "complete",
+      "seconds": 3.792,
+      "actual_models": [
+        "Qwen3.6-35B-A3B"
+      ],
+      "output_tokens": 182
+    },
+    {
+      "experience": "translate",
+      "status": "complete",
+      "seconds": 1.346,
+      "actual_models": [
+        "Qwen3.6-35B-A3B"
+      ],
+      "output_tokens": 79
+    },
+    {
+      "experience": "voice",
+      "status": "complete",
+      "seconds": 3.592,
+      "actual_models": [
+        "Kokoro-82M"
+      ],
+      "output_tokens": 0
+    },
+    {
+      "experience": "atlas",
+      "status": "complete",
+      "seconds": 3.099,
+      "actual_models": [
+        "gpt-oss-120b"
+      ],
+      "output_tokens": 88
+    }
+  ],
+  "rush_live_runs": [
+    {
+      "experience": "atlas",
+      "status": "complete",
+      "seconds": 42.657,
+      "actual_models": [
+        "gpt-oss-120b"
+      ],
+      "output_tokens": 757
+    },
+    {
+      "experience": "slides",
+      "status": "complete",
+      "seconds": 18.164,
+      "actual_models": [
+        "Qwen3.6-35B-A3B"
+      ],
+      "output_tokens": 330
+    },
+    {
+      "experience": "factory",
+      "status": "complete",
+      "seconds": 67.357,
+      "actual_models": [
+        "Qwen3.6-35B-A3B",
+        "gpt-oss-120b"
+      ],
+      "output_tokens": 2164
+    },
+    {
+      "experience": "images",
+      "status": "complete",
+      "seconds": 12.148,
+      "actual_models": [
+        "FLUX.2-klein-4B"
+      ],
+      "output_tokens": 0
+    },
+    {
+      "experience": "vision",
+      "status": "complete",
+      "seconds": 10.656,
+      "actual_models": [
+        "Qwen3.6-35B-A3B"
+      ],
+      "output_tokens": 182
+    },
+    {
+      "experience": "translate",
+      "status": "complete",
+      "seconds": 2.835,
+      "actual_models": [
+        "Qwen3.6-35B-A3B"
+      ],
+      "output_tokens": 79
+    }
+  ],
+  "rush_wall_seconds": 67.4,
+  "rush_note": "Free Mode uses a three-workflow scheduler and the existing gateway admission; these timings are not executive-stage deadlines or a hardware benchmark.",
+  "custom_artwork": {
+    "subject": "Fictional ruby glass sculpture",
+    "individual_images": 2,
+    "rush_images": 1,
+    "review_checks": 3,
+    "every_displayed_image_passed_lettering_review": true
+  },
+  "interaction_checks": {
+    "generated_calculator_arithmetic": 3,
+    "zero_cost_handled": true,
+    "slide_edit_and_browser_pptx_download": true,
+    "browser_document_import": true,
+    "browser_custom_image_resizing_upload_and_live_vision": true,
+    "new_chat_stays_empty": true,
+    "wav_browser_decode": true
+  },
+  "cancellation_checks": {
+    "live_cancel_terminal": true,
+    "downstream_lanes_drained": true,
+    "test_outputs_deleted": 4
+  },
+  "live_mode_overlap_rejection": true,
+  "presenter_transition": "Positive transition and rewarming verified in source tests; live control rejected presenter overlap during Free Mode and Rush. Final executive-stage rehearsal remains a separate gate.",
+  "offline_inference": {
+    "instrumented_gateway_external_api_calls": 0,
+    "endpoints": "Existing loopback language/image/speech lanes; no external inference destination."
+  },
+  "resolved_findings": [
+    "Cold image startup must release only the owned native language engines before CPU materialization/upload, then restore the measured model order. Launcher now matches the established recovery path.",
+    "Increase the free app-planning output budget to include native reasoning and the visible plan.",
+    "Translate ordinary hyphenated words such as 4-week; preserve uppercase product identifiers and ISO dates.",
+    "New conversation must stay empty on subsequent state polling.",
+    "Image export removes its creative backing copy so deleting a Free Mode output does not leave a duplicate."
+  ],
+  "limits": [
+    "Atlas is a bounded fictional-account assistant, not the full Fury SQL analytics system.",
+    "Agent Factory builds frontend-only apps. Generic app acceptance is a browser smoke check; the generated default calculator separately passed three arithmetic cases and zero-cost handling.",
+    "Text/PPTX/DOCX/WAV/PNG outputs are drafts for review. Language quality across all 34 target choices was not exhaustively evaluated.",
+    "Video Studio and Action Trailer are excluded; no Nano video model is loaded.",
+    "Raw prompts, uploaded images, generated decks/audio/artwork, private job identities and browser screenshots remain outside the source distribution."
+  ]
+}

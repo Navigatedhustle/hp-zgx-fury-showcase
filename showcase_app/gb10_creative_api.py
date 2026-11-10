@@ -19,7 +19,7 @@ from atlas.offline_guard import install
 install()
 from showcase_app.creative import CreativeLane
 from showcase_app.gateway import execution_end, execution_start, record
-from showcase_app.gb10_image_policy import stage_prompt, check_artwork
+from showcase_app.gb10_image_policy import stage_prompt, check_artwork, NO_LETTERING
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'state/stage/creative'
@@ -39,14 +39,15 @@ async def work():
             pending.mkdir(parents=True, exist_ok=False)
             accepted = []
             aggregate = {'render_seconds': 0, 'gpu_peak_allocated_bytes': 0, 'gpu_peak_reserved_bytes': 0}
-            job.update(policy='Text-free abstract artwork', checker_model='Qwen3.6-35B-A3B', text_rejections=0, images_generated=0, text_checks=[], _private=True)
+            job.update(policy='Text-free studio material study', checker_model='Qwen3.6-35B-A3B', text_rejections=0, images_generated=0, text_checks=[], _private=True)
             for index in range(spec.batch):
                 for attempt in range(2):
                     if job['_stop'].is_set():
                         raise InterruptedError('Artwork job cancelled')
                     path = pending / (str(index) + '-' + str(attempt) + '.png')
                     job.update(phase='rendering', stage='Rendering text-free artwork', batch_index=index + 1)
-                    metrics = await asyncio.to_thread(lane.run, 'image', stage_prompt(spec.batch), path, job['_stop'],
+                    prompt = free_prompt(spec) if getattr(spec, 'art_direction', 'stage') == 'free' else stage_prompt(spec.batch, index)
+                    metrics = await asyncio.to_thread(lane.run, 'image', prompt, path, job['_stop'],
                         {'width': spec.width, 'height': spec.height, 'batch': 1, 'seed': spec.seed + index + attempt * 1009}, job)
                     aggregate['render_seconds'] += metrics['render_seconds']
                     for key in ('gpu_peak_allocated_bytes', 'gpu_peak_reserved_bytes'):
@@ -114,10 +115,23 @@ class ImageRequest(BaseModel):
     prompt: str = Field(min_length=5, max_length=1500)
     width: Literal[1024, 1344] = 1024
     height: Literal[576, 768] = 576
-    batch: Literal[1, 4] = 1
+    batch: Literal[1, 2, 4] = 1
     seed: int = Field(default=42, ge=0, le=4294967295)
     run_id: str = Field(pattern=r'^[A-Za-z0-9_-]{1,100}$')
     purpose: Literal['live', 'warmup', 'keepalive'] = 'live'
+    art_direction: Literal['stage', 'free'] = 'stage'
+    style: Literal['Studio', 'Photographic', 'Architectural', 'Illustration', 'Cinematic'] = 'Studio'
+
+
+def free_prompt(spec):
+    directions = {
+        'Studio': 'Museum-quality studio material study, meticulous physical detail and controlled lighting. ',
+        'Photographic': 'Refined editorial photography, natural materials, precise composition and beautiful light. ',
+        'Architectural': 'Architectural visualization, monumental geometry, carefully composed spaces and refined material detail. ',
+        'Illustration': 'Original editorial illustration, sophisticated color palette and clear sculptural forms. ',
+        'Cinematic': 'Cinematic still life, dramatic light, restrained color grading and extraordinary material detail. ',
+    }
+    return directions[spec.style] + spec.prompt + NO_LETTERING
 
 
 def public(job):
@@ -139,6 +153,8 @@ async def generate(spec: ImageRequest, request: Request):
         raise HTTPException(403, 'Only local stage origins are accepted')
     if (spec.width, spec.height) not in ((1024, 576), (1344, 768)):
         raise HTTPException(422, 'Unsupported stage image size')
+    if spec.art_direction == 'stage' and spec.batch == 2:
+        raise HTTPException(422, 'The stage uses batches of one or four')
     if queue.full():
         raise HTTPException(429, 'Local image queue is full')
     cid = uuid.uuid4().hex

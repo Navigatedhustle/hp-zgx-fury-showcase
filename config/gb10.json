@@ -162,14 +162,8 @@
     "about"
   ],
   "qualification": {
-    "passed": true,
-    "source_workload_started_at": 1794269531.3598037,
-    "measured_at_utc": "2026-11-10T00:23:40.786539+00:00",
-    "agent_p95_seconds": 41.79850141819334,
-    "rush_max_seconds": 50.67650041799061,
-    "rush_min_available_gib": 10.58962631225586,
-    "text_free_artwork_review": true,
-    "reason": "All required real resident workload checks passed with checked wordless artwork and a functional model-generated calculator."
+    "passed": false,
+    "reason": "Visual upgrade changes deck rendering and image conditioning; real workload and stage proof must be refreshed."
   },
   "creative_reserve_gib": {
     "agent_cover": 8.125,
@@ -181,7 +175,7 @@
     "MALLOC_TRIM_THRESHOLD_": "131072"
   },
   "image_policy": {
-    "art_direction": "Text-free abstract landscape",
+    "art_direction": "Text-free studio material studies",
     "validation_model": "Qwen3.6-35B-A3B",
     "maximum_attempts_per_image": 2,
     "publish_only_after_text_check": true

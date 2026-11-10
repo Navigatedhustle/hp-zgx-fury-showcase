@@ -1,5 +1,5 @@
 {
-  "status": "stage_ready_p0",
+  "status": "visual_upgrade_pending",
   "scope": "Actual GB10 native HDMI kiosk; mocks and source fixtures are not hardware acceptance.",
   "runtime_build": "5e14dc4dcf76a8fe4f7f8f67cc26782c0aac3b340d657b28c60bb184458f219f",
   "controls": {
@@ -822,5 +822,6 @@
       "outcome": "45 minute idle and its full live show passed; sequence stopped after two completed shows by a test synchronization race before the third Agent state was observed.",
       "fix": "Wait for the expected state after one actual keypress; do not resend keys. Ten new consecutive shows are counted separately."
     }
-  ]
+  ],
+  "current_build_notice": "Previous evidence below qualifies commit05be930. The significant Nano visual refresh and integrated Free Mode sources require fresh native workload, backup, controls, chaos, idle and rehearsal proof before this build is stage ready."
 }

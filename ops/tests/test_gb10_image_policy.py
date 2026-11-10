@@ -19,6 +19,15 @@ def test_no_unbounded_image_batch_or_text_transcription():
     assert TEXT_SCHEMA['properties'] == {'text': {'type': 'boolean'}}
 
 
+def test_gallery_has_four_distinct_wordless_compositions_with_bounded_index():
+    prompts = [stage_prompt(4, index) for index in range(4)]
+    assert len(set(prompts)) == 4
+    assert all('no text, letters, numbers' in prompt for prompt in prompts)
+    for batch, index in [(1, 1), (4, 4), (4, -1)]:
+        with pytest.raises(ValueError):
+            stage_prompt(batch, index)
+
+
 def test_worker_quarantines_rejected_images_and_fails_closed(monkeypatch, tmp_path):
     import asyncio
     import importlib

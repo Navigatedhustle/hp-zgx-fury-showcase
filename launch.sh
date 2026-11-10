@@ -19,7 +19,8 @@ if [[ "$FURY_PROFILE" == gb10 && "$command" != stage ]]; then
  esac
 fi
 case "$command" in
- stage) shift; export FURY_PROFILE=gb10; exec .venv/bin/python ops/gb10-stage.py "${@:-start}" ;;
+ free) shift; export FURY_PROFILE=gb10 FURY_FREE_MODE=1; exec .venv/bin/python ops/gb10-stage.py "${@:-start}" ;;
+ stage) shift; export FURY_PROFILE=gb10; unset FURY_FREE_MODE; exec .venv/bin/python ops/gb10-stage.py "${@:-start}" ;;
  setup) exec bash ops/bootstrap.sh ;;
  stop|status|restart) shift || true; exec ./showcase "$command" "$@" ;;
  diagnostics) exec python3 ops/diagnostics.py ;;
@@ -43,5 +44,5 @@ PY
   if [[ "${FURY_NO_BROWSER:-0}" != 1 && ( -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ) ]] && command -v xdg-open >/dev/null; then
    xdg-open http://localhost:8080/ >/dev/null 2>&1 || true
   fi ;;
- *) echo 'Usage: ./launch.sh [start|setup|stop|status|diagnostics|recover COMPONENT|restart COMPONENT|desktop|skin prep NAMES...|skin list|skin clear]' >&2; exit 2 ;;
+ *) echo 'Usage: ./launch.sh [start|stage [start|status|reset|record|rehearse|stop]|free [start|status|stop]|setup|stop|status|diagnostics|recover COMPONENT|restart COMPONENT|desktop|skin prep NAMES...|skin list|skin clear]' >&2; exit 2 ;;
 esac

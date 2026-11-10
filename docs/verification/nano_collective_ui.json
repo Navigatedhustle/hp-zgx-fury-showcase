@@ -1,0 +1,101 @@
+{
+  "date": "2026-11-10",
+  "profile": "Nano / NVIDIA GB10",
+  "scope": "Nano Collective visual redesign and fast functional presenter preparation; not full event qualification",
+  "identity": "Unchanged owner-supplied official HP Electric Blue keyline PNG",
+  "artwork": "Owner-authorized public decorative robot hero and original vector glyphs are included in source; private overrides and generated session outputs remain excluded.",
+  "preparation": {
+    "models_already_resident": true,
+    "observed_functional_seconds": [
+      5.56,
+      6.09,
+      7.12
+    ],
+    "latest_seconds": 7.12,
+    "opening_scene_click_seconds": 0.12,
+    "cold_model_loading_measured": false,
+    "full_rehearsal_optional": true,
+    "recording_still_requires_two_passes": true,
+    "verified_backup_protection_explicit": true
+  },
+  "browser": {
+    "layouts": 44,
+    "script_errors": [],
+    "no_horizontal_overflow": true,
+    "stress_layouts": 25,
+    "stress_scope": "layout replay of archived real fictional show data, with three additional truth notices; not model acceptance",
+    "stress_passed": true,
+    "automated_accessibility_views": 5,
+    "accessibility_violations": 0,
+    "accessibility_scope": "Automated WCAG A/AA checks on five Free Mode views; not a complete accessibility audit"
+  },
+  "live_show": {
+    "complete": true,
+    "segments": [
+      {
+        "beat": "S0",
+        "status": "complete",
+        "seconds": 0.052,
+        "backup": false
+      },
+      {
+        "beat": "S1",
+        "status": "complete",
+        "seconds": 57.409,
+        "backup": false
+      },
+      {
+        "beat": "S2",
+        "status": "complete",
+        "seconds": 6.632,
+        "backup": false
+      },
+      {
+        "beat": "S3",
+        "status": "complete",
+        "seconds": 46.938,
+        "backup": false
+      },
+      {
+        "beat": "S4",
+        "status": "complete",
+        "seconds": 0.047,
+        "backup": false
+      }
+    ],
+    "oom_kill_delta": 0,
+    "global_swap_io_pages": {
+      "pswpin": 29,
+      "pswpout": 36,
+      "oom_kill": 0
+    },
+    "zero_swap_claim": false,
+    "full_event_qualification": false
+  },
+  "tests": {
+    "nano_ops_gateway_booth": {
+      "passed": 217
+    },
+    "frontier_cost_node": {
+      "passed": 7
+    },
+    "full_fury_factory": {
+      "passed": 143,
+      "skipped": 41,
+      "failed": 5,
+      "limitation": "Existing host bubblewrap loopback namespace initialization returns Operation not permitted; not repaired by weakening sandbox or changing host policy."
+    }
+  },
+  "limits": [
+    "One actual live five-beat run without keynote dwell; no ten-show or 45-minute idle qualification.",
+    "Current build needs fresh recorded backups before protected-show mode can be used.",
+    "The first live trial failed with unrelated Firefox memory pressure and a test restart missing the configured browser cache; corrected final run completed all five beats."
+  ],
+  "publication_preparation": {
+    "installer": "install.sh with read-only preflight, existing pinned bootstrap, dependency/CUDA/browser smoke check and portable desktop entry",
+    "fresh_application_environment": "Pinned application requirements installed in a new venv; pip check clean and all 217 Nano/controller/API tests passed",
+    "fresh_model_environment": "Pinned model requirements installed in a new venv; missing setuptools pin found and added at the installed tested version; final pip check clean; CUDA, FLUX dependencies, Kokoro package and actual English phonemizer passed without loading model weights.",
+    "model_downloads": "Immutable revisions and SHA256 file manifest; existing installed weights reused for same-host runtime validation; no second stack started",
+    "guide": "Seven-page public PDF exported from the guide HTML using local sandboxed Chromium after the connected PDF service returned an internal error."
+  }
+}
