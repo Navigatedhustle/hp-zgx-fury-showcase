@@ -1,0 +1,242 @@
+{
+  "scope": "Development attempts before the required normal-mode rehearsal series; no rehearsal acceptance is claimed.",
+  "stage_ready": false,
+  "attempts": [
+    {
+      "build": "dad99ab80e2e6cbd2420d0848599a45b0b2fa5856abda392b989bb1a7ec7fefc",
+      "started_at": 1794255242.6028738,
+      "beats": [
+        {
+          "segment": "S0",
+          "seconds": 0.08269572257995605,
+          "status": "complete",
+          "backup": false
+        },
+        {
+          "segment": "S1",
+          "seconds": 43.65582895278931,
+          "status": "failed",
+          "backup": true
+        }
+      ],
+      "failures": [
+        {
+          "kind": "failover",
+          "at": 1794255663.5578232,
+          "reason": "ExceptionGroup"
+        }
+      ]
+    },
+    {
+      "build": "8a114dcd1fca01bc4fc1dd5d8869cb2b69bd9b32498ff6d3075b711e6c32c03c",
+      "started_at": 1794256020.2819746,
+      "beats": [],
+      "failures": [
+        {
+          "kind": "warm_failed",
+          "at": 1794256168.379431,
+          "reason": "ExceptionGroup"
+        }
+      ]
+    },
+    {
+      "build": "87bcfdf3fad6bb80b60b94253f5a65398e7713c777df5e4021f9f97fa955a76d",
+      "started_at": 1794256662.741799,
+      "beats": [],
+      "failures": [
+        {
+          "kind": "warm_failed",
+          "at": 1794256821.6812792,
+          "reason": "ExceptionGroup"
+        }
+      ]
+    },
+    {
+      "build": "963b2d2d12cbf39136640eccb75fb6d1019abc2a16f53a707cb3db887f72805f",
+      "started_at": 1794257049.2535539,
+      "beats": [
+        {
+          "segment": "S0",
+          "seconds": 0.04805397987365723,
+          "status": "complete",
+          "backup": false
+        },
+        {
+          "segment": "S1",
+          "seconds": 31.266929149627686,
+          "status": "interrupted",
+          "backup": false
+        }
+      ],
+      "failures": [
+        {
+          "kind": "recording_failed",
+          "at": 1794257426.8603306,
+          "reason": "A local model lane is unavailable"
+        }
+      ]
+    },
+    {
+      "build": "68c49958bcbcdcd8b6a280e25023aaaa4c12f40f45c4b2f809ca7b5b392a37a1",
+      "started_at": 1794257577.218983,
+      "beats": [
+        {
+          "segment": "S0",
+          "seconds": 0.03347492218017578,
+          "status": "complete",
+          "backup": false
+        },
+        {
+          "segment": "S1",
+          "seconds": 40.64555811882019,
+          "status": "complete",
+          "backup": false
+        },
+        {
+          "segment": "S2",
+          "seconds": 6.7347657680511475,
+          "status": "complete",
+          "backup": false
+        },
+        {
+          "segment": "S3",
+          "seconds": 52.1538565158844,
+          "status": "complete",
+          "backup": false
+        },
+        {
+          "segment": "S4",
+          "seconds": 0.04437899589538574,
+          "status": "complete",
+          "backup": false
+        }
+      ],
+      "failures": []
+    },
+    {
+      "build": "845d6de305c62fe05b152eeb484f985144de426d9d47dc05c6726a2c0a0e8655",
+      "started_at": 1794260994.4831963,
+      "beats": [],
+      "failures": [
+        {
+          "kind": "warm_failed",
+          "at": 1794261095.2660484,
+          "reason": "RuntimeError"
+        }
+      ]
+    },
+    {
+      "build": "65b8230e3ff4b604de53566f1b31c1aeb3ca706e0aa1d20415d3f6d88f7e5048",
+      "started_at": 1794261125.355647,
+      "beats": [],
+      "failures": [
+        {
+          "kind": "warm_failed",
+          "at": 1794261152.4050694,
+          "reason": "ExceptionGroup"
+        }
+      ]
+    },
+    {
+      "build": "b2c8f2bbe57b25f2290fb419f9f9dd747185462091c7ee9ea7e62693350f8edc",
+      "started_at": 1794261596.2177672,
+      "beats": [
+        {
+          "segment": "S0",
+          "seconds": 0.0862727165222168,
+          "status": "complete",
+          "backup": false,
+          "minimum_memavailable": 13339447296,
+          "swap_in_pages": 0,
+          "swap_out_pages": 0
+        },
+        {
+          "segment": "S1",
+          "seconds": 43.92554688453674,
+          "status": "complete",
+          "backup": false,
+          "minimum_memavailable": 9338236928,
+          "swap_in_pages": 1,
+          "swap_out_pages": 0
+        },
+        {
+          "segment": "S2",
+          "seconds": 6.765305757522583,
+          "status": "complete",
+          "backup": false,
+          "minimum_memavailable": 13420933120,
+          "swap_in_pages": 0,
+          "swap_out_pages": 0
+        },
+        {
+          "segment": "S3",
+          "seconds": 44.6343674659729,
+          "status": "complete",
+          "backup": false,
+          "minimum_memavailable": 10901405696,
+          "swap_in_pages": 0,
+          "swap_out_pages": 0
+        },
+        {
+          "segment": "S4",
+          "seconds": 0.0626516342163086,
+          "status": "complete",
+          "backup": false,
+          "minimum_memavailable": 13348352000,
+          "swap_in_pages": 0,
+          "swap_out_pages": 0
+        }
+      ],
+      "failures": []
+    },
+    {
+      "build": "0e17ff3747b43d3c1be406297c85d12d3b93979df59f57243c06f45535be2a25",
+      "started_at": 1794263107.9208164,
+      "beats": [
+        {
+          "segment": "S0",
+          "seconds": 0.045287370681762695,
+          "status": "complete",
+          "backup": false,
+          "minimum_memavailable": 13270704128,
+          "swap_in_pages": 0,
+          "swap_out_pages": 0
+        },
+        {
+          "segment": "S1",
+          "seconds": 42.993916511535645,
+          "status": "complete",
+          "backup": false,
+          "minimum_memavailable": 9165365248,
+          "swap_in_pages": 0,
+          "swap_out_pages": 0
+        },
+        {
+          "segment": "S2",
+          "seconds": 7.116653680801392,
+          "status": "complete",
+          "backup": false,
+          "minimum_memavailable": 13306769408,
+          "swap_in_pages": 0,
+          "swap_out_pages": 0
+        },
+        {
+          "segment": "S3",
+          "seconds": 50.86041235923767,
+          "status": "failed",
+          "backup": false,
+          "minimum_memavailable": 10777481216,
+          "swap_in_pages": 0,
+          "swap_out_pages": 0
+        }
+      ],
+      "failures": [
+        {
+          "kind": "recording_failed",
+          "at": 1794263371.1327415,
+          "reason": "RuntimeError"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "status": "final_timed_proof_in_progress",
+  "scope": "Actual GB10 native HDMI kiosk; mocks and source fixtures are not hardware acceptance.",
+  "runtime_build": "5e14dc4dcf76a8fe4f7f8f67cc26782c0aac3b340d657b28c60bb184458f219f",
+  "controls": {
+    "real_origin_host_upload_guards": true,
+    "raw_key_test_page": true,
+    "600ms_debounce": true,
+    "unmapped_keys_ignored": true,
+    "back_does_not_rerun": true,
+    "both_blank_keys": true,
+    "manual_backup_frame_and_return": true,
+    "short_r_ignored_and_2s_hold_resets": true,
+    "concurrent_reset_rejected_and_ready_unblanks": true,
+    "live_animation_cadence": {
+      "frames_per_second": 144.84790969525167,
+      "p95_frame_interval_ms": 7.0
+    },
+    "real_priority_routing_visible_and_measured": {
+      "model": "Qwen3.6-35B-A3B",
+      "routing": "Routed to Qwen3.6: gpt-oss-120b is busy",
+      "output_tokens": 93
+    },
+    "three_next_presses_queue_exactly_one_advance": true,
+    "reduced_motion": {
+      "preference": true,
+      "animation": "none",
+      "backupTransition": "0s"
+    },
+    "passed": true
+  },
+  "chaos": {
+    "passed": true,
+    "verified_owned_processes_only": true,
+    "segments": [
+      {
+        "segment": "S0",
+        "lane": "lead",
+        "first_frame_seconds_from_stop": 0.20411396026611328,
+        "full_crossfade_seconds_from_stop": 0.21292734146118164,
+        "seek_media_time": 0.466667,
+        "reset_seconds": 19.852707487996668
+      },
+      {
+        "segment": "S1",
+        "lane": "lead",
+        "first_frame_seconds_from_stop": 0.1520094871520996,
+        "full_crossfade_seconds_from_stop": 0.1623094081878662,
+        "seek_media_time": 1.133333,
+        "reset_seconds": 20.1363183450012
+      },
+      {
+        "segment": "S2",
+        "lane": "text",
+        "first_frame_seconds_from_stop": 0.35004162788391113,
+        "full_crossfade_seconds_from_stop": 0.35997509956359863,
+        "seek_media_time": 1.266667,
+        "reset_seconds": 13.115829018002842
+      },
+      {
+        "segment": "S3",
+        "lane": "image",
+        "first_frame_seconds_from_stop": 0.3414585590362549,
+        "full_crossfade_seconds_from_stop": 0.3582801818847656,
+        "seek_media_time": 1.266667,
+        "reset_seconds": 48.178673558009905
+      },
+      {
+        "segment": "S4",
+        "lane": "gateway",
+        "first_frame_seconds_from_stop": 0.19731497764587402,
+        "full_crossfade_seconds_from_stop": 0.2075648307800293,
+        "seek_media_time": 0.433333,
+        "reset_seconds": 11.1743824199948
+      }
+    ]
+  },
+  "final_idle_and_ten_show_proof": {
+    "status": "in_progress",
+    "mode": "final",
+    "required_idle_minutes": 45,
+    "required_consecutive_shows": 10,
+    "show_pacing_minutes": 5,
+    "socket_capture_scope": "All host sockets captured; only verified owned stage process trees are included in the loopback application claim."
+  },
+  "source_validation": {
+    "fury_source_suite": {
+      "passed": true,
+      "factory": 189,
+      "operations_gateway_booth": 180,
+      "node": 7
+    },
+    "gb10_focused_suite": {
+      "passed": true,
+      "tests": 56
+    },
+    "all_ops_and_showcase_python_sources_compile": true,
+    "fury_hardware_scope": "Configuration and unit/source checks only. No Fury hardware contacted or hardware run claimed."
+  },
+  "cuts": [
+    "Optional Customer Skin opener disabled",
+    "Optional camera poster disabled",
+    "Optional live camera input disabled",
+    "Audio off for all stage acceptance; physical HDMI audio decision remains with the AV team"
+  ],
+  "evidence_policy": "Raw sessions, owned process identities, private socket logs, artwork and recordings stay under ignored state/. Only reviewed fictional-data screenshots and numeric aggregates are published."
+}

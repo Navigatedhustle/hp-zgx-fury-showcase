@@ -1,3 +1,7 @@
+# Historical Gate 1 failure, superseded
+
+Gate 1 subsequently passed on 2026-11-09. See [the current report](gb10_gate1.md). The unsuccessful measurement and owner action below are retained as history.
+
 # GB10 Gate 1: blocked
 
 Measured on 2026-11-09. Gate 0 passed. Gate 1 still fails global zero-swap acceptance. Stage UI, backups, rehearsal proof and P1 have not started. All owned runtime components are stopped and the GPU is free while an owner-only prerequisite is pending.

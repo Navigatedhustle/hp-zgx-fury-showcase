@@ -1,0 +1,86 @@
+{
+  "date_utc": "2026-11-09",
+  "scope": "Real local FLUX generation and Qwen3.6 vision review; image-policy verification only, not full stage acceptance.",
+  "policy": "Trusted fixed wordless abstract art direction, original generated pixels reviewed locally before publication. One logged live regeneration after lettering rejection, then fail closed. No rejected candidate displayed.",
+  "models": {
+    "generator": "black-forest-labs/FLUX.2-klein-4B@e7b7dc27f91deacad38e78976d1f2b499d76a294",
+    "checker": "unsloth/Qwen3.6-35B-A3B-GGUF@a483e9e6cbd595906af30beda3187c2663a1118c (UD-Q4_K_XL + F16 mmproj)"
+  },
+  "positive_control": {
+    "text": true,
+    "model": "Qwen3.6-35B-A3B",
+    "seconds": 1.807869475989719
+  },
+  "generated_batches": [
+    {
+      "batch": 1,
+      "seconds": 6.643898599999375,
+      "width": 1344,
+      "height": 768,
+      "text_rejections": 0,
+      "checks": [
+        {
+          "image": 1,
+          "attempt": 1,
+          "text": false,
+          "model": "Qwen3.6-35B-A3B",
+          "seconds": 1.5431833930051653
+        }
+      ],
+      "output_sha256": [
+        "353b0e24ed64dd6ba540be1e196adb350a2af9dcb700388556f302ff26211f77"
+      ]
+    },
+    {
+      "batch": 4,
+      "seconds": 14.354222841007868,
+      "width": 1024,
+      "height": 576,
+      "text_rejections": 0,
+      "checks": [
+        {
+          "image": 1,
+          "attempt": 1,
+          "text": false,
+          "model": "Qwen3.6-35B-A3B",
+          "seconds": 0.9857042740040924
+        },
+        {
+          "image": 2,
+          "attempt": 1,
+          "text": false,
+          "model": "Qwen3.6-35B-A3B",
+          "seconds": 0.9584441100014374
+        },
+        {
+          "image": 3,
+          "attempt": 1,
+          "text": false,
+          "model": "Qwen3.6-35B-A3B",
+          "seconds": 1.025573342005373
+        },
+        {
+          "image": 4,
+          "attempt": 1,
+          "text": false,
+          "model": "Qwen3.6-35B-A3B",
+          "seconds": 0.9800012310006423
+        }
+      ],
+      "output_sha256": [
+        "5bfb04d7afdb8a261b0460ff419043e6f5ed1bc322a872fd15fa0c09385085f1",
+        "74ab6391d33321b447d75ecedb230e86518dc69f406a9c70e3cc4aa18c7cacc7",
+        "c559150e6282becbd181c774a6b0b8381ba92a9c3708888fe0033d39e3c10696",
+        "b71df2f3045920f654d0383710b5fddbda99bfc1531ed66a4804f7ccea869aa2"
+      ]
+    }
+  ],
+  "human_visual_inspection": "All five accepted images inspected at original resolution: abstract blue and periwinkle landscapes with no visible lettering.",
+  "keepalive_real_check": {
+    "purpose": "keepalive",
+    "status": "complete",
+    "output_tokens": 6,
+    "session_totals_excluded": true
+  },
+  "limitations": "Vision review is probabilistic. Two uncertain or rejected attempts fail closed; the complete show must separately pass workload and rehearsal gates."
+}

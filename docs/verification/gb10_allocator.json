@@ -1,0 +1,63 @@
+{
+  "source": "https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation-Tunables.html",
+  "retrieved": "2026-11-09",
+  "method": "Fresh owned image service processes, same pinned weights and actual 1344x768 four-step render with seed42. All models stayed stopped between trials. Prototype resident-drop fields were excluded because driver cleanup had not finished at some immediate post-stop baselines. Per-process RSS and rendered bytes remain directly measured.",
+  "selected": {
+    "MALLOC_ARENA_MAX": "2",
+    "MALLOC_MMAP_THRESHOLD_": "131072",
+    "MALLOC_TRIM_THRESHOLD_": "131072"
+  },
+  "python_hash_seed_override_selected": false,
+  "new_system_library_installed": false,
+  "renders_identical": true,
+  "trials": [
+    {
+      "variant": "default",
+      "load_seconds": 15.462868949005497,
+      "load_process_rss_bytes": 2080739328,
+      "post_render_rss_bytes": 3166359552,
+      "rendered_png_sha256": "00874ef02d56f1e20b64d2622489d190b6296af0bc0e1dfb61e0ea0922d554c7",
+      "image_peak_cuda_allocated_bytes": 15319996928
+    },
+    {
+      "variant": "default",
+      "load_seconds": 15.436102381994715,
+      "load_process_rss_bytes": 3826528256,
+      "post_render_rss_bytes": 4915757056,
+      "rendered_png_sha256": "00874ef02d56f1e20b64d2622489d190b6296af0bc0e1dfb61e0ea0922d554c7",
+      "image_peak_cuda_allocated_bytes": 15319996928
+    },
+    {
+      "variant": "bounded",
+      "load_seconds": 15.44605041599425,
+      "load_process_rss_bytes": 2898198528,
+      "post_render_rss_bytes": 3946594304,
+      "rendered_png_sha256": "00874ef02d56f1e20b64d2622489d190b6296af0bc0e1dfb61e0ea0922d554c7",
+      "image_peak_cuda_allocated_bytes": 15319996928
+    },
+    {
+      "variant": "bounded",
+      "load_seconds": 15.43801441200776,
+      "load_process_rss_bytes": 2912288768,
+      "post_render_rss_bytes": 3959410688,
+      "rendered_png_sha256": "00874ef02d56f1e20b64d2622489d190b6296af0bc0e1dfb61e0ea0922d554c7",
+      "image_peak_cuda_allocated_bytes": 15319996928
+    },
+    {
+      "variant": "bounded_seeded",
+      "load_seconds": 15.50740820899955,
+      "load_process_rss_bytes": 2663092224,
+      "post_render_rss_bytes": 3689336832,
+      "rendered_png_sha256": "00874ef02d56f1e20b64d2622489d190b6296af0bc0e1dfb61e0ea0922d554c7",
+      "image_peak_cuda_allocated_bytes": 15319996928
+    },
+    {
+      "variant": "bounded_seeded",
+      "load_seconds": 15.45692882000003,
+      "load_process_rss_bytes": 1665044480,
+      "post_render_rss_bytes": 2710708224,
+      "rendered_png_sha256": "00874ef02d56f1e20b64d2622489d190b6296af0bc0e1dfb61e0ea0922d554c7",
+      "image_peak_cuda_allocated_bytes": 15319996928
+    }
+  ]
+}
