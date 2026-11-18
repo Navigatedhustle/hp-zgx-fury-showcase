@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-18",
+  "scope": "Closing-scene arithmetic and browser verification with illustrative 1000 input / 2000 output tokens. No cloud API calls, model inference, wall-power measurement or throughput qualification.",
+  "source_tests_passed": 262,
+  "existing_frontier_chart_tests_passed": 7,
+  "new_projection_tests_passed": 4,
+  "workflow_multipliers": {
+    "customers_per_employee_day": 10,
+    "employees": 200,
+    "days_per_month": 30,
+    "months_per_year": 12,
+    "monthly_workflows": 60000,
+    "annual_workflows": 720000
+  },
+  "electricity_defaults": {
+    "devices": 200,
+    "watts_each": 140,
+    "hours_per_day": 8,
+    "usd_per_kwh": 0.15,
+    "monthly_usd": 1008,
+    "annual_usd": 12096
+  },
+  "browser_checks": [
+    {
+      "viewport": "1920x1080",
+      "geometry": {
+        "scrollX": 0,
+        "contentOverflow": 0,
+        "clipped": []
+      },
+      "errors": [],
+      "assumptions_updated": true
+    },
+    {
+      "viewport": "1366x768",
+      "geometry": {
+        "scrollX": 0,
+        "contentOverflow": 0,
+        "clipped": []
+      },
+      "errors": [],
+      "assumptions_updated": true
+    },
+    {
+      "viewport": "1280x720",
+      "geometry": {
+        "scrollX": 0,
+        "contentOverflow": 0,
+        "clipped": []
+      },
+      "errors": [],
+      "assumptions_updated": true
+    },
+    {
+      "viewport": "1440x900",
+      "geometry": {
+        "scrollX": 0,
+        "contentOverflow": 0,
+        "clipped": []
+      },
+      "errors": [],
+      "assumptions_updated": true
+    },
+    {
+      "viewport": "1024x768",
+      "geometry": {
+        "scrollX": 0,
+        "contentOverflow": 175,
+        "clipped": []
+      },
+      "errors": [],
+      "assumptions_updated": true
+    }
+  ],
+  "pricing_checked": "2026-11-18",
+  "annual_scope": "12 30-day months at the dated rates, including Gemini promotional pricing. Not a forecast.",
+  "limits": [
+    "No fresh-device cold install repeated",
+    "No new full hardware acceptance",
+    "Electricity assumptions editable; hardware/support excluded",
+    "Text-only cloud API scenario; provider tokenization and outputs differ"
+  ]
+}

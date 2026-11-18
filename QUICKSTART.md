@@ -1,3 +1,19 @@
+# Nano quickstart
+
+For the **HP ZGX Nano / NVIDIA GB10**, start with [the fresh-install guide](docs/NANO_QUICKSTART.md) or [download its PDF](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.2.0-nano.3/HP-ZGX-Nano-Quickstart.pdf).
+
+```bash
+git clone --branch v3.2.0-nano.3 --depth 1 \
+  https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git hp-zgx-nano
+cd hp-zgx-nano
+./install.sh
+./launch.sh free
+```
+
+Use Ubuntu 24.04 ARM64, 128 GB unified memory, an existing working NVIDIA driver/CUDA toolkit and 200 GiB free disk. Initial setup downloads about 95.9 GiB of models plus dependencies. Open http://127.0.0.1:18808/free on the Nano; switch to Presenter Mode from the sidebar. [Full guide](docs/NANO_GUIDE.md) · [Share kit and release](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.3).
+
+---
+
 # Fury V3 quickstart
 
 Use the tested Ubuntu 24.04 ARM64 GB300 with its existing working driver and CUDA toolkit. Physical Grace memory is 494.15 GiB; the approximately 743.65 GiB Linux aggregate includes HBM. Reserve 350 GiB initially free disk; model files are about 227.566 GiB. See [prerequisites](docs/PREREQUISITES.md).

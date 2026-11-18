@@ -115,13 +115,13 @@
     rendered[demo] = signature;
     $(`#output-state-${demo}`).textContent = job.status.toUpperCase();
     const button = $(`#form-${demo} button[type=submit]`);
-    button.disabled = state.mode !== 'free' || state.jobs.some(row=>row.demo===demo && active(row));
+    button.disabled = state.mode !== 'free' || state.recovering || state.jobs.some(row=>row.demo===demo && active(row));
     if (active(job)) {
       target.innerHTML = `<div class="live-state"><span class="working-agent" aria-hidden="true">${glyph(demo)}</span><span class="spinner"></span><span>${esc(job.phase)}${job.images_done ? ` / ${job.images_done} image(s) reviewed` : ''}</span><button class="quiet cancel-job">Cancel</button></div>${job.plan ? `<p class="provenance">${esc(job.plan)}</p>` : ''}<pre class="text-output">${esc(job.partial || 'The Nano is working. This output updates as the model responds.')}</pre>`;
       $('.cancel-job',target).addEventListener('click',()=>cancelJob(job.id));
       return;
     }
-    if (job.status !== 'complete') {target.innerHTML=`<p class="error">${esc(job.error || 'This job was cancelled.')}</p><p class="help">Your inputs are retained. Adjust the brief and run it again.</p>`;return;}
+    if (job.status !== 'complete') {target.innerHTML=`<p class="error">${esc(job.error || 'This job was cancelled.')}</p><p class="help">Your inputs are retained. Adjust the brief if needed.</p><button class="quiet" type="button" data-retry-demo="${esc(demo)}">Run again</button>`;return;}
     const result = job.result || {};
     let html = '';
     if (demo === 'atlas') {
@@ -187,10 +187,11 @@
   }
   async function switchMode(free) {
     const button=$('#stage-mode');button.disabled=true;
-    try {await api('mode',{method:'POST',body:JSON.stringify({mode:free?'free':'presenter'})});if(free)await poll();else location.href='/stage';}catch(error){toast(error.message);}finally{button.disabled=false;}
+    try {await api(free?'presenter-exit':'mode',{method:'POST',body:JSON.stringify(free?{}:{mode:'presenter'})});if(free)await poll();else location.href='/stage';}catch(error){toast(error.message);}finally{button.disabled=false;}
   }
   $('#stage-mode').addEventListener('click',()=>switchMode(false));
-  $('#fullscreen').addEventListener('click',()=>{(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>toast('Full screen is unavailable in this browser.'));});
+  $('#recover-models').addEventListener('click',async()=>{const button=$('#recover-models');button.disabled=true;button.textContent='Recovering…';try{await api('recover',{method:'POST',body:'{}'});toast('Local models are ready. Your work is kept.');}catch(error){toast(error.message);}finally{await poll();}});
+  document.addEventListener('click',event=>{const retry=event.target.closest('[data-retry-demo]');if(!retry||state?.mode!=='free')return;const form=$(`#form-${retry.dataset.retryDemo}`),submit=form?.querySelector('button[type=submit]');if(form&&submit&&!submit.disabled&&form.reportValidity())form.requestSubmit();});
   async function poll() {
     if(polling)return;polling=true;
     try {
@@ -203,15 +204,17 @@
       const gpu=state.telemetry.gpu;$('#hardware').textContent=[gpu?.utilization!=null?`GPU ${gpu.utilization}%`:null,gpu?.power!=null?`${gpu.power.toFixed(0)} W`:null,gpu?.temperature!=null?`${gpu.temperature}°C`:null].filter(Boolean).join(' · ');
       $('#usage').textContent=`${(state.totals.output_tokens||0).toLocaleString()} output tokens · ${state.totals.images||0} renders · ${state.totals.pages||0} translated pages`;
       $('#queue-count').textContent=state.jobs.filter(active).length;
-      $('#mode-banner').hidden=state.mode==='free';
-      if(state.mode!=='free') {$('#mode-banner').replaceChildren(document.createTextNode(state.warming?'Presenter warm-up is running. Free Mode becomes available when it finishes.':'Presenter Mode owns the models. Reset the show to its Ready screen before entering Free Mode.'));const enter=document.createElement('button');enter.textContent='Enter Free Mode';enter.disabled=state.warming;enter.addEventListener('click',()=>switchMode(true));$('#mode-banner').append(enter);}
+      const recover=$('#recover-models'),offline=['lead','text','image','tts','gateway'].some(key=>!state.health[key]?.ready);recover.hidden=state.mode!=='free'||(!offline&&!state.recovering);recover.disabled=!!state.recovering||!!state.busy;recover.textContent=state.recovering?'Recovering…':'Recover local models';$('#stage-mode').disabled=!!state.recovering;
+      $('#mode-banner').hidden=state.mode==='free'&&!state.recovering;
+      if(state.recovering)$('#mode-banner').textContent='Recovering local models. Your inputs and completed outputs are kept.';
+      if(state.mode!=='free') {$('#mode-banner').replaceChildren(document.createTextNode(state.warming?'Presenter checks are running. Enter Free Mode stops them and opens your workspaces.':'Presenter Mode is using the models. Enter Free Mode ends the current show and opens your workspaces.'));const enter=document.createElement('button');enter.textContent='Enter Free Mode';enter.disabled=false;enter.addEventListener('click',()=>switchMode(true));$('#mode-banner').append(enter);}
       for(const item of state.catalog) {
         if(!(item.id in latest))latest[item.id]=state.jobs.find(row=>row.demo===item.id)?.id;
         const job=state.jobs.find(row=>row.id===latest[item.id]);if(job)renderOutput(job);
-        $(`#form-${item.id} button[type=submit]`).disabled=state.mode!=='free'||state.jobs.some(row=>row.demo===item.id&&active(row));
+        $(`#form-${item.id} button[type=submit]`).disabled=state.mode!=='free'||state.recovering||state.jobs.some(row=>row.demo===item.id&&active(row));
       }
       if(view==='jobs')renderJobs();if(view==='models')renderModels();
-      $('#open-rush').disabled=state.mode!=='free'||state.jobs.some(active);
+      $('#open-rush').disabled=state.mode!=='free'||state.recovering||state.jobs.some(active);
     }catch(error){$('#connection').textContent='○ Nano connection unavailable';if(!state)toast(error.message);}finally{polling=false;}
   }
   poll();setInterval(()=>{if(!document.hidden)poll();},1300);document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll();});

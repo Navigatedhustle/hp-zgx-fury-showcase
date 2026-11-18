@@ -6,6 +6,11 @@ from contextlib import asynccontextmanager
 if os.getenv('FURY_PROFILE') != 'gb10':
     raise RuntimeError('This service requires the GB10 profile')
 
+# The explicit CPU voice profile must not initialize a CUDA context while
+# Kokoro chooses its initial device. Keep that memory available to image work.
+if os.getenv('FURY_GB10_VOICE_DEVICE', 'cuda') == 'cpu':
+    os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
 from atlas.tts_server import app
 from atlas import tts_server
 from showcase_app.gb10_security import StageRequestGuard

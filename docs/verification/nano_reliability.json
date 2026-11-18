@@ -1,0 +1,564 @@
+{
+  "date": "2026-11-10",
+  "profile": "Nano / NVIDIA GB10",
+  "scope": "Observed memory failure, safe scene recovery and default Free Mode workflows on the resident Nano stack. Not a guarantee for arbitrary prompts or hardware failures.",
+  "observed_failure": {
+    "scene": "Rush",
+    "cause": "FP8 quantization broke the text encoder input/output weight tie, retaining a duplicate unused projection; image activation memory then exceeded the guarded allocator budget. Five independent Rush jobs had completed.",
+    "previous_message": "RuntimeError / no current backup",
+    "previous_rush_minimum_memavailable_bytes": 11011178496
+  },
+  "fixes": {
+    "conditioning": "Restore the checkpoint-configured shared input/output embedding before materialization; all conditioning parameters and hidden states used by FLUX remain unchanged.",
+    "duplicate_projection_parameters_released": 388956160,
+    "checkpoint_or_model_substitution": false,
+    "reserve_targets_gib": {
+      "agent_cover": 8.125,
+      "rush": 10.125
+    },
+    "decoder_tiles_pixels": 256,
+    "free_prompt_conditioning": "Smallest 32-token-aligned window within 64\u2013512 that fits the entire brief. Overlong inputs are rejected, not truncated.",
+    "memory_retry": "One automatic buffer-cleanup retry per whole image job; review quarantine remains in force.",
+    "readiness": "Actual Rush image dimensions and stricter reserve are exercised by functional preparation.",
+    "partial_results": "Completed Rush jobs stay visible. Retry unfinished work copies their artifacts and retries only unfinished tasks with a new run/call identity.",
+    "service_recovery": "Recover only verified owned services; existing load order, model selection and bounded queues remain enforced.",
+    "watchdog": "Completed scenes stay complete; an unavailable lane does not cancel unrelated Rush work. Scene deadlines still apply.",
+    "ui": "Specific error messages, Retry/Continue/Free Mode controls, retryable connection errors, honest failed-preparation state; notices cannot intercept controls.",
+    "missing_backup": "Manual selection of a missing optional recording returns a notice without corrupting completed live results.",
+    "ownership": "Retries recheck session/scene ownership after async health probes to prevent stale work after exit.",
+    "free_mode_recovery": "Idle Free Mode can recover unavailable verified local workers without losing prior jobs or current form values; active work blocks service recovery.",
+    "close_scene": "Closing can display actual session totals even if a model service is unavailable.",
+    "mode_navigation": "Enter Free Mode stops presenter checks safely; stale /stage navigation redirects to the active Free Mode.",
+    "qualification": "Hardware qualification treats partial work as incomplete and fails promptly; its full-success requirements remain unchanged.",
+    "idle_probe": "The exact strict two-boolean local artwork review may emit at most 32 tokens during keep-alive; other keep-alive calls remain limited to eight tokens without tools. Failed idle checks expose Retry preparation."
+  },
+  "source_tests_passed": 258,
+  "conditioning_equivalence": {
+    "scope": "Pinned Qwen3 and torchao on a small real Qwen3 architecture, before/after restoring the quantization-broken embedding tie",
+    "maximum_hidden_state_difference": 0.0,
+    "checkpoint_weight_sharing_restored": true,
+    "layers_compared": 5,
+    "metadata": {
+      "restored": true,
+      "duplicate_parameters_released": 8192
+    }
+  },
+  "live_presenter": {
+    "runs": [
+      {
+        "cycle": 1,
+        "scope": "normal five-scene live run",
+        "preparation": {
+          "kind": "functional",
+          "status": "complete",
+          "started": 1794337234.0228698,
+          "steps": [
+            {
+              "name": "Executive reasoning",
+              "status": "complete",
+              "started": 1794337234.0229492,
+              "seconds": 2.08
+            },
+            {
+              "name": "Language & code",
+              "status": "complete",
+              "started": 1794337234.0436375,
+              "seconds": 3.38
+            },
+            {
+              "name": "Vision",
+              "status": "complete",
+              "started": 1794337234.0638623,
+              "seconds": 3.45
+            },
+            {
+              "name": "Image generation",
+              "status": "complete",
+              "started": 1794337237.509237,
+              "seconds": 5.02
+            },
+            {
+              "name": "Voice",
+              "status": "complete",
+              "started": 1794337234.0762143,
+              "seconds": 0.84
+            }
+          ],
+          "seconds": 8.54
+        },
+        "beats": [
+          {
+            "beat": "S0",
+            "status": "complete",
+            "seconds": 0.055,
+            "minimum_memavailable": 13793366016,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S1",
+            "status": "complete",
+            "seconds": 45.828,
+            "minimum_memavailable": 12684726272,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S2",
+            "status": "complete",
+            "seconds": 6.994,
+            "minimum_memavailable": 13398695936,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S3",
+            "status": "complete",
+            "seconds": 50.473,
+            "minimum_memavailable": 12789702656,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S4",
+            "status": "complete",
+            "seconds": 0.058,
+            "minimum_memavailable": 13159993344,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          }
+        ],
+        "five_prior_results_retained": false
+      },
+      {
+        "cycle": 2,
+        "scope": "normal five-scene live run",
+        "preparation": {
+          "kind": "functional",
+          "status": "complete",
+          "started": 1794337347.8534336,
+          "steps": [
+            {
+              "name": "Executive reasoning",
+              "status": "complete",
+              "started": 1794337347.8534744,
+              "seconds": 1.04
+            },
+            {
+              "name": "Language & code",
+              "status": "complete",
+              "started": 1794337347.8657296,
+              "seconds": 2.87
+            },
+            {
+              "name": "Vision",
+              "status": "complete",
+              "started": 1794337347.8776686,
+              "seconds": 2.94
+            },
+            {
+              "name": "Image generation",
+              "status": "complete",
+              "started": 1794337350.81394,
+              "seconds": 3.91
+            },
+            {
+              "name": "Voice",
+              "status": "complete",
+              "started": 1794337347.8900678,
+              "seconds": 0.9
+            }
+          ],
+          "seconds": 6.92
+        },
+        "beats": [
+          {
+            "beat": "S0",
+            "status": "complete",
+            "seconds": 0.035,
+            "minimum_memavailable": 13559447552,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S1",
+            "status": "complete",
+            "seconds": 48.333,
+            "minimum_memavailable": 12563300352,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S2",
+            "status": "complete",
+            "seconds": 6.805,
+            "minimum_memavailable": 13372497920,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S3",
+            "status": "complete",
+            "seconds": 46.382,
+            "minimum_memavailable": 12752281600,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S4",
+            "status": "complete",
+            "seconds": 0.049,
+            "minimum_memavailable": 13152911360,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          }
+        ],
+        "five_prior_results_retained": false
+      },
+      {
+        "cycle": 3,
+        "scope": "controlled image-service outage and actual retry recovery",
+        "preparation": {
+          "kind": "functional",
+          "status": "complete",
+          "started": 1794337458.2506194,
+          "steps": [
+            {
+              "name": "Executive reasoning",
+              "status": "complete",
+              "started": 1794337458.2506614,
+              "seconds": 1.95
+            },
+            {
+              "name": "Language & code",
+              "status": "complete",
+              "started": 1794337458.2630284,
+              "seconds": 3.22
+            },
+            {
+              "name": "Vision",
+              "status": "complete",
+              "started": 1794337458.2751105,
+              "seconds": 3.31
+            },
+            {
+              "name": "Image generation",
+              "status": "complete",
+              "started": 1794337461.5855792,
+              "seconds": 3.93
+            },
+            {
+              "name": "Voice",
+              "status": "complete",
+              "started": 1794337458.287516,
+              "seconds": 0.98
+            }
+          ],
+          "seconds": 7.32
+        },
+        "beats": [
+          {
+            "beat": "S0",
+            "status": "complete",
+            "seconds": 0.033,
+            "minimum_memavailable": 13543153664,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S1",
+            "status": "complete",
+            "seconds": 45.616,
+            "minimum_memavailable": 12483031040,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S2",
+            "status": "complete",
+            "seconds": 6.738,
+            "minimum_memavailable": 13253414912,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S3",
+            "status": "complete",
+            "seconds": 16.828,
+            "minimum_memavailable": 11635687424,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          },
+          {
+            "beat": "S4",
+            "status": "complete",
+            "seconds": 0.042,
+            "minimum_memavailable": 12089929728,
+            "backup": false,
+            "swap_in_pages": 0,
+            "swap_out_pages": 0
+          }
+        ],
+        "five_prior_results_retained": true
+      }
+    ],
+    "script_errors": []
+  },
+  "minimum_normal_rush_memavailable_bytes": 12752281600,
+  "controlled_failure_recovery": {
+    "fault": "Stopped the verified owned image service during the actual third Rush run.",
+    "five_completed_job_results_retained_byte_for_byte": true,
+    "prior_validated_app_artifact_retained_byte_for_byte": true,
+    "new_unique_retry_run_identity": true,
+    "only_images_retried": true,
+    "final_completed_jobs": 6,
+    "ui_retry_including_service_recovery_seconds": 56.53,
+    "image_retry_processing_seconds": 16.828
+  },
+  "free_mode": {
+    "scope": "Actual UI-launched six-job Free Mode Rush plus simultaneous CPU voice job on the resident Nano stack",
+    "jobs": [
+      {
+        "demo": "voice",
+        "status": "complete",
+        "seconds": 3.316
+      },
+      {
+        "demo": "slides",
+        "status": "complete",
+        "seconds": 18.189
+      },
+      {
+        "demo": "images",
+        "status": "complete",
+        "seconds": 14.723
+      },
+      {
+        "demo": "atlas",
+        "status": "complete",
+        "seconds": 43.108
+      },
+      {
+        "demo": "translate",
+        "status": "complete",
+        "seconds": 2.531
+      },
+      {
+        "demo": "vision",
+        "status": "complete",
+        "seconds": 16.033
+      },
+      {
+        "demo": "factory",
+        "status": "complete",
+        "seconds": 75.375
+      }
+    ],
+    "downloads": [
+      {
+        "demo": "voice",
+        "file": "narration.wav",
+        "bytes": 424844
+      },
+      {
+        "demo": "slides",
+        "file": "presentation.pptx",
+        "bytes": 38569
+      },
+      {
+        "demo": "slides",
+        "file": "presentation.json",
+        "bytes": 1294
+      },
+      {
+        "demo": "slides",
+        "file": "slide-1.svg",
+        "bytes": 1450
+      },
+      {
+        "demo": "slides",
+        "file": "slide-2.svg",
+        "bytes": 1215
+      },
+      {
+        "demo": "slides",
+        "file": "slide-3.svg",
+        "bytes": 1614
+      },
+      {
+        "demo": "images",
+        "file": "image-1.png",
+        "bytes": 1021768
+      },
+      {
+        "demo": "atlas",
+        "file": "answer.txt",
+        "bytes": 3314
+      },
+      {
+        "demo": "atlas",
+        "file": "sources.txt",
+        "bytes": 3672
+      },
+      {
+        "demo": "translate",
+        "file": "translation.txt",
+        "bytes": 254
+      },
+      {
+        "demo": "translate",
+        "file": "translation.docx",
+        "bytes": 36743
+      },
+      {
+        "demo": "translate",
+        "file": "original.txt",
+        "bytes": 198
+      },
+      {
+        "demo": "vision",
+        "file": "analysis.txt",
+        "bytes": 1055
+      },
+      {
+        "demo": "factory",
+        "file": "app.html",
+        "bytes": 8424
+      },
+      {
+        "demo": "factory",
+        "file": "app-source.txt",
+        "bytes": 8424
+      },
+      {
+        "demo": "factory",
+        "file": "plan.txt",
+        "bytes": 621
+      },
+      {
+        "demo": "factory",
+        "file": "app-preview.png",
+        "bytes": 28683
+      }
+    ],
+    "three_editable_pptx_slides_verified": true,
+    "png_verified": true,
+    "script_errors": [],
+    "wav_verification": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "seconds": 8.85,
+      "non_silent_pcm": true
+    },
+    "docx_source_values_verified": true,
+    "factory_functional": {
+      "actual_generated_roi_cases": 4,
+      "zero_cost_handled": true,
+      "negative_result_handled": true
+    }
+  },
+  "recovery_ui": {
+    "scope": "Layout replay of the actual controlled service failure plus failed-Agent/failed-preparation fixtures; actual service recovery is separately verified live.",
+    "views": [
+      {
+        "view": "partial",
+        "width": 1280,
+        "controls_visible": true,
+        "overflow": []
+      },
+      {
+        "view": "partial",
+        "width": 1920,
+        "controls_visible": true,
+        "overflow": []
+      },
+      {
+        "view": "agent_failed",
+        "width": 1280,
+        "controls_visible": true,
+        "overflow": []
+      },
+      {
+        "view": "agent_failed",
+        "width": 1920,
+        "controls_visible": true,
+        "overflow": []
+      },
+      {
+        "view": "ready_failed",
+        "width": 1280,
+        "controls_visible": true,
+        "overflow": []
+      },
+      {
+        "view": "ready_failed",
+        "width": 1920,
+        "controls_visible": true,
+        "overflow": []
+      }
+    ],
+    "failed_retry_is_retryable": true,
+    "continue_reaches_close": true,
+    "script_errors": []
+  },
+  "cover_export": {
+    "live_download_verified": true,
+    "exact_accepted_png_embedded": true,
+    "hash_verified": true
+  },
+  "image_kit": {
+    "accepted_pngs": 4,
+    "all_hashes_verified": true,
+    "intended_uses_present": true
+  },
+  "visual_review": "Reviewed final generated cover and proposal-kit PNGs at original resolution; recognizable intended subjects and no obvious decode-tile seams. Automated image review remains probabilistic and human review is still required.",
+  "limits": [
+    "Two clean full shows plus one controlled outage/recovery show; no ten-show/45-minute idle qualification.",
+    "Free Mode uses default fictional samples and Spanish translation; this does not validate every prompt, generated app or supported language.",
+    "No zero-total-swap claim. Existing other desktop applications remained open; memory reserves were not lowered."
+  ],
+  "private_outputs_in_source": false,
+  "full_event_qualification_passed": false,
+  "free_recovery": {
+    "controlled_worker_outage": "Kokoro CPU service stopped through the verified controller",
+    "actual_free_mode_recovery_seconds": 5.901,
+    "all_prior_results_kept_byte_for_byte": true,
+    "form_value_retained": true,
+    "other_model_processes_unchanged": true,
+    "mode_remained_free": true,
+    "stale_presenter_url_returns_to_active_free_mode": true
+  },
+  "final_smoke": {
+    "stale_stage_redirect_verified": true,
+    "real_sidebar_mode_entry_verified": true,
+    "real_start_and_return_verified": true,
+    "final_mode": "presenter",
+    "final_scene": "Ready",
+    "ready_checks": 8,
+    "all_ready": true,
+    "preparation_seconds": 3.95,
+    "window_out_of_fullscreen": true,
+    "script_errors": []
+  },
+  "idle_readiness": {
+    "actual_idle_seconds": 148.69,
+    "consecutive_successful_idle_probes": 2,
+    "final_all_ready": true,
+    "warm_error": "",
+    "live_accounting_excludes_probes": true
+  }
+}

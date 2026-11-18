@@ -68,10 +68,12 @@ def nano_outline():
     </g>'''
 
 
-def slide_svg(slide, index):
+def slide_svg(slide, index, cover_uri=None):
     """Five distinct compositions share the exact model-authored slide content."""
     if index not in range(1, 6):
         raise ValueError('A stage briefing has exactly five slides')
+    if cover_uri is not None and (len(cover_uri) > 12000000 or not re.fullmatch(r'data:image/png;base64,[A-Za-z0-9+/]+={0,2}', cover_uri)):
+        raise ValueError('Cover must be an embedded local PNG')
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img"><title>{escape(slide["title"])}</title>',
            '<g font-family="Arial,Helvetica,Liberation Sans,sans-serif">', f'<rect width="1920" height="1080" fill="{BG}"/>',
            label(100, 80, 'HP ZGX NANO'), label(100, 128, 'EXECUTIVE BRIEFING / FICTIONAL ACCOUNT', META),
@@ -85,7 +87,14 @@ def slide_svg(slide, index):
         for point in points:
             out.append(f'<rect x="100" y="{y+12}" width="8" height="28" fill="{BLUE}"/>')
             item, y = block(130, y, point, 30, 1000);out.append(item);y += 16
-        out.append(nano_outline())
+        if cover_uri:
+            out.append('<defs><clipPath id="briefing-cover"><rect x="1220" y="315" width="600" height="460" rx="18"/></clipPath></defs>')
+            out.append(f'<image x="1220" y="315" width="600" height="460" href="{cover_uri}" preserveAspectRatio="xMidYMid slice" clip-path="url(#briefing-cover)"/>')
+            out.append(label(1220, 825, 'FICTIONAL PILOT CONCEPT'))
+            caption, _ = block(1220, 850, 'Generated locally for this briefing.', 26, 600, color=META)
+            out.append(caption)
+        else:
+            out.append(nano_outline())
     elif index in (2, 3, 5):
         item, end = block(100, 190, slide['title'], 76, 1690, bold=True, limit=400);out.append(item)
         out.append(rule(100, end + 25, 1720))

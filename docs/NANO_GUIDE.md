@@ -1,11 +1,11 @@
 # HP ZGX Nano Collective
 ## Complete installation, launch and presenter guide
 
-**Public Nano preview: v3.2.0-nano.2 · 10 November 2026**
+**Public Nano preview: v3.2.0-nano.3 · 18 November 2026**
 
 Repository: https://github.com/Navigatedhustle/hp-zgx-fury-showcase/tree/nano_exec
 
-Release and downloadable source: https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.2
+Release and downloadable source: https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.3
 
 This guide covers the seven-experience Nano Collective hub and the five-scene Executive Stage. Both share one local four-model stack. This is a community demonstration, not an officially supported or endorsed HP or NVIDIA product. HP trademarks remain HP property. All supplied business examples are fictional.
 
@@ -24,7 +24,7 @@ For the automatic browser window, sign in to the Nano's local desktop. HDMI is r
 Run on the Nano:
 
 ```bash
-git clone --branch v3.2.0-nano.2 --depth 1 \
+git clone --branch v3.2.0-nano.3 --depth 1 \
   https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git hp-zgx-nano
 cd hp-zgx-nano
 ./install.sh
@@ -138,15 +138,31 @@ From the Free Mode sidebar, select **Presenter Mode** after current work finishe
 
 Presenter Mode is at **http://127.0.0.1:18808/stage**. The CLI stage command opens the existing native presenter kiosk. The sidebar opens the presenter in its current browser window. Both use the same resident models.
 
-The Ready screen shows eight core checks, real per-lane progress, elapsed preparation time, a visible Start presentation button, audio/projector options and the verified-backup count. Fast preparation checks real language, vision, speech and a presenter-size image render. It avoids generating the entire show twice. With models already resident, observed preparation was approximately **5.6–7.1 seconds**; an observed Start click reached the opening scene in **0.12 seconds**. Performance varies with memory pressure and caches. Cold model loading is separate.
+The Ready screen shows eight core checks, real per-lane progress, elapsed preparation time, a visible Start presentation button, audio/projector options and the verified-backup count. Fast preparation checks real language, vision, speech and a presenter-size image render. It avoids generating the entire show twice. With models already resident, observed preparation was approximately **6.9–8.6 seconds**; an observed Start click reached the opening scene in **0.12 seconds**. Performance varies with memory pressure and caches. The current source reliability update measured 6.9–8.6 seconds with models resident. Cold model loading is separate.
 
 | Scene | What you demonstrate |
 |---|---|
 | Open | Four resident local lanes, the compact Nano and measured local system counters |
-| Nano Agent | A fictional account assignment, five-slide briefing, bilingual draft and cover image |
+| Nano Agent | A fictional account assignment, five-slide briefing with its generated cover applied to slide 1, and bilingual draft |
 | Vision | The supplied fictional whiteboard, extracted actions/owners/dates and executive readout |
-| Rush | Six actual parallel/queued workflows, a working ROI app and four locally reviewed images |
-| Close | Actual session totals and dated, explicitly limited cloud-comparison assumptions |
+| Rush | Six actual parallel/queued workflows, a working ROI app and a downloadable four-image pilot proposal kit |
+| Close | Recorded text tokens scaled to 10 customers × 200 employees × 30 days × 12 months, with monthly/yearly frontier API and Nano electricity bar charts |
+
+The closing comparison stays visible until you advance or leave. It uses the live show's text-token ledger (input and output), excluding warmup, recorded playback and vision/image-review requests. One show is repeated once per customer: **10 customers per employee per day × 200 employees = 2,000 workflows/day; × 30 = 60,000/month; × 12 = 720,000/year**. Output, input and combined token totals appear for each period. Cloud costs use both input and output rates, not output rates alone.
+
+**Assumptions & pricing sources** opens dated official OpenAI, Anthropic and Google rates and editable Nano electricity inputs. Defaults are **200 Nanos (one per employee), 140 W average wall power, 8 powered hours/day, $0.15/kWh**: $1,008/month or $12,096 across 12 30-day months. Power and runtime are assumptions, not measurements or capacity qualification. Nano has no token fees; hardware and support are excluded. Cloud bars represent text API fees only, excluding vision, generated images, audio, tools, discounts and taxes; tokenizers, reasoning and model outputs differ. Annual figures hold the 2026-11-18 rates constant across 360 days. Gemini 4 Carbon's promotional $2 input / $10 output per million expires November 30, with published $4 / $20 rates from December 1; the chart is a dated annualized comparison, not a forecast. Changing electricity assumptions affects only this browser's current presentation view.
+
+Generated presenter illustrations follow the fictional Northwind administrative planning-pilot story. The briefing cover depicts a meeting suite. Rush supplies a CIO briefing opener, private administrative workspace, team workshop and pilot-planning background, each labeled with its intended use. **Download 4 images** exports the PNGs, a usage README and a manifest with hashes. The briefing download contains its reviewed cover. These are proposed concept illustrations, not photographs of a customer or proof of deployment. Local vision checks both subject relevance and unwanted lettering before release; one regeneration is permitted per image. Free Mode's starter image brief also supports the Northwind pilot proposal; edited prompts remain visitor-directed.
+
+**Exit full screen** is available in the presenter header and Free Mode's top bar when fullscreen is active. It restores the native demo window without changing scenes or clearing work. The same control becomes **Full screen** to enter again. In a standard browser, this toggles webpage fullscreen; if you entered browser fullscreen using F11, use F11 to leave it.
+
+**Back to Free Mode** is available in the top bar of every presenter scene, with a larger button on the closing comparison in step 05. It ends the current presentation, stops its unfinished work and clears its session outputs before opening Free Mode. It does not run another rehearsal or reload the resident models. Download any presenter outputs you want to keep before leaving.
+
+If a Rush task fails, successful results stay visible and the scene reports the actual completed count. **Retry unfinished work** keeps those results and retries only failed/interrupted tasks under a new run identity; unavailable owned services are recovered first. **Continue** advances the show, and **Back to Free Mode** remains available. A missing optional backup does not erase completed work. A failed Agent/Vision scene offers **Retry this scene**. Preparation and idle-check errors offer **Retry preparation**. Idle image review has a bounded two-boolean response budget, separate from the eight-token text keep-alive probes. Free Mode retains form inputs and provides **Run again** for failed/cancelled jobs.
+
+If Free Mode reports a local model unavailable, **Recover local models** appears in its top bar. Finish or cancel active jobs first, then use it to recover the unavailable services while keeping inputs and completed outputs. The closing scene can still show session results when a worker is offline. Opening a stale `/stage` link while Free Mode owns the stack returns to the active Free Mode hub; use **Presenter Mode** in its navigation to switch explicitly.
+
+The image renderer restores checkpoint weight sharing after FP8 quantization and uses small decode tiles to reduce memory pressure. Memory reserve guards, bounded queues and local artwork review remain enforced. Preparation now tests the Rush image dimensions and its stricter reserve. A transient allocation failure gets one automatic cleanup retry; persistent failures remain visible with a specific recovery action.
 
 The UI does not fabricate token throughput or report the decorative robot as model work. Recorded playback is labelled separately. The default fast live session can start without video backups. If a live workflow fails and a current verified clip is unavailable, the failure stays visible; no stale recording is substituted.
 
@@ -220,14 +236,16 @@ git fetch --tags origin
 ./launch.sh free
 ```
 
-The guide's clone command pins v3.2.0-nano.2 for reproducibility. A future update should name an explicit reviewed Nano tag in `git switch --detach TAG` between fetch and install. To roll back, stop and select the prior known-good Nano tag, then rerun its installer. Existing Fury releases are for different hardware profiles and are not an automatic Nano rollback target.
+The guide's clone command pins v3.2.0-nano.3 for reproducibility. A future update should name an explicit reviewed Nano tag in `git switch --detach TAG` between fetch and install. To roll back, stop and select the prior known-good Nano tag, then rerun its installer. Existing Fury releases are for different hardware profiles and are not an automatic Nano rollback target.
 
 Do not copy process registries between installations. Recreate the desktop shortcut after moving the installation. Keep recordings matched to their build. Do not delete model files merely to free memory; stop unused workloads instead.
 
 ## 12. Validation and release limits
 
-This preview includes 217 passed Nano/controller/gateway/booth/installer tests, seven passed cost-chart tests, 44 interface layouts, 25 additional layout replays with stress notices and automated accessibility checks on five hub views. A fresh application environment installed the pinned requirements, passed its dependency check and ran the same 217 tests. A fresh model environment also installed its pinned requirements and passed dependency, CUDA/import and actual English phonemizer checks without loading another model stack. Release audits are recorded with the public release. The actual live run completed all five scenes, including all six presenter Rush jobs; it was one run without keynote dwell, not ten consecutive shows or a 45-minute idle qualification. Some global swap activity occurred, so no zero-swap claim is made.
+The v3.2.0-nano.3 release reran **262 hardware-independent Nano/controller/gateway/booth/installer tests** and **seven JavaScript cost-chart tests** successfully. The new closing economics screen passed browser layout and interaction checks at 1920×1080, 1366×768, 1280×720, 1440×900 and 1024×768; the smaller viewport uses contained vertical scrolling. Those browser checks used explicitly illustrative token counts and did not run model inference. [Economics verification](verification/nano_economics.json).
 
-The separate full Fury/GB300 Factory test suite had five failures on this host, including restricted bubblewrap namespace checks; it is not represented as passing by this Nano release. The source audit, exact publication allowlist and secret scans are separate from hardware qualification. Current evidence and limits are in `docs/verification/nano_collective_ui.json` and the release notes.
+Prior 10 November hardware evidence covers two normal five-scene shows, recovery of a third show after an intentionally stopped image service while preserving five completed Rush results, and all seven Free Mode experiences. See [the reliability record](verification/nano_reliability.json). This release did not repeat a fresh-device cold installation, full hardware acceptance, ten-show qualification or a 45-minute idle test. No zero-swap claim is made. Earlier dependency-environment and interface checks remain in [the Nano UI record](verification/nano_collective_ui.json); they are prior results, not newly repeated checks.
+
+The separately documented Fury/GB300 profile and its historical Factory test limits are not Nano hardware acceptance. Publication allowlist, exact source/archive checks and secret scans are separate from hardware qualification.
 
 A fresh source/archive check and installer dependency smoke test do not establish that every new driver/OS combination will cold-install successfully. The release retains the tested hardware profile and pinned model identities. If a prerequisite or checksum fails, stop and fix the named issue; never bypass a safety check or silently change models.

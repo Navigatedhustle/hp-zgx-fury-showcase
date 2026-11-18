@@ -163,7 +163,7 @@
   ],
   "qualification": {
     "passed": false,
-    "reason": "Visual upgrade changes deck rendering and image conditioning; real workload and stage proof must be refreshed."
+    "reason": "Live reliability and recovery checks passed; full event qualification (ten shows and idle dwell) remains incomplete."
   },
   "creative_reserve_gib": {
     "agent_cover": 8.125,
@@ -175,9 +175,13 @@
     "MALLOC_TRIM_THRESHOLD_": "131072"
   },
   "image_policy": {
-    "art_direction": "Text-free studio material studies",
+    "art_direction": "Fictional Northwind administrative planning-pilot concepts",
     "validation_model": "Qwen3.6-35B-A3B",
     "maximum_attempts_per_image": 2,
-    "publish_only_after_text_check": true
+    "publish_only_after_text_check": true,
+    "publish_only_after_relevance_check": true,
+    "conditioning_tokens": 256,
+    "decode_tile_pixels": 256,
+    "maximum_memory_retries_per_job": 1
   }
 }

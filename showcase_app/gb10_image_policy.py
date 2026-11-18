@@ -1,4 +1,4 @@
-"""Wordless stage artwork: fixed visual direction and fail-closed local review."""
+"""Story-grounded fictional stage visuals and fail-closed local review."""
 import base64
 import io
 import time
@@ -9,25 +9,49 @@ from PIL import Image
 from showcase_app.gb10_client import infer, WORKER, json_content
 from showcase_app.gb10_accounting import validated_counts
 
-COVER_PROMPT = 'Original architectural studio still life: a single sweeping cobalt blue anodized aluminum ribbon suspended between two solid precision-machined silver blocks on an obsidian plinth. Monumental sculptural composition, beautifully controlled broad reflections, fine brushed-metal grain, unmarked surfaces, deep midnight navy studio, pale periwinkle rim light, confident negative space. Museum-quality product photography of an abstract sculpture, exquisitely detailed physical materials.'
-RUSH_PROMPTS = (
-    'Original studio material study: one continuous cobalt blue anodized metal ribbon folding through a polished silver arch. Strong sculptural silhouette, unmarked surfaces, obsidian stage, deep navy background, broad softbox reflections, meticulous product photography.',
-    'Original studio material study: a monumental matte cobalt blue ceramic ring with a brushed silver sphere resting inside its aperture. Asymmetric editorial composition, unmarked surfaces, dark navy studio, pale periwinkle edge light, refined physical material detail.',
-    'Original studio material study: three cantilevered solid slabs of cobalt anodized aluminum and satin ivory ceramic, balanced with architectural precision above an obsidian base. Unmarked surfaces, deep navy studio, controlled grazing light, exquisite machined edges.',
-    'Original studio material study: two interlocking sculptural arches, one cobalt blue ceramic and one brushed silver aluminum, a clean continuous silhouette. Unmarked surfaces, dark navy stage, broad studio reflections, restrained periwinkle edge light, extraordinary material realism.',
+COVER_BRIEF = {
+    'id': 'cio-cover', 'title': 'CIO briefing cover',
+    'use': 'Opening slide of the proposed Northwind planning pilot',
+    'subject': 'A recognizable administrative meeting room with a table and chairs; not an abstract sculpture or clinical scene.',
+    'prompt': 'Fictional healthcare administration meeting suite for a CIO pilot briefing. Human-scale oak conference table, navy chairs, oak side credenza, large windows overlooking a landscaped campus. Realistic architectural visualization, warm daylight, blue accents, wide editorial composition. Recognizable practical room, not abstract sculpture.',
+}
+RUSH_BRIEFS = (
+    {'id': 'briefing-cover', 'title': 'CIO briefing', 'use': 'Presentation opener / account context',
+     'subject': 'A recognizable landscaped institutional campus or administrative building, not an abstract sculpture.',
+     'prompt': 'Fictional healthcare administration campus for a CIO planning proposal. Welcoming low-rise building, glass windows, pale stone walls, sheltered entrance, landscaped courtyard, mature trees. Human-scale architectural visualization, gentle morning light, restrained blue accents, wide editorial composition. Recognizable institutional building, not abstract sculpture.'},
+    {'id': 'local-workspace', 'title': 'Private workspace', 'use': 'Local-workflow and privacy proposal illustration',
+     'subject': 'A recognizable private office with a desk, chair and closed storage cabinets. There must be no computer, monitor or keyboard; not an abstract sculpture.',
+     'prompt': 'Fictional private administrative workspace for a local AI pilot proposal. Tidy oak writing desk, one navy upholstered chair, closed floor-to-ceiling wooden storage cabinets, frosted glass partition, large daylight window. Entirely empty desk. No electronics, screens or printed objects. Realistic human-scale architectural visualization, warm wood and restrained blue accents. Private work setting, not sculpture.'},
+    {'id': 'team-workshop', 'title': 'Team workshop', 'use': 'Technical workshop invitation background',
+     'subject': 'A recognizable collaborative meeting or training room with a table and chairs, not an abstract sculpture.',
+     'prompt': 'Fictional healthcare administration workshop room for a planning invitation. Oval oak discussion table, six navy chairs, entirely blank wall whiteboard, broad windows, natural daylight. Practical human-scale collaborative room, realistic architectural visualization, restrained blue and warm ivory palette. Recognizable furniture, not abstract sculpture.'},
+    {'id': 'pilot-planning', 'title': 'Pilot planning', 'use': 'Pilot checklist / follow-up document background',
+     'subject': 'Recognizable everyday planning stationery such as a notebook, folder, blank cards and pen on a desk; not an abstract sculpture.',
+     'prompt': 'Fictional pilot-planning desk for a follow-up document background. Overhead editorial illustration: entirely blank open notebook, two plain blue document folders, four completely blank ivory note cards, unmarked pen, warm oak tabletop. Familiar practical stationery, realistic paper grain, natural daylight, clear space for copy. Not abstract sculpture.'},
 )
+COVER_PROMPT = COVER_BRIEF['prompt']
+RUSH_PROMPTS = tuple(brief['prompt'] for brief in RUSH_BRIEFS)
 RUSH_PROMPT = RUSH_PROMPTS[0]
+# Free Mode retains its original conservative user-prompt guard.
 NO_LETTERING = ' Every surface is blank and unmarked. Absolutely no text, letters, numbers, words, captions, labels, symbols, logos, signatures, watermarks or fake writing in any language, even tiny or unreadable. No screens, keyboards, cards, documents, signs, charts, packaging or printed objects. No people.'
+STAGE_NO_LETTERING = ' Every surface is blank and unmarked. Absolutely no text, letters, numbers, logos, labels, watermarks or fake writing, even tiny. No screens, keyboards, signage, charts, people, patients or medical equipment. All paper and whiteboards entirely blank. Original fictional concept, no real facility or deployment claim.'
+STAGE_CONDITIONING_TOKENS = 256
 TEXT_SCHEMA = {'type': 'object', 'properties': {'text': {'type': 'boolean'}}, 'required': ['text'], 'additionalProperties': False}
+STAGE_REVIEW_SCHEMA = {'type': 'object', 'properties': {'text': {'type': 'boolean'}, 'relevant': {'type': 'boolean'}},
+                       'required': ['text', 'relevant'], 'additionalProperties': False}
 
 
-def stage_prompt(batch, index=0):
-    """The trusted stage tool applies this documented house art direction."""
+def stage_brief(batch, index=0):
+    """Approved visual deliverables for the fixed fictional presenter story."""
     if batch not in (1, 4):
         raise ValueError('Unsupported stage artwork batch')
     if not 0 <= index < batch:
         raise ValueError('Invalid artwork index')
-    return (COVER_PROMPT if batch == 1 else RUSH_PROMPTS[index]) + NO_LETTERING
+    return dict(COVER_BRIEF if batch == 1 else RUSH_BRIEFS[index])
+
+
+def stage_prompt(batch, index=0):
+    return stage_brief(batch, index)['prompt'] + STAGE_NO_LETTERING
 
 
 def vision_payload(path):
@@ -45,17 +69,23 @@ def vision_payload(path):
     return 'data:' + mime + ';base64,' + base64.b64encode(data).decode()
 
 
-async def check_artwork(path, run_id, purpose):
+async def check_artwork(path, run_id, purpose, *, brief=None):
     began = time.monotonic()
+    instruction = 'Inspect the ENTIRE artwork, including tiny markings on objects and in corners. Does it contain any printed or handwritten lettering, numbers, logos, captions, labels, or fake unreadable writing? Gibberish spelling still counts as writing. Plain objects and shapes alone do not count as writing. If uncertain about a marking, count it as writing. Do not transcribe or describe the image.'
+    schema = STAGE_REVIEW_SCHEMA if brief else TEXT_SCHEMA
+    if brief:
+        instruction += ' Also check the visual brief: ' + brief['subject'] + ' Set relevant=true only when the visible scene matches that subject. An unrelated abstract sculpture must be relevant=false. Return only JSON with boolean text and relevant.'
+    else:
+        instruction += ' Return only JSON {"text":true} when any writing is present, otherwise {"text":false}.'
     result = await infer([{'role': 'user', 'content': [
         {'type': 'image_url', 'image_url': {'url': vision_payload(path)}},
-        {'type': 'text', 'text': 'Inspect the ENTIRE artwork, including tiny markings on objects and in corners. Does it contain any printed or handwritten lettering, numbers, logos, captions, labels, or fake unreadable writing? Gibberish spelling still counts as writing. Plain abstract shapes alone do not count. If uncertain about a marking, count it as writing. Return only JSON {"text":true} when any writing is present, otherwise {"text":false}. Do not transcribe or describe the image.'}]}],
+        {'type': 'text', 'text': instruction}]}],
         model=WORKER, caller='vision', run_id=run_id, purpose=purpose, role='image_text_check',
-        max_tokens=8 if purpose == 'keepalive' else 24,
-        response_format={'type': 'json_schema', 'json_schema': {'name': 'artwork_text_check', 'strict': True, 'schema': TEXT_SCHEMA}})
+        max_tokens=32 if brief else 8 if purpose == 'keepalive' else 24,
+        response_format={'type': 'json_schema', 'json_schema': {'name': 'artwork_text_check', 'strict': True, 'schema': schema}})
     value = json_content(result['content'])
-    if not isinstance(value, dict) or set(value) != {'text'} or type(value['text']) is not bool:
+    if not isinstance(value, dict) or set(value) != set(schema['properties']) or any(type(v) is not bool for v in value.values()):
         raise ValueError('Local artwork text check returned an invalid result')
     validated_counts(result['call_id'], images_analyzed=1)
-    return {'text': value['text'], 'model': result['model'], 'seconds': time.monotonic() - began,
+    return {**value, 'model': result['model'], 'seconds': time.monotonic() - began,
             'call_id': result['call_id']}

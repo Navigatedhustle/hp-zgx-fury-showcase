@@ -1,0 +1,139 @@
+{
+  "date": "2026-11-10",
+  "profile": "Nano / NVIDIA GB10",
+  "scope": "Native kiosk and webpage fullscreen controls; no inference/model-quality acceptance claimed.",
+  "behavior": "Presenter header and Free Mode top bar switch between Full screen and Exit full screen. Native exit restores the previous normal or maximized window without navigating or changing the presentation.",
+  "native_safety": "Only main frames of explicitly allowed loopback shell pages can operate their own browser window. Generated apps, child frames, other origins and invalid state values are rejected. No window-management HTTP write endpoint is added.",
+  "browser_limit": "In a standard browser, webpage fullscreen uses the browser API. Browser fullscreen entered externally with F11 displays F11 guidance because webpages cannot reliably exit it.",
+  "source_tests": 242,
+  "native": {
+    "native_views": [
+      {
+        "view": "/free/images",
+        "exit_seconds": 0.132,
+        "enter_and_exit_verified": true,
+        "no_navigation": true
+      },
+      {
+        "view": "/stage",
+        "exit_seconds": 0.142,
+        "enter_and_exit_verified": true,
+        "no_navigation": true
+      }
+    ],
+    "free_mode_form_value_retained": true,
+    "presentation_session_and_scene_unchanged": true,
+    "inference_calls_added": 0,
+    "same_resident_model_processes": true,
+    "final_mode": "free",
+    "final_window_state": "maximized",
+    "script_errors": []
+  },
+  "browser_api": {
+    "views": [
+      {
+        "route": "/free",
+        "real_document_fullscreen_enter_and_exit": true
+      },
+      {
+        "route": "/stage",
+        "real_document_fullscreen_enter_and_exit": true
+      }
+    ],
+    "script_errors": []
+  },
+  "layout": {
+    "scope": "Archived fictional scene layout replay checks fullscreen and return controls on Ready and all five scenes; native fullscreen behavior is tested separately.",
+    "layouts": [
+      {
+        "view": -1,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": -1,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 0,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 0,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 1,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 1,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 2,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 2,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 3,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 3,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 4,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      },
+      {
+        "view": 4,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": [],
+        "fullscreen_toggle_visible": true
+      }
+    ],
+    "closing_totals_exit_visible": true,
+    "failed_exit_remains_retryable": true,
+    "script_errors": []
+  },
+  "models_and_admission_limits_changed": false,
+  "private_screenshots_in_source": false
+}

@@ -12,6 +12,7 @@ import threading
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from showcase_app.gb10_miniapp import chromium_wrapper
+from showcase_app.gb10_window import WindowControls
 from playwright.async_api import async_playwright
 
 status = {'ready': False}
@@ -63,9 +64,12 @@ async def main():
                   '--no-default-browser-check', '--autoplay-policy=no-user-gesture-required',
                   '--disable-features=MediaRouter,OptimizationHints,AutofillServerCommunication',
                   '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1, EXCLUDE [::1]'], **options)
+        window_controls = WindowControls()
+        await context.expose_binding('nanoWindowState', window_controls.state)
+        await context.expose_binding('nanoSetFullscreen', window_controls.set_fullscreen)
         page = context.pages[0] if context.pages else await context.new_page()
         page.on('pageerror', lambda error: print('Stage browser error:', error, flush=True))
-        await page.goto('http://127.0.0.1:18808/stage', wait_until='domcontentloaded')
+        await page.goto('http://127.0.0.1:18808/', wait_until='domcontentloaded')
         status.update(ready=True, pid=os.getpid(), headless=os.getenv('FURY_STAGE_HEADLESS') == '1')
         await stop.wait()
         status['ready'] = False

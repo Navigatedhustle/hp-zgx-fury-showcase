@@ -1,0 +1,230 @@
+{
+  "date": "2026-11-10",
+  "profile": "Nano / NVIDIA GB10",
+  "scope": "Actual presenter Agent and Rush artifacts validated; Rush retried after removing the duplicate demo browser and CPU-voice CUDA context. Not event qualification.",
+  "source_tests": 225,
+  "story": "Fictional Northwind administrative planning-pilot proposal; no real customer or deployment claim.",
+  "deliverables": {
+    "briefing_cover": "Reviewed meeting-suite PNG embedded in the real first-slide SVG and standalone briefing HTML.",
+    "rush_kit": [
+      "CIO briefing",
+      "Private workspace",
+      "Team workshop",
+      "Pilot planning"
+    ],
+    "zip_contents": "Four unchanged reviewed PNGs, intended-use manifest with SHA-256 hashes, README.",
+    "free_rush": "Starter image prompt now supports the same fictional pilot. Custom prompts remain user-directed."
+  },
+  "local_models": {
+    "image": "FLUX.2-klein-4B",
+    "review": "Qwen3.6-35B-A3B",
+    "additional_models": false
+  },
+  "review": {
+    "required": [
+      "text=false",
+      "relevant=true"
+    ],
+    "attempts_per_image": 2,
+    "all_candidates_private_until_batch_passes": true,
+    "final_cover_accepted": true,
+    "final_rush_accepted": 4,
+    "final_rush_rejections": 0,
+    "controls": [
+      {
+        "expected": {
+          "text": false,
+          "relevant": false
+        },
+        "actual": {
+          "text": false,
+          "relevant": false
+        },
+        "seconds": 1.8234761519997846
+      },
+      {
+        "expected": {
+          "text": true,
+          "relevant": false
+        },
+        "actual": {
+          "text": true,
+          "relevant": false
+        },
+        "seconds": 1.7700007809999079
+      },
+      {
+        "expected": {
+          "relevant": false
+        },
+        "actual": {
+          "relevant": false
+        },
+        "seconds": 1.3109353320014634
+      }
+    ],
+    "human_inspection": "Final cover and four kit images inspected at original resolution; recognizable subjects, no visible lettering, product branding or tile seams. Model review is probabilistic and still requires human review."
+  },
+  "runtime": {
+    "conditioning_token_preflight": [
+      {
+        "id": "cio-cover",
+        "tokens": 136,
+        "window": 256
+      },
+      {
+        "id": "briefing-cover",
+        "tokens": 139,
+        "window": 256
+      },
+      {
+        "id": "local-workspace",
+        "tokens": 153,
+        "window": 256
+      },
+      {
+        "id": "team-workshop",
+        "tokens": 134,
+        "window": 256
+      },
+      {
+        "id": "pilot-planning",
+        "tokens": 143,
+        "window": 256
+      }
+    ],
+    "decode_tile_pixels": 512,
+    "output_sizes": {
+      "cover": [
+        1344,
+        768
+      ],
+      "rush": [
+        1024,
+        576
+      ]
+    },
+    "reserve_targets_gib": {
+      "cover": 8.125,
+      "rush": 10.125
+    },
+    "same_models_and_queue_limits": true,
+    "free_mode_decode_settings_restored_after_call": true,
+    "cpu_voice": "Kokoro remains on CPU; CPU profile no longer initializes an unused CUDA context.",
+    "functional_preparation_seconds": 11.6,
+    "cold_model_load_included": false,
+    "retained_findings": [
+      "Earlier guarded allocator failures required smaller conditioning padding and tiled decoding; no reserve was lowered.",
+      "A branded-looking computer passed model review but was caught visually; the approved workspace subject now depicts a private office without electronics.",
+      "Latest Rush succeeded after reclaiming unused browser memory. A duplicate demo browser was closed; Firefox memory minimization preserved existing tabs.",
+      "Memory remains tight with this four-model profile. No clean ten-show, idle-dwell, zero-swap or full event qualification claim is made."
+    ],
+    "measured_segments": [
+      {
+        "beat": "S0",
+        "status": "complete",
+        "seconds": 0.042,
+        "backup": false,
+        "minimum_memavailable": 10996510720,
+        "swap_in_pages": 0,
+        "swap_out_pages": 0
+      },
+      {
+        "beat": "S1",
+        "status": "complete",
+        "seconds": 43.833,
+        "backup": false,
+        "minimum_memavailable": 9517592576,
+        "swap_in_pages": 0,
+        "swap_out_pages": 0
+      },
+      {
+        "beat": "S2",
+        "status": "complete",
+        "seconds": 6.718,
+        "backup": false,
+        "minimum_memavailable": 10828963840,
+        "swap_in_pages": 0,
+        "swap_out_pages": 0
+      },
+      {
+        "beat": "S3",
+        "status": "complete",
+        "seconds": 46.242,
+        "backup": false,
+        "minimum_memavailable": 10859393024,
+        "swap_in_pages": 0,
+        "swap_out_pages": 0
+      },
+      {
+        "beat": "S4",
+        "status": "complete",
+        "seconds": 0.108,
+        "backup": false,
+        "minimum_memavailable": 11440779264,
+        "swap_in_pages": 0,
+        "swap_out_pages": 0
+      }
+    ]
+  },
+  "artifacts": {
+    "cover_embedded_in_download_and_preview": true,
+    "cover_png_hash_verified": true,
+    "kit_download_attachment": true,
+    "kit_files": 4,
+    "kit_png_hashes_verified": true,
+    "local_review_controls": [
+      {
+        "expected": {
+          "text": false,
+          "relevant": false
+        },
+        "actual": {
+          "text": false,
+          "relevant": false
+        },
+        "seconds": 1.8234761519997846
+      },
+      {
+        "expected": {
+          "text": true,
+          "relevant": false
+        },
+        "actual": {
+          "text": true,
+          "relevant": false
+        },
+        "seconds": 1.7700007809999079
+      },
+      {
+        "expected": {
+          "relevant": false
+        },
+        "actual": {
+          "relevant": false
+        },
+        "seconds": 1.3109353320014634
+      }
+    ]
+  },
+  "browser": {
+    "zip_browser_download": "Northwind-pilot-image-kit.zip",
+    "briefing_browser_download": "Northwind-executive-briefing.html",
+    "self_contained_html_opened": true,
+    "script_errors": [],
+    "viewports": [
+      [
+        1280,
+        720
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "changed_presenter_panels_overflow": false,
+    "free_rush_contextual_default_verified": true
+  },
+  "qualification_passed": false,
+  "private_outputs_in_source": false
+}

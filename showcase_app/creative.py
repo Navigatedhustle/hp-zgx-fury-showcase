@@ -146,6 +146,8 @@ class CreativeLane:
                 began = time.monotonic()
                 quantize_(self.flux.text_encoder, Float8WeightOnlyConfig(set_inductor_config=False))
                 self.load_timings['text_encoder_fp8_seconds'] = time.monotonic() - began
+            from showcase_app.gb10_encoder import restore_conditioning_ties
+            self.conditioning_ties = restore_conditioning_ties(self.flux.text_encoder)
             began = time.monotonic()
             # Materialize mapped weights before CUDA reads them, using the existing helper.
             copy_cpu_weights(self.flux)
@@ -241,10 +243,34 @@ class CreativeLane:
             job['steps_done'] = step + 1
             return kwargs
 
+        vae_state = None
+        if self.gb10 and kind == 'image':
+            # Decode Nano PNGs in small overlapping tiles to bound activation
+            # memory. Restore the original VAE settings after each call.
+            vae = pipeline.vae
+            vae_state = (vae.use_tiling, vae.tile_sample_min_size, vae.tile_latent_min_size)
+            vae.enable_tiling()
+            vae.tile_sample_min_size = 256
+            vae.tile_latent_min_size = 256 // (2 ** (len(vae.config.block_out_channels) - 1))
+            job['decode_tile_pixels'] = 256
         began = time.monotonic()
         try:
             job['stage']='Denoising'
             args = dict(prompt=prompt, height=job['height'], width=job['width'], num_inference_steps=steps, guidance_scale=job['guidance'] if kind == 'video' else 1.0, generator=torch.Generator('cuda').manual_seed(options.get('seed', 42)), callback_on_step_end=checkpoint)
+            if kind == 'image' and self.gb10:
+                window = options.get('max_sequence_length')
+                if window is None:
+                    text = pipeline.tokenizer.apply_chat_template([{'role': 'user', 'content': prompt}],
+                        tokenize=False, add_generation_prompt=True, enable_thinking=False)
+                    count = len(pipeline.tokenizer(text)['input_ids'])
+                    if count > 512:
+                        from showcase_app.gb10_errors import WorkflowError
+                        raise WorkflowError('image_prompt', 'This image brief is too long. Shorten it before generating.', retryable=False)
+                    window = max(64, ((count + 31) // 32) * 32)
+                if not isinstance(window, int) or window < 64 or window > 512:
+                    raise ValueError('Unsupported image conditioning window')
+                args['max_sequence_length'] = window
+                job['conditioning_tokens'] = window
             if options.get('reference') is not None:
                 args['image'] = options['reference']
             if kind == 'video':
@@ -259,18 +285,21 @@ class CreativeLane:
                 batch=options.get('batch',1)
                 for index in range(batch):
                     args['generator']=torch.Generator('cuda').manual_seed(options.get('seed',42)+index)
-                    job.update(stage=f'Image {index+1} of {batch}',batch_index=index+1)
+                    job.update(stage=f"Image {options.get('public_index', index+1)} of {options.get('public_total', batch)}" + (' · ' + options['public_title'] if options.get('public_title') else ''), batch_index=options.get('public_index', index+1))
                     picture=pipeline(**args).images[0]
                     if stop.is_set():raise InterruptedError('Creative job cancelled')
                     if not path.parent.is_dir():raise InterruptedError('Session deleted; output discarded')
                     target=path if batch==1 else path.with_stem(path.stem+'-'+str(index+1))
                     picture.save(target);picture.close()
-                    job['images_done']=index+1
+                    if not job.get('_private'):
+                        job['images_done']=index+1
                     if not job.get('_private'):job.setdefault('urls',[]).append('/images/'+target.name)
             torch.cuda.synchronize()
             return {'render_seconds': time.monotonic() - began, 'gpu_peak_allocated_bytes': torch.cuda.max_memory_allocated(), 'gpu_peak_reserved_bytes': torch.cuda.max_memory_reserved()}
         finally:
             job.update(render_seconds=time.monotonic() - began, gpu_peak_allocated_bytes=torch.cuda.max_memory_allocated(), gpu_peak_reserved_bytes=torch.cuda.max_memory_reserved())
+            if vae_state is not None:
+                pipeline.vae.use_tiling, pipeline.vae.tile_sample_min_size, pipeline.vae.tile_latent_min_size = vae_state
             pipeline.maybe_free_model_hooks()
             torch.cuda.empty_cache()
             if self.gb10:

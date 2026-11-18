@@ -136,7 +136,13 @@ async def chat(prefix:str,request:Request):
  if GB10:
   if not re.fullmatch(r'[A-Za-z0-9_-]{0,100}',run_id) or purpose not in ('live','warmup','keepalive'):raise HTTPException(422,'Invalid stage accounting identity')
   if purpose=='keepalive':
-   if body.get('tools') or type(body.get('max_tokens')) is not int or not 1<=body['max_tokens']<=8:raise HTTPException(422,'Keep alive output is limited to eight tokens, without tools')
+   # The reviewed image probe emits two booleans, which needs more than
+   # eight tokens. Only that exact bounded schema gets the larger budget.
+   from showcase_app.gb10_image_policy import STAGE_REVIEW_SCHEMA
+   review_format={'type':'json_schema','json_schema':{'name':'artwork_text_check','strict':True,'schema':STAGE_REVIEW_SCHEMA}}
+   image_review=demo=='stage_vision' and alias==MODEL and role=='image_text_check' and body.get('response_format')==review_format
+   cap=32 if image_review else 8
+   if body.get('tools') or type(body.get('max_tokens')) is not int or not 1<=body['max_tokens']<=cap:raise HTTPException(422,'Keep alive output exceeds its bounded probe budget or contains tools')
   body['timings_per_token']=True
  if cid in waiting or cid in active:raise HTTPException(409,'Call already in flight')
  if len(waiting)>=24:raise HTTPException(429,'Shared queue full')

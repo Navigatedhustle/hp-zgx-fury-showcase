@@ -128,15 +128,18 @@ async def image_job(prompt, run_id, purpose='live', *, batch=1, width=1344, heig
                 response = await client.get('http://127.0.0.1:18800/jobs/' + job['id'])
                 response.raise_for_status()
                 job = response.json()
+            if on_update:
+                on_update(job)
             if job['status'] != 'complete':
-                raise RuntimeError('Local image generation did not complete')
+                from showcase_app.gb10_errors import image_failure
+                raise image_failure(job)
             return job
         except asyncio.CancelledError:
             await client.post('http://127.0.0.1:18800/jobs/' + job['id'] + '/cancel')
             raise
 
 
-def write_deck(data, folder):
+def write_deck(data, folder, cover_uri=None):
     """Use the existing Presentations assembler with five validated, escaped specs."""
     (folder / 'briefing-candidate.json').write_text(json.dumps(data, ensure_ascii=False, indent=2))
     validate(data, DECK_SCHEMA)
@@ -147,7 +150,7 @@ def write_deck(data, folder):
     from showcase_app.gb10_deck_design import slide_svg
     specs, previews = [], []
     for index, slide in enumerate(data['slides'], 1):
-        vector = slide_svg(slide, index)
+        vector = slide_svg(slide, index, cover_uri=cover_uri if index == 1 else None)
         name = 'slide-' + str(index) + '.svg'
         (folder / name).write_text(vector)
         previews.append(name)
@@ -162,7 +165,8 @@ def write_deck(data, folder):
     document = re.sub(r'@font-face\s*\{[^}]*\}', '', document)
     (folder / 'briefing.html').write_text(document)
     (folder / 'briefing.json').write_text(json.dumps(data, ensure_ascii=False, indent=2))
-    return {'file': 'briefing.html', 'data_file': 'briefing.json', 'title': data['title'], 'slides': data['slides'], 'previews': previews}
+    return {'file': 'briefing.html', 'data_file': 'briefing.json', 'title': data['title'], 'slides': data['slides'], 'previews': previews,
+            'cover_applied': bool(cover_uri)}
 
 
 class NanoAgent:
@@ -315,6 +319,30 @@ class NanoAgent:
             ('generate_image', {'prompt': COVER_PROMPT}),
             ('translate', {'source': 'email-en', 'languages': ['es']})])
 
+    def apply_reviewed_cover(self):
+        """Use the accepted live image in the actual exported first slide."""
+        import base64
+        import hashlib
+        image = self.artifacts['image']
+        if not image.get('text_checks') or any(check.get('text') is not False or check.get('relevant') is not True for check in image['text_checks'][-1:]):
+            raise ValueError('The briefing cover has not passed local review')
+        name = image['files'][0]
+        if not re.fullmatch(r'[a-f0-9]{32}\.png', name):
+            raise ValueError('Invalid briefing cover identity')
+        path = ROOT / 'state/stage/creative' / name
+        if path.is_symlink():
+            raise ValueError('Cover cannot be a linked file')
+        pixels = path.read_bytes()
+        if not pixels.startswith(b'\x89PNG\r\n\x1a\n') or len(pixels) > 8000000:
+            raise ValueError('Invalid reviewed PNG')
+        uri = 'data:image/png;base64,' + base64.b64encode(pixels).decode()
+        data = json.loads((self.folder / 'briefing.json').read_text())
+        deck = write_deck(data, self.folder, cover_uri=uri)
+        deck['cover_sha256'] = hashlib.sha256(pixels).hexdigest()
+        deck['preview_revision'] = deck['cover_sha256'][:12]
+        self.artifacts['deck'] = deck
+        self.event('artifact', artifact='deck', data=deck)
+
     async def run(self):
         began = time.monotonic()
         plan = await self.plan()
@@ -324,11 +352,11 @@ class NanoAgent:
             names = [name for name in TOOL_SCHEMAS if self.audio or name != 'speak_summary']
             tools = [{'type': 'function', 'function': {'name': name, 'description': {
                 'list_files': 'List the fictional account notes.', 'read_file': 'Read one or more of the listed sample files in one bounded read-only batch.',
-                'build_deck': 'Generate the five-slide briefing live using the local Presentations engine.', 'generate_image': 'Generate an original cover illustration live with FLUX.',
+                'build_deck': 'Generate the five-slide briefing live using the local Presentations engine.', 'generate_image': 'Generate the approved fictional planning-pilot cover live with FLUX, review it locally and use it in the briefing.',
                 'draft_email': 'Save the English email YOU author in subject/body as a draft. This never sends email.',
                 'translate': 'Translate the saved email-en draft into Spanish live with Qwen. This may run in the same parallel batch as draft_email.',
                 'speak_summary': 'Synthesize a short summary with the local Kokoro voice.'}[name], 'parameters': TOOL_SCHEMAS[name]}} for name in names]
-            messages = [{'role': 'system', 'content': 'You are a local personal agent for fictional sample data. Execute the supplied plan using only the provided tools. First list files, then read ALL FOUR files in ONE read_file call. After reading, request build_deck, generate_image, draft_email and translate as independent parallel tool calls. The scheduler queues artifact requests until all four have been requested, then executes them together. A queued response means you must request the remaining tools, never repeat a queued request. Author the English email yourself in draft_email arguments, under 150 words. translate refers to email-en and waits for that draft. Do not type tool code or a final answer in place of calls. No more than eight tool calls total. For generate_image describe only an abstract blue landscape with blank unmarked surfaces. Never request words, lettering, numbers, screens, documents, cards or diagrams. The image tool applies the fixed wordless stage art direction and a local text check. No paths, URLs, shell commands or SQL. Audio is ' + ('on; also request speak_summary with a short account briefing summary.' if self.audio else 'off; never request speech.')},
+            messages = [{'role': 'system', 'content': 'You are a local personal agent for fictional sample data. Execute the supplied plan using only the provided tools. First list files, then read ALL FOUR files in ONE read_file call. After reading, request build_deck, generate_image, draft_email and translate as independent parallel tool calls. The scheduler queues artifact requests until all four have been requested, then executes them together. A queued response means you must request the remaining tools, never repeat a queued request. Author the English email yourself in draft_email arguments, under 150 words. translate refers to email-en and waits for that draft. Do not type tool code or a final answer in place of calls. No more than eight tool calls total. For generate_image request a fictional healthcare administration planning-room concept for this CIO briefing. No abstract sculptures, real people, patients, clinical imagery, words, logos, charts or product claims. The image tool applies the approved planning-pilot visual brief and local lettering/relevance checks. Its reviewed cover is placed in slide one. No paths, URLs, shell commands or SQL. Audio is ' + ('on; also request speak_summary with a short account briefing summary.' if self.audio else 'off; never request speech.')},
                         {'role': 'user', 'content': GOAL + '\nValidated plan: ' + json.dumps(plan)}]
             total_calls = 0
             pending = {}
@@ -373,6 +401,7 @@ class NanoAgent:
                 raise ValueError('Agent exceeded its bounded execution rounds')
         if not set(DELIVERABLES) <= set(self.artifacts):
             raise ValueError('Agent is missing a required deliverable')
+        self.apply_reviewed_cover()
         result = {'seconds': time.monotonic() - began, 'rehearsed_plan': self.rehearsed, 'artifacts': self.artifacts, 'steps': self.steps}
         (self.folder / 'result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2))
         self.event('complete', seconds=result['seconds'])

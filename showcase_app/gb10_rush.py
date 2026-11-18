@@ -1,10 +1,13 @@
 """Actual six-job Nano Rush; the same jobs are used by qualification and the stage."""
 import asyncio
+import copy
 import base64
 import json
 import logging
 import re
 import time
+import hashlib
+import zipfile
 from pathlib import Path
 
 import httpx
@@ -13,6 +16,7 @@ from showcase_app.gb10_agent import ACCOUNT, FILES, ROOT, image_job, object_sche
 from showcase_app.gb10_client import LEAD, WORKER, infer, json_content
 from showcase_app.gb10_miniapp import validate_app
 from showcase_app.gb10_image_policy import RUSH_PROMPT
+from showcase_app.gb10_errors import public_failure
 
 VOICE_LINE = 'Six jobs, four models, one Nano. Everything ran locally.'
 APP_PROMPT = '''Write a complete self-contained HTML ROI calculator using only semantic HTML controls and inline vanilla JavaScript. The host adds the trusted stage layout, labels and styling: do not generate CSS, decorative markup, headers, frameworks or external resources. Keep the whole HTML under1200 characters. Include numeric inputs with ids hourly (default75), hours (default20), cost (default500); button id calculate; outputs id net and id roi. net=hourly*hours-cost. roi=net/cost*100 with percent, or N/A when cost is zero. Calculate on load and on button click using the current inputs. Direct arithmetic only, no eval. Label assumptions fictional, source date2026-11-08. Return JSON with one key html containing the entire working file. No Markdown.'''
@@ -59,8 +63,28 @@ class NanoRush:
         return {**checked, 'model': result['model'], 'routing': result['routing']}
 
     async def images(self):
-        return await image_job(RUSH_PROMPT,
+        result = await image_job(RUSH_PROMPT,
             self.run_id, self.purpose, batch=4, width=1024, height=576, on_update=lambda job: self.event('images_progress', job=job))
+        if len(result.get('briefs', [])) != 4 or len(result.get('files', [])) != 4:
+            raise ValueError('Pilot image kit is incomplete')
+        manifest = {'account': 'Northwind Regional Health (fictional)', 'purpose': 'Proposed local AI planning pilot',
+                    'notice': 'Generated concept illustrations, not a real customer site, clinical scene or approved deployment.',
+                    'model': result['model'], 'images': []}
+        kit = self.folder / 'pilot-image-kit.zip'
+        with zipfile.ZipFile(kit, 'w', compression=zipfile.ZIP_STORED) as archive:
+            for index, (name, brief) in enumerate(zip(result['files'], result['briefs']), 1):
+                if not re.fullmatch(r'[a-f0-9]{32}-[1-4]\.png', name) or not re.fullmatch(r'[a-z-]+', brief['id']):
+                    raise ValueError('Invalid reviewed image kit identity')
+                path = ROOT / 'state/stage/creative' / name
+                if path.is_symlink():
+                    raise ValueError('Image kit cannot contain linked files')
+                filename = f'{index:02d}-' + brief['id'] + '.png'
+                archive.write(path, filename)
+                manifest['images'].append({**brief, 'file': filename, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+            archive.writestr('image-briefs.json', json.dumps(manifest, ensure_ascii=False, indent=2))
+            archive.writestr('README.txt', 'NORTHWIND PILOT PROPOSAL IMAGE KIT\n\n' + manifest['notice'] + '\n\n' +
+                '\n'.join(f"{row['file']}: {row['title']} — {row['use']}" for row in manifest['images']))
+        return {**result, 'kit_file': kit.name}
 
     async def chart(self):
         image = base64.b64encode((ROOT / 'samples/stage/vision/chart.png').read_bytes()).decode()
@@ -135,16 +159,23 @@ class NanoRush:
             self.event('job', job=dict(row))
             result = await function()
             row.update(status='complete', seconds=time.monotonic() - began, result=result)
+        except asyncio.CancelledError:
+            row.update(status='interrupted', seconds=time.monotonic() - began)
+            raise
         except Exception as exc:
             logging.exception('Nano Rush job failed name=%s', name)
-            row.update(status='failed', seconds=time.monotonic() - began, error=type(exc).__name__)
-        self.event('job', job=dict(row))
+            row.update(status='failed', seconds=time.monotonic() - began, error=type(exc).__name__, failure=public_failure(exc))
+        finally:
+            self.event('job', job=dict(row))
 
-    async def run(self):
+    async def run(self, previous=None):
         began = time.monotonic()
-        await asyncio.gather(*(self.job(name, function) for name, function in [
-            ('risks', self.risks), ('app', self.app), ('images', self.images), ('chart', self.chart),
-            ('translation', self.translate), ('voice' if self.audio else 'summary', self.voice_or_summary)]))
+        operations = [('risks', self.risks), ('app', self.app), ('images', self.images), ('chart', self.chart),
+                      ('translation', self.translate), ('voice' if self.audio else 'summary', self.voice_or_summary)]
+        if previous:
+            self.jobs = copy.deepcopy(previous)
+        await asyncio.gather(*(self.job(name, function) for name, function in operations
+                               if self.jobs.get(name, {}).get('status') != 'complete'))
         result = {'seconds': time.monotonic() - began, 'done': sum(job['status'] == 'complete' for job in self.jobs.values()), 'jobs': self.jobs}
         (self.folder / 'result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2))
         return result

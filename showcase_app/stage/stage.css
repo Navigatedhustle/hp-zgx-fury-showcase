@@ -95,3 +95,62 @@ body.boost{--bg:#12273a;--panel:#1e384d;--meta:#d5e8f6;--head:#f1faff;--line:#66
 .rush-layout .jobs td{padding:1.15vh .15vw}
 .agent-task{gap:.7vh}.agent-identity img{width:4.6vh;height:4.6vh}.agent-identity{padding-bottom:.5vh}
 .agent-task{gap:.5vh}
+/* Each generated image is a named proposal deliverable. */
+.kit-image{display:flex;flex-direction:column;gap:.45vh;margin:0;min-width:0;min-height:0}
+.image-batch .kit-image img{height:0;flex:1;min-height:0;width:100%;object-fit:cover;border-radius:5px}
+.kit-image figcaption{flex:none;color:var(--head);font-size:.5em;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artifact-download{color:var(--lift);text-decoration:underline;text-underline-offset:.22em}
+
+/* Leave a presentation from any scene without a keyboard reset. */
+.stage-actions{display:flex;align-items:center;gap:1.4vw;flex:none}
+.free-exit{position:relative;z-index:25;display:inline-flex;align-items:center;justify-content:center;gap:.6em;white-space:nowrap;cursor:pointer;border:1px solid #6195ac;border-radius:7px;background:#102c3c;color:#c9f7ff;padding:.5em .75em;font-size:.58em;font-weight:700;line-height:1.25}
+.free-exit:hover{background:#19475a;border-color:#84eaf1}
+.free-exit:disabled{cursor:wait;opacity:.7}
+.free-exit-primary{align-self:center;font-size:.78em;margin-top:2vh;padding:.8em 1.2em;background:#67dfea;color:#052231;border-color:#67dfea}
+.free-exit-primary:hover{background:#a2f3f7}
+.ready-links .free-exit{font-size:inherit}
+
+.live-failure{left:5vw;right:5vw;bottom:2vh;font-size:.68em;display:flex;align-items:center;justify-content:space-between;gap:1.5vw;padding:1.4vh 1.6vw}
+.live-failure p{margin-top:.4em;max-width:70ch}.recovery-actions{display:flex;gap:.6vw;flex-wrap:wrap;flex:none}
+.recovery-actions button,.retry-preparation{border:1px solid #76cddc;border-radius:6px;background:#143447;color:#e8fbff;padding:.65em .8em;font-size:.9em;min-height:38px;cursor:pointer}
+.recovery-actions button:first-child{background:#67dfea;color:#052231;font-weight:700}.retry-preparation{margin-top:1vh;align-self:flex-start}
+@media(max-width:1400px){.live-failure{align-items:flex-start;flex-direction:column;gap:1vh}.recovery-actions{gap:1vw}}
+
+.recovery-actions button:disabled{opacity:.65;cursor:wait}
+/* Status notices must never intercept recovery or navigation controls. */
+#notice{pointer-events:none;bottom:auto;top:18vh;left:5vw;right:5vw}
+
+/* Keep the scale story and both cost periods visible for the entire closing beat. */
+.economics-layout{display:flex;flex-direction:column;gap:1.2vh;overflow:auto}
+.projection-baseline{display:flex;justify-content:space-between;gap:1vw;font-size:.67em;color:var(--head);line-height:1.4}
+.local-proof{color:var(--good);white-space:nowrap}
+.projection-scale{display:flex;justify-content:space-between;align-items:center;gap:1vw;border:1px solid #31566c;background:#0b1e2d;border-radius:10px;padding:1.3vh 1.3vw}
+.projection-scale>div{display:flex;align-items:center;gap:.7vw;min-width:0}
+.projection-scale strong{font-size:1.5em;line-height:1;color:#89edf0;font-variant-numeric:tabular-nums}
+.projection-scale span{font-size:.58em;line-height:1.4;max-width:17ch;color:var(--head)}
+.projection-scale>b{font-weight:400;color:var(--meta)}
+.projection-usage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5vw}
+.projection-usage article{display:flex;flex-direction:column;gap:.45vh;padding:.7vh 1vw;border-left:3px solid #3ca9b9}
+.projection-usage .section{font-size:.55em}.projection-usage strong{font-size:1.2em;line-height:1.2;font-variant-numeric:tabular-nums}
+.projection-usage strong small{font-size:.48em;font-weight:400;color:var(--head)}
+.projection-usage article>span:not(.section),.projection-usage article>small{font-size:.55em;color:var(--meta);line-height:1.3}
+.cost-charts{display:grid;grid-template-columns:1fr 1fr;gap:1.5vw;flex:1;min-height:26vh}
+.cost-chart{display:flex;flex-direction:column;justify-content:space-between;padding:1.4vh 1.2vw;overflow:visible}
+.chart-heading{display:flex;justify-content:space-between;align-items:baseline;gap:1vw}.chart-heading h2{font-size:1.05em;color:#edfaff}.chart-heading>span{font-size:.52em;color:var(--meta)}
+.chart-zero{display:flex;gap:.5vw;font-size:.46em;color:var(--meta);margin:.6vh 0}.chart-zero>span{margin-left:auto}
+.cost-row{display:grid;grid-template-columns:minmax(108px,30%) minmax(0,1fr) minmax(75px,21%);gap:.6vw;align-items:center;padding:.65vh 0;border-top:1px solid #223d50}
+.cost-label{display:flex;flex-direction:column;gap:.25vh;min-width:0}.cost-label strong{font-size:.62em;line-height:1.3;color:var(--head)}.cost-label small{font-size:.43em;line-height:1.3;color:var(--meta)}
+.cost-bar{min-width:0}.cost-bar svg{display:block;width:100%;height:2.1vh;min-height:10px}.bar-track{fill:#1d3449}.bar-fill{fill:#8ea6f8}.nano-cost .bar-fill{fill:#79e9c6}.nano-cost .cost-label strong,.nano-cost .cost-value{color:#87efcf}
+.cost-value{text-align:right;white-space:nowrap;font-size:.83em;font-variant-numeric:tabular-nums}
+.economics-notes{display:grid;gap:.4vh;font-size:.5em;color:var(--meta);line-height:1.4}
+.economics-bottom{display:flex;justify-content:space-between;align-items:center;gap:1vw;padding-top:.6vh;border-top:1px solid #31536b}
+.economics-bottom>span{font-size:.85em;font-weight:700;color:var(--good)}.economics-bottom>div{display:flex;gap:1vw}.economics-bottom .free-exit{font-size:.59em;margin:0}
+.economics-empty{flex-direction:column;justify-content:center;align-items:flex-start}.economics-empty p{font-size:.8em;color:var(--meta)}
+#economics-dialog{width:min(1000px,92vw);max-height:88vh;overflow:auto;padding:24px;border:1px solid #4d96ae;border-radius:14px;background:#0b1b2b;color:#e2f5ff;font:16px/1.5 Arial,Helvetica,sans-serif}
+#economics-dialog::backdrop{background:#020812cf}.economics-dialog-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px}#economics-dialog h2{font-size:25px}#economics-dialog h3{font-size:18px;margin-top:24px}#economics-dialog p{font-size:14px;margin:12px 0;color:#adc7d9}
+#economics-dialog button{cursor:pointer;background:#174b60;border:1px solid #67dce6;border-radius:6px;padding:10px 16px;color:white}#economics-dialog button[aria-label]{padding:4px 12px;font-size:24px}
+.electricity-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.electricity-fields label{display:flex;flex-direction:column;gap:5px;font-size:14px}.electricity-fields input{width:100%;padding:9px;background:#08131f;border:1px solid #59879d;border-radius:6px;color:white}
+.pricing-table{overflow:auto}#economics-dialog table{width:100%;border-collapse:collapse;font-size:14px}#economics-dialog td,#economics-dialog th{padding:10px;text-align:left;vertical-align:top;border-bottom:1px solid #2b4b60}#economics-dialog td small{display:block;max-width:65ch;font-size:12px;color:#adc7d9;margin-top:5px}#economics-dialog th:not(:first-child){white-space:nowrap}
+@media(max-width:1100px){.cost-charts{grid-template-columns:1fr;min-height:60vh}.economics-bottom{flex-wrap:wrap}.projection-baseline{flex-wrap:wrap}.cost-value{font-size:1em}.projection-scale{flex-wrap:wrap}}
+
+.projection-scale span>small{display:block;color:var(--meta);font-size:.85em;margin-top:.35vh;max-width:22ch}

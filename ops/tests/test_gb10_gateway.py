@@ -72,3 +72,26 @@ def test_keepalive_is_bounded_and_tagged_outside_live_accounting(gateway, monkey
     with g.connect() as db:
         assert db.execute('SELECT output_tokens,purpose FROM events').fetchone() == (2, 'keepalive')
         assert db.execute("SELECT coalesce(sum(output_tokens),0) FROM events WHERE purpose='live'").fetchone()[0] == 0
+
+
+def test_idle_artwork_review_allows_only_the_exact_two_boolean_probe(gateway, monkeypatch):
+    from showcase_app.gb10_image_policy import STAGE_REVIEW_SCHEMA
+    g = gateway
+    real = httpx.AsyncClient
+    monkeypatch.setattr(g.httpx, 'AsyncClient', lambda **kw: real(transport=httpx.MockTransport(
+        lambda req: httpx.Response(200, json={'choices': [], 'usage': {'prompt_tokens': 4, 'completion_tokens': 12}})), **kw))
+    payload = {'model': g.MODEL, 'messages': [{'role': 'user', 'content': 'Review'}], 'max_tokens': 32,
+               'response_format': {'type': 'json_schema', 'json_schema': {
+                   'name': 'artwork_text_check', 'strict': True, 'schema': STAGE_REVIEW_SCHEMA}}}
+    headers = {'x-stage-purpose': 'keepalive', 'x-stage-run': 'idle-image', 'x-fury-role': 'image_text_check'}
+    with TestClient(g.app) as client:
+        path = '/stage/vision/v1/chat/completions'
+        assert client.post(path, json={**payload, 'max_tokens': 33}, headers=headers).status_code == 422
+        assert client.post(path, json={**payload, 'tools': [{}]}, headers=headers).status_code == 422
+        assert client.post(path, json={**payload, 'response_format': {'type': 'json_object'}}, headers=headers).status_code == 422
+        assert client.post('/stage/keepalive/v1/chat/completions', json=payload, headers=headers).status_code == 422
+        assert client.post(path, json=payload, headers={**headers, 'x-fury-role': 'language'}).status_code == 422
+        assert client.post(path, json=payload, headers=headers).status_code == 200
+    with g.connect() as db:
+        assert db.execute('SELECT output_tokens,purpose FROM events').fetchone() == (12, 'keepalive')
+        assert db.execute("SELECT count(*) FROM events WHERE purpose='live'").fetchone()[0] == 0

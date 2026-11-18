@@ -2,25 +2,33 @@
 
 Seven interactive local AI experiences and a fast-starting Executive Stage on the HP ZGX Nano / NVIDIA GB10, with the supplied official HP logo, original robot artwork and the complete portable installer.
 
-**Nano preview v3.2.0-nano.2** · Ubuntu 24.04 ARM64 · 128 GB unified memory · working NVIDIA driver/CUDA toolkit · 200 GiB free installation space. Selected model files: about 95.9 GiB. This is a community demonstration, not an officially supported or endorsed HP or NVIDIA product.
+**Nano preview v3.2.0-nano.3** · Ubuntu 24.04 ARM64 · 128 GB unified memory · working NVIDIA driver/CUDA toolkit · 200 GiB free installation space. Selected model files: about 95.9 GiB. This is a community demonstration, not an officially supported or endorsed HP or NVIDIA product.
 
 ```bash
-git clone --branch v3.2.0-nano.2 --depth 1 \
+git clone --branch v3.2.0-nano.3 --depth 1 \
   https://github.com/Navigatedhustle/hp-zgx-fury-showcase.git hp-zgx-nano
 cd hp-zgx-nano
 ./install.sh
 ./launch.sh free
 ```
 
-Open **http://127.0.0.1:18808/free**, or use the installed **HP ZGX Nano Experience** desktop/application shortcut. Switch to Presenter Mode from the sidebar, or run `./launch.sh stage`. With models already resident, measured functional preparation was about 5.6–7.1 seconds; cold install/model loading is separate. Full rehearsal and verified-recording protection remain available explicitly.
+Open **http://127.0.0.1:18808/free**, or use the installed **HP ZGX Nano Experience** desktop/application shortcut. Switch to Presenter Mode from the sidebar, or run `./launch.sh stage`. With models already resident, the current source reliability checks prepared the stage in about 7–9 seconds; cold install/model loading is separate. Full rehearsal and verified-recording protection remain available explicitly. Use **Back to Free Mode** in the presenter header or on step 05 to end the show and return directly to the hub.
+
+Presenter images now support the fictional Northwind pilot proposal: a generated cover embedded in the briefing and a downloadable four-image kit for the CIO briefing, private workspace, team workshop and pilot planning. Each image is reviewed locally for subject relevance and unwanted lettering before release. [Contextual-image verification](docs/verification/nano_contextual_images.json).
 
 `./install.sh --check` inspects prerequisites; `./install.sh --no-desktop` supports headless preparation. Setup downloads pinned dependencies and model files and verifies their recorded hashes. It never replaces a driver, changes networking or disables a sandbox. Only one model stack should run on this GPU.
 
-[Complete install and presenter guide](docs/NANO_GUIDE.md) · [Download the guide PDF](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.2.0-nano.2/HP-ZGX-Nano-Complete-Guide.pdf) · [Public Nano release](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/tag/v3.2.0-nano.2) · [Capabilities](docs/FREE_MODE.md) · [Verification and limits](docs/verification/nano_collective_ui.json)
+[Fresh Nano quickstart](docs/NANO_QUICKSTART.md) · [Quickstart PDF](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.2.0-nano.3/HP-ZGX-Nano-Quickstart.pdf) · [Complete guide](docs/NANO_GUIDE.md) · [Complete guide PDF](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.2.0-nano.3/HP-ZGX-Nano-Complete-Guide.pdf) · [Download the share kit](https://github.com/Navigatedhustle/hp-zgx-fury-showcase/releases/download/v3.2.0-nano.3/HP-ZGX-Nano-v3.2.0-nano.3-share-kit.zip)
+
+The final presenter scene now scales measured text tokens across **10 customers per employee per day × 200 employees × 30 days × 12 months**, with persistent monthly/yearly frontier API and Nano electricity charts. Electricity assumptions are editable and official pricing sources are linked. [Economics verification](docs/verification/nano_economics.json).
+
+![Closing cost comparison — illustrative token counts](docs/screenshots/nano-economics.png)
+
+*Layout example with explicitly illustrative token counts; actual runs use their own recorded ledger. Electricity is an assumed 200-device fleet, not a wall-power measurement. Annual costs hold the dated rates constant.*
 
 ![Nano Collective experience center](docs/screenshots/nano-collective.png)
 
-This is a functional Nano preview, not full keynote qualification. One actual live five-scene show passed; no ten-show, 45-minute idle or zero-swap claim is made. The full Fury/GB300 profile below is separate and requires its documented hardware capacity.
+This is a functional Nano preview, not full keynote qualification. The current source reliability pass completed two normal five-scene shows, recovered a third show from a deliberately stopped image service while retaining five completed Rush results, and completed all seven Free Mode experiences. No ten-show or 45-minute idle qualification is claimed. [Reliability fixes and verification](docs/verification/nano_reliability.json).
 
 ---
 

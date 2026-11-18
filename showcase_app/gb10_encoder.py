@@ -2,6 +2,23 @@
 import torch
 
 
+def restore_conditioning_ties(encoder):
+    """FP8 Linear quantization unties the unused LM head from input embeddings.
+
+    Restore the checkpoint's original sharing before materialization. FLUX uses
+    only model hidden states, so its conditioning values remain unchanged.
+    """
+    if not getattr(encoder.config, 'tie_word_embeddings', False):
+        return {'restored': False, 'duplicate_parameters_released': 0}
+    embedding, projection = encoder.get_input_embeddings(), encoder.get_output_embeddings()
+    if embedding is None or projection is None or embedding.weight.shape != projection.weight.shape:
+        raise ValueError('Unexpected tied image encoder projection')
+    duplicate = projection.weight is not embedding.weight
+    count = projection.weight.numel() if duplicate else 0
+    projection.weight = embedding.weight
+    return {'restored': duplicate, 'duplicate_parameters_released': count}
+
+
 class ImageConditioningEncoder(torch.nn.Module):
     def __init__(self, encoder):
         super().__init__()

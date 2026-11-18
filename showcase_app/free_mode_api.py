@@ -32,9 +32,9 @@ CATALOG = [
     {'id': 'factory', 'name': 'Agent Factory', 'tag': 'Build something useful', 'model': 'gpt-oss + Qwen',
      'description': 'Plan and build an interactive browser app with live preview and source.', 'mark': 'F',
      'prompt': 'Build a polished ROI calculator with hourly rate, hours saved per month, and monthly cost. Show net monthly value = rate * hours - cost and ROI = net / cost * 100. Handle zero cost. Label inputs fictional.'},
-    {'id': 'images', 'name': 'Image Studio', 'tag': 'Imagine in materials', 'model': 'FLUX.2 klein 4B',
+    {'id': 'images', 'name': 'Image Studio', 'tag': 'Proposal visuals', 'model': 'FLUX.2 klein 4B',
      'description': 'Create original artwork with your own prompt, style, size and seed.', 'mark': 'I',
-     'prompt': 'A sculptural cobalt aluminum ribbon resting on an obsidian plinth in a dark architectural studio, refined reflections and confident negative space.'},
+     'prompt': 'Architectural illustration for a fictional Northwind local AI pilot proposal: a welcoming low-rise healthcare administration building, landscaped courtyard, oak entrance canopy, large windows, morning light and restrained navy accents. Human-scale, recognizable administrative campus. No signage, people, logos or writing. This is a fictional concept, not a real customer site.'},
     {'id': 'vision', 'name': 'Vision Lab', 'tag': 'From image to insight', 'model': 'Qwen3.6 vision',
      'description': 'Inspect a whiteboard, chart or public sample and extract its details.', 'mark': 'V',
      'prompt': 'Read this image carefully. Extract the visible text and numbers, then summarize the key takeaways.'},
@@ -148,6 +148,7 @@ class FreeMode:
         self.voice_slot = asyncio.Semaphore(1)
         self.session = 'free_' + uuid.uuid4().hex
         self.editing = set()
+        self.recovering = False
         self.switching = False
         self.load()
 
@@ -219,6 +220,46 @@ class FreeMode:
         finally:
             self.switching = False
 
+    async def exit_presenter(self):
+        """End the show and transfer ownership without rehearsing another show."""
+        if self.switching or self.show.resetting or getattr(self.show, 'maintenance', False):
+            raise HTTPException(409, 'A mode change or recovery is in progress. Try again in a moment.')
+        if self.active:
+            return
+        self.switching = True
+        try:
+            # Reset cancels owned work, drains the renderer and clears this
+            # presentation's outputs. No model reload or inference is needed.
+            await self.show.reset(prepare=False)
+            deadline = time.monotonic() + 20
+            while True:
+                health = await self.show.fetch_health()
+                if not any(health.get(name, {}).get('active') or health.get(name, {}).get('queued')
+                           for name in ('gateway', 'image', 'tts')):
+                    break
+                if time.monotonic() >= deadline:
+                    raise HTTPException(409, 'Local work is still stopping. Try Back to Free Mode again in a moment.')
+                await asyncio.sleep(.15)
+            self.active = True
+            self.show.keepalive_at = time.monotonic()
+        finally:
+            self.switching = False
+
+    async def recover_services(self):
+        if not self.active or self.switching or self.busy() or self.show.resetting or getattr(self.show, 'maintenance', False):
+            raise HTTPException(409, 'Wait for active work or mode changes to finish before recovering models.')
+        self.switching = self.recovering = True
+        try:
+            await self.show.recover()
+            self.show.health = await self.show.fetch_health()
+            if not all(self.show.health.get(name, {}).get('ready') for name in ('lead', 'text', 'image', 'tts', 'gateway')):
+                raise RuntimeError('A local service is still unavailable')
+        except Exception:
+            logging.exception('Free Mode service recovery failed')
+            raise HTTPException(503, 'Local model recovery did not finish. Your inputs and outputs are kept; try again or check model status.')
+        finally:
+            self.switching = self.recovering = False
+
     def submit(self, specs):
         self.available()
         if len(specs) + sum(row['status'] in ACTIVE for row in self.jobs.values()) > 12:
@@ -257,8 +298,9 @@ class FreeMode:
             job.update(status='cancelled', phase='Cancelled')
         except Exception as exc:
             logging.error('Free Mode job failed demo=%s id=%s type=%s', spec.demo, job['id'], type(exc).__name__)
-            error = str(exc) if isinstance(exc, ValueError) else 'The local job could not finish. Check model status and try again.'
-            job.update(status='failed', phase='Failed', error=error)
+            from showcase_app.gb10_errors import WorkflowError, public_failure
+            error = str(exc) if isinstance(exc, (ValueError, WorkflowError)) else 'The local job could not finish. Check model status and try again.'
+            job.update(status='failed', phase='Failed', error=error, failure=public_failure(exc))
         finally:
             job.pop('partial', None)
             job['ended'] = time.time()
@@ -308,7 +350,7 @@ def create_router(show):
 
     @router.get('/free/api/state')
     async def state():
-        return {'mode': 'free' if manager.active else 'presenter', 'catalog': CATALOG, 'languages': LANGUAGES,
+        return {'mode': 'free' if manager.active else 'presenter', 'recovering': manager.recovering, 'busy': manager.busy(), 'catalog': CATALOG, 'languages': LANGUAGES,
                 'jobs': sorted(manager.jobs.values(), key=lambda row: row['created'], reverse=True),
                 'health': show.health, 'telemetry': {key: show.telemetry.get(key) for key in ('gpu', 'available', 'total', 'external_calls', 'clock')},
                 'totals': manager.totals(), 'warming': bool(show.warm_task and not show.warm_task.done()),
@@ -322,6 +364,16 @@ def create_router(show):
     async def mode(value: Mode):
         await manager.set_mode(value.mode == 'free')
         return {'mode': value.mode}
+
+    @router.post('/free/api/recover')
+    async def recover_models():
+        await manager.recover_services()
+        return {'ready': True}
+
+    @router.post('/free/api/presenter-exit')
+    async def presenter_exit():
+        await manager.exit_presenter()
+        return {'mode': 'free'}
 
     @router.post('/free/api/jobs', status_code=202)
     async def submit(spec: JobRequest):

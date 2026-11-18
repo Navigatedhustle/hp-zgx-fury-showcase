@@ -19,7 +19,9 @@ from atlas.offline_guard import install
 install()
 from showcase_app.creative import CreativeLane
 from showcase_app.gateway import execution_end, execution_start, record
-from showcase_app.gb10_image_policy import stage_prompt, check_artwork, NO_LETTERING
+from showcase_app.gb10_image_policy import stage_prompt, stage_brief, check_artwork, NO_LETTERING, STAGE_CONDITIONING_TOKENS
+
+from showcase_app.gb10_errors import WorkflowError, is_memory_error, public_failure
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'state/stage/creative'
@@ -39,32 +41,58 @@ async def work():
             pending.mkdir(parents=True, exist_ok=False)
             accepted = []
             aggregate = {'render_seconds': 0, 'gpu_peak_allocated_bytes': 0, 'gpu_peak_reserved_bytes': 0}
-            job.update(policy='Text-free studio material study', checker_model='Qwen3.6-35B-A3B', text_rejections=0, images_generated=0, text_checks=[], _private=True)
+            stage = getattr(spec, 'art_direction', 'stage') == 'stage'
+            briefs = [stage_brief(spec.batch, index) for index in range(spec.batch)] if stage else []
+            job.update(policy='Fictional Northwind planning-pilot visuals' if stage else 'User-directed wordless artwork',
+                       briefs=[{key: brief[key] for key in ('id', 'title', 'use')} for brief in briefs],
+                       checker_model='Qwen3.6-35B-A3B', text_rejections=0, relevance_rejections=0,
+                       images_generated=0, text_checks=[], _private=True)
             for index in range(spec.batch):
                 for attempt in range(2):
                     if job['_stop'].is_set():
                         raise InterruptedError('Artwork job cancelled')
                     path = pending / (str(index) + '-' + str(attempt) + '.png')
-                    job.update(phase='rendering', stage='Rendering text-free artwork', batch_index=index + 1)
+                    job.update(phase='rendering', stage='Rendering ' + briefs[index]['title'] if stage else 'Rendering wordless artwork', batch_index=index + 1)
                     prompt = free_prompt(spec) if getattr(spec, 'art_direction', 'stage') == 'free' else stage_prompt(spec.batch, index)
-                    metrics = await asyncio.to_thread(lane.run, 'image', prompt, path, job['_stop'],
-                        {'width': spec.width, 'height': spec.height, 'batch': 1, 'seed': spec.seed + index + attempt * 1009}, job)
+                    while True:
+                        retry_memory = False
+                        try:
+                            metrics = await asyncio.to_thread(lane.run, 'image', prompt, path, job['_stop'],
+                                {'width': spec.width, 'height': spec.height, 'batch': 1, 'seed': spec.seed + index + attempt * 1009, 'public_index': index + 1, 'public_total': spec.batch, 'public_title': briefs[index]['title'] if stage else 'Wordless artwork', **({'max_sequence_length': STAGE_CONDITIONING_TOKENS} if stage else {})}, job)
+                            break
+                        except Exception as exc:
+                            if is_memory_error(exc) and job.get('memory_retries', 0) < 1:
+                                retry_memory = True
+                            else:
+                                raise
+                        if retry_memory:
+                            # Leave the exception scope before collecting tensors
+                            # retained by its traceback. One retry per whole job.
+                            from showcase_app.gb10_memory import release_unused_buffers
+                            job['memory_retries'] = job.get('memory_retries', 0) + 1
+                            job.update(phase='waiting', stage='Releasing unused image buffers before one retry')
+                            await asyncio.to_thread(release_unused_buffers)
+                            await asyncio.sleep(.3)
+                            if job['_stop'].is_set():
+                                raise InterruptedError('Artwork job cancelled')
+
                     aggregate['render_seconds'] += metrics['render_seconds']
                     for key in ('gpu_peak_allocated_bytes', 'gpu_peak_reserved_bytes'):
                         aggregate[key] = max(aggregate[key], metrics[key])
                     job['images_generated'] += 1
-                    job.update(phase='checking', stage='Checking for lettering')
-                    check = await check_artwork(path, spec.run_id, spec.purpose)
+                    job.update(phase='checking', stage='Checking subject and lettering' if stage else 'Checking for lettering')
+                    check = await check_artwork(path, spec.run_id, spec.purpose, brief=briefs[index]) if stage else await check_artwork(path, spec.run_id, spec.purpose)
                     job['text_checks'].append({'image': index + 1, 'attempt': attempt + 1, **check})
-                    if not check['text']:
+                    if not check['text'] and (not stage or check.get('relevant') is True):
                         accepted.append(path)
                         break
                     path.unlink(missing_ok=True)
-                    job['text_rejections'] += 1
-                    job['stage'] = 'Lettering rejected; generating a new image'
-                    logging.info('Artwork lettering rejected id=%s image=%s attempt=%s', job['id'], index + 1, attempt + 1)
+                    reason = 'text' if check['text'] else 'relevance'
+                    job['text_rejections' if check['text'] else 'relevance_rejections'] += 1
+                    job['stage'] = 'Lettering rejected; generating a new image' if check['text'] else 'Visual brief not met; generating a new image'
+                    logging.info('Artwork rejected id=%s image=%s attempt=%s reason=%s', job['id'], index + 1, attempt + 1, reason)
                 else:
-                    raise ValueError('Artwork still contains lettering after two live attempts')
+                    raise WorkflowError('image_review', 'An image did not pass local subject or lettering review. Retry the image task.')
                 job['images_done'] = len(accepted)
             if job['_stop'].is_set():
                 raise InterruptedError('Artwork job cancelled')
@@ -74,13 +102,13 @@ async def work():
                 path.replace(target)
                 files.append(target.name)
             pending.rmdir()
-            job.update(status='complete', phase='complete', stage='Text check clear', ended=time.time(), files=files, **aggregate)
+            job.update(status='complete', phase='complete', stage='Visual brief and lettering review passed' if stage else 'Text check clear', ended=time.time(), files=files, **aggregate)
             record(job['id'], 'stage_image', 'image', 'FLUX.2-klein-4B', 'complete', began,
                    run_id=spec.run_id, purpose=spec.purpose, images=job['images_generated'])
         except Exception as exc:
             logging.exception('GB10 image job failed id=%s', job['id'])
-            job.update(status='failed', error=type(exc).__name__, ended=time.time())
-            record(job['id'], 'stage_image', 'image', 'FLUX.2-klein-4B', 'failed', began,
+            job.update(status='cancelled' if job['_stop'].is_set() else 'failed', error=type(exc).__name__, failure=public_failure(exc), ended=time.time())
+            record(job['id'], 'stage_image', 'image', 'FLUX.2-klein-4B', job['status'], began, images=job.get('images_generated', 0),
                    error=type(exc).__name__, run_id=spec.run_id, purpose=spec.purpose)
         finally:
             import shutil
@@ -144,7 +172,7 @@ async def health():
             'active': sum(job['status'] == 'running' for job in jobs.values()),
             'render_active': sum(job['status'] == 'running' and job.get('phase') == 'rendering' for job in jobs.values()), 'queued': queue.qsize(), 'limit': 1,
             'parameter_count': getattr(lane, 'parameter_count', None), 'load_timings': getattr(lane, 'load_timings', {}),
-            'weight_file_cache': getattr(lane, 'weight_cache', None), 'load_cleanup': getattr(lane, 'load_cleanup', None)}
+            'weight_file_cache': getattr(lane, 'weight_cache', None), 'load_cleanup': getattr(lane, 'load_cleanup', None), 'conditioning_ties': getattr(lane, 'conditioning_ties', None)}
 
 
 @app.post('/generate')

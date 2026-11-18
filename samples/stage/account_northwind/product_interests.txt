@@ -6,8 +6,12 @@ workstation; large local language models; a bounded agent with read-only sample
 file access; vision extraction; image generation; and multilingual drafting.
 
 Briefing outline: account context, priorities, a bounded local pilot, open risks,
-and next actions. Use exactly five slides. A cover image should be an original,
-calm abstract illustration of connected planning cards beside a small desktop
-computer. Do not use real people, medical imagery, logos, product photography,
-or numerical product claims in the image. Avoid invented budgets, benchmarks,
+and next actions. Use exactly five slides. A cover image should be an original architectural concept of an administrative
+planning suite for this fictional local AI pilot proposal. Use the reviewed
+cover in the opening slide. A four-image proposal kit should support the CIO
+briefing, local workspace discussion, technical workshop invitation and pilot
+planning follow-up. These are fictional concepts, not photographs of a real
+customer site or evidence of an approved deployment. No real people, patients,
+clinical treatment imagery, logos, generated lettering or numerical product
+claims belong in the images. Avoid invented budgets, benchmarks,
 commercial commitments, customer testimonials and legal assurances.

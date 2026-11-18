@@ -30,3 +30,18 @@ def test_unreadable_copy_fails_instead_of_clipping_or_shrinking():
         with pytest.raises(ValueError, match='five slides'):
             slide_svg({}, index)
     assert ''.join(lines('ABCDEFGHIJK', 36, 20)) == 'ABCDEFGHIJK'
+
+
+def test_cover_can_only_embed_a_local_png_and_preserves_slide_copy():
+    slide = {'title': 'A fictional planning pilot', 'subtitle': 'For discussion only',
+             'points': ['Choose a pilot owner.', 'Agree on review measures.']}
+    uri = 'data:image/png;base64,iVBORw0KGgo='
+    vector = slide_svg(slide, 1, cover_uri=uri)
+    root = ET.fromstring(vector)
+    images = [e for e in root.iter() if e.tag.rsplit('}', 1)[-1] == 'image']
+    assert len(images) == 1 and images[0].attrib['href'] == uri
+    assert slide['title'] in ' '.join(root.itertext())
+    assert 'FICTIONAL PILOT CONCEPT' in ' '.join(root.itertext())
+    for source in ['https://example.com/image.png', 'data:image/svg+xml,<svg/>', '" onload="alert(1)']:
+        with pytest.raises(ValueError, match='embedded local PNG'):
+            slide_svg(slide, 1, cover_uri=source)

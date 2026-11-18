@@ -106,7 +106,7 @@ class Proof:
                     await asyncio.sleep(.02)
                     continue
                 raise RuntimeError('Unexpected beat after clicker Next')
-            if row['backup'] or row.get('recording_error') or row['status'] in ('failed', 'interrupted'):
+            if row['backup'] or row.get('recording_error') or row['status'] in ('failed', 'partial', 'interrupted'):
                 self.save('failed-' + BEATS[number] + '.json', s)
                 raise RuntimeError('Live segment failed: ' + str(row.get('failure', row['status'])))
             if row['status'] == 'complete':

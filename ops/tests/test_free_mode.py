@@ -308,3 +308,83 @@ def test_image_export_does_not_leave_hidden_duplicate_after_job_deletion(monkeyp
     assert result['files']==['image-1.png']
     assert (exports/'image-1.png').read_bytes()==b'checked-image'
     assert not (creative/(cid+'.png')).exists()
+
+
+def test_presenter_exit_from_close_is_idempotent_and_skips_preparation(tmp_path):
+    async def run():
+        show = fake_show()
+        show.view = 4
+        calls = []
+        async def reset(*, prepare):
+            calls.append(prepare)
+            show.view = -1
+            show.warm = show.full_warm_complete = False
+        show.reset = reset
+        manager = free.FreeMode(show, tmp_path)
+        manager.active = False
+        await manager.exit_presenter()
+        await manager.exit_presenter()
+        assert calls == [False]
+        assert manager.active and not manager.switching
+        assert show.view == -1 and not show.warm and show.warm_task is None
+    asyncio.run(run())
+
+
+def test_presenter_exit_waits_for_draining_work_and_blocks_new_jobs(tmp_path):
+    async def run():
+        show = fake_show()
+        entered, release = asyncio.Event(), asyncio.Event()
+        async def reset(*, prepare):
+            assert prepare is False
+            show.view = -1
+        async def health():
+            entered.set()
+            return {'image': {'active': not release.is_set()}}
+        show.reset, show.fetch_health = reset, health
+        manager = free.FreeMode(show, tmp_path)
+        manager.active = False
+        switching = asyncio.create_task(manager.exit_presenter())
+        await entered.wait()
+        assert manager.switching and not manager.active
+        with pytest.raises(HTTPException):
+            manager.submit([free.JobRequest(demo='atlas', prompt='Wait for ownership')])
+        with pytest.raises(HTTPException):
+            await manager.exit_presenter()
+        release.set()
+        await switching
+        assert manager.active and not manager.switching
+    asyncio.run(run())
+
+
+def test_presenter_exit_endpoint_rejects_foreign_origin(api):
+    app, manager = api
+    manager.active = False
+    with TestClient(app, base_url='http://127.0.0.1:18808') as client:
+        assert client.post('/free/api/presenter-exit', json={}, headers={'origin':'https://foreign.invalid'}).status_code == 403
+    assert not manager.active
+
+
+def test_free_mode_recovers_models_without_losing_jobs_or_admitting_new_work(tmp_path):
+    async def run():
+        show = fake_show()
+        entered, release = asyncio.Event(), asyncio.Event()
+        async def recover(): entered.set();await release.wait()
+        async def health(): return {name: {'ready': True} for name in ('lead','text','image','tts','gateway')}
+        show.recover, show.fetch_health = recover, health
+        manager = free.FreeMode(show, tmp_path);manager.active = True
+        manager.jobs['previous'] = {'status':'complete','result':{'file':'kept.txt'}}
+        work = asyncio.create_task(manager.recover_services())
+        await entered.wait()
+        assert manager.recovering and manager.switching
+        with pytest.raises(HTTPException): manager.submit([free.JobRequest(demo='atlas',prompt='wait')])
+        release.set();await work
+        assert not manager.recovering and not manager.switching and manager.active
+        assert manager.jobs['previous']['result']['file']=='kept.txt'
+    asyncio.run(run())
+
+
+def test_free_recovery_rejects_active_jobs(tmp_path):
+    manager = free.FreeMode(fake_show(), tmp_path);manager.active = True
+    manager.jobs['busy']={'status':'running'}
+    with pytest.raises(HTTPException) as error: asyncio.run(manager.recover_services())
+    assert error.value.status_code==409 and not manager.recovering

@@ -137,7 +137,8 @@ async def images(job, spec, manager, folder):
                 response.raise_for_status()
                 image = response.json()
             if image['status'] != 'complete':
-                raise ValueError('Image generation or local lettering review failed. Try a simpler wordless subject.')
+                from showcase_app.gb10_errors import image_failure
+                raise image_failure(image)
             files = []
             for index, name in enumerate(image['files'], 1):
                 if not re.fullmatch(r'[a-f0-9]{32}(?:-[1-4])?\.png', name):

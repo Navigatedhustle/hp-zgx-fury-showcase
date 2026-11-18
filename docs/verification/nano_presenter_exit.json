@@ -1,0 +1,109 @@
+{
+  "date": "2026-11-10",
+  "profile": "Nano / NVIDIA GB10",
+  "scope": "Presenter navigation and safe mode transfer; not model-quality or event qualification.",
+  "behavior": {
+    "header_exit": "Back to Free Mode on Ready and every presenter scene.",
+    "closing_exit": "Larger return button on both the measured session view and the final closing message.",
+    "ownership": "Stops owned presenter tasks and preparation, drains local work before admitting Free Mode jobs.",
+    "session_cleanup": "Ends and clears the current presentation like the existing reset; download outputs before leaving.",
+    "preparation": "Exit performs no new model inference, rehearsal or model reload. Normal reset behavior is unchanged.",
+    "failure": "A failed transfer stays visible and retryable; concurrent switches and foreign-origin requests are rejected."
+  },
+  "source_tests": 229,
+  "live": {
+    "completed_live_scene_exit_seconds": 0.145,
+    "idle_exit_added_no_inference_calls": true,
+    "running_agent_exit_seconds": 0.159,
+    "exit_during_preparation_seconds": 0.642,
+    "same_resident_model_processes": true,
+    "final_mode": "free",
+    "final_page": "http://127.0.0.1:18808/free",
+    "script_errors": []
+  },
+  "browser": {
+    "scope": "Layout replay of archived real fictional presenter states; actual mode switch tested separately",
+    "layouts": [
+      {
+        "view": -1,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": -1,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 0,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 0,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 1,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 1,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 2,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 2,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 3,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 3,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 4,
+        "width": 1280,
+        "header_exit_visible": true,
+        "overflow": []
+      },
+      {
+        "view": 4,
+        "width": 1920,
+        "header_exit_visible": true,
+        "overflow": []
+      }
+    ],
+    "closing_totals_exit_visible": true,
+    "failed_exit_remains_retryable": true,
+    "script_errors": []
+  },
+  "tests": "Actual reset/cancellation/session cleanup with no preparation; completed-step mode ownership; drain/race protection; foreign-origin protection; browser retry after error.",
+  "limits": [
+    "Scene layouts, including step 05, replay archived fictional presenter data. The live hardware checks exited an actual completed opening scene, an active Agent scene and active preparation.",
+    "Existing image/runtime qualification remains separate."
+  ]
+}

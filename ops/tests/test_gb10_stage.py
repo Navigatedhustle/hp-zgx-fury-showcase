@@ -51,6 +51,7 @@ def test_back_and_multiple_pending_next_never_repeat_or_stack(monkeypatch):
     async def check():
         show = object.__new__(module.Show)
         show.lock = asyncio.Lock()
+        show.session = 'unit'
         show.view = 1
         show.runs = {'S0': {'backup': False}, 'S1': {'backup': False}}
         show.resetting = False
@@ -177,7 +178,7 @@ def test_functional_warmup_has_real_language_vision_image_and_audio_probes(monke
         calls.append(options)
         return {'content': 'Ready', 'finish_reason': 'stop'}
     async def image(*args, **options):
-        calls.append({'image': True, 'purpose': args[2]})
+        calls.append({'image': True, 'purpose': args[2], **options})
         return {'files': ['probe.png']}
     class Client:
         def __init__(self, **options): pass
@@ -193,6 +194,8 @@ def test_functional_warmup_has_real_language_vision_image_and_audio_probes(monke
     assert len(calls) == 5
     assert {row['model'] for row in calls if 'model' in row} == {module.LEAD, module.WORKER}
     assert any(row.get('role') == 'vision_probe' for row in calls)
+    assert next(row for row in calls if row.get('image'))['width'] == 1024
+    assert next(row for row in calls if row.get('image'))['height'] == 576
     assert all(row.get('purpose', 'warmup') == 'warmup' for row in calls)
     assert all(step['status'] == 'complete' and step['seconds'] >= 0 for step in show.preparation['steps'])
     assert not artifact.exists()
@@ -322,3 +325,47 @@ def test_nano_uses_original_supplied_hp_logo(monkeypatch):
     response = asyncio.run(module.logo())
     assert response.media_type == 'image/png'
     assert Path(response.path) == ROOT / 'showcase_app/assets/hp-logo-keyline.png'
+
+
+def test_exit_reset_cancels_owned_work_and_cleans_session_without_inference(monkeypatch, tmp_path):
+    module = stage_module(monkeypatch)
+    monkeypatch.setattr(module, 'STATE', tmp_path)
+    async def run():
+        show = object.__new__(module.Show)
+        show.resetting, show.pending, show.warm, show.full_warm_complete = False, True, True, True
+        show.session, show.view, show.runs, show.attempts = 'exiting', 4, {'S1': {}}, []
+        show.build = {'id': 'test'}
+        show.active_segment = None
+        cancelled = []
+        async def owned():
+            try:
+                await asyncio.sleep(30)
+            except asyncio.CancelledError:
+                cancelled.append(True)
+        show.task = asyncio.create_task(owned())
+        show.warm_task = asyncio.create_task(asyncio.sleep(30))
+        await asyncio.sleep(0)
+        async def forbidden(*args):
+            raise AssertionError('Exiting must not load models or run inference')
+        async def health():
+            return {'image': {'active': 0, 'queued': 0}}
+        show.recover = show.warmup = show.tiny_warm = forbidden
+        show.fetch_health = health
+        show.journal = lambda *args, **kwargs: None
+        show.totals = lambda: {}
+        with sqlite3.connect(tmp_path / 'usage.sqlite') as db:
+            db.execute('CREATE TABLE events(id,run_id,role)')
+            db.execute('INSERT INTO events VALUES(?,?,?)', ('a'*32, 'exiting_S1', 'image'))
+        creative = tmp_path / 'creative'
+        creative.mkdir()
+        image = creative / ('a'*32 + '.png')
+        image.write_bytes(b'private output')
+        output = tmp_path / 'outputs/exiting_S1'
+        output.mkdir(parents=True)
+        (output / 'briefing.html').write_text('private output')
+        await show.reset(prepare=False)
+        assert cancelled and show.task.done() and show.warm_task.done()
+        assert not show.resetting and not show.pending and not show.warm and not show.full_warm_complete
+        assert show.view == -1 and not show.runs and show.session != 'exiting'
+        assert not image.exists() and not output.exists()
+    asyncio.run(run())

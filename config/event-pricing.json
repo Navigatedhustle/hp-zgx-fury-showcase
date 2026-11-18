@@ -74,6 +74,55 @@
     "output": 0.6,
     "source": "https://console.groq.com/docs/model/openai/gpt-oss-120b",
     "verification": "Official model pricing page read with the browsing tool on 2026-11-08. Direct urllib access returned HTTP 403; no API call was made.",
-    "scope": "Hypothetical standard text-token API charge for observed input and output tokens at the dated gpt-oss-120b rates. Excludes images, audio, taxes and tools. Not total cost of ownership. Hosted quantization and performance differ from local MXFP4."
+    "scope": "Hypothetical standard text-token API charge for observed input and output tokens at the dated gpt-oss-120b rates. Excludes images, audio, taxes and tools. Not total cost of ownership. Hosted quantization and performance differ from local MXFP4.",
+    "projection": {
+      "checked": "2026-11-18",
+      "currency": "USD",
+      "customers_per_employee_day": 10,
+      "employees": 200,
+      "days_per_month": 30,
+      "months_per_year": 12,
+      "electricity": {
+        "devices": 200,
+        "watts": 140,
+        "hours_per_day": 8,
+        "usd_per_kwh": 0.15
+      },
+      "models": [
+        {
+          "name": "GPT-6.2 Astra",
+          "provider": "OpenAI",
+          "input": 8,
+          "output": 40,
+          "source": "https://developers.openai.com/api/docs/models/gpt-6.2-astra",
+          "note": "Standard short-context rates; requests above 272K input tokens have higher rates. The local context limit is below that threshold."
+        },
+        {
+          "name": "Claude Fable 5.2",
+          "provider": "Anthropic",
+          "input": 8,
+          "output": 40,
+          "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+          "note": "Standard global routing, no caching or batch discounts."
+        },
+        {
+          "name": "Claude Opus 5.5",
+          "provider": "Anthropic",
+          "input": 4,
+          "output": 20,
+          "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+          "note": "Standard global routing, no caching or batch discounts."
+        },
+        {
+          "name": "Gemini 4 Carbon",
+          "provider": "Google",
+          "input": 2,
+          "output": 10,
+          "source": "https://aistudio.google.com/docs/pricing#gemini-4-carbon",
+          "note": "Promotional standard rates through November 30, 2026. Published rates become $4 input / $20 output per million on December 1. This comparison annualizes today’s rates, not future billing."
+        }
+      ],
+      "scope": "Text-token scenario using this live presentation’s pricing_totals. Repeats the same observed input/output token mix for every customer workflow; no new cloud requests. Excludes vision input, image generation, audio, tools, taxes, discounts and hardware/support costs. Tokenizers, reasoning and output quality differ. Electricity is an assumption, not a wall-power measurement or throughput validation. Annual values are 12 30-day months at the dated rates, not a forecast."
+    }
   }
 }
